@@ -1,0 +1,41 @@
+{
+  "name": "fastify-cookie",
+  "version": "1.0.0",
+  "description": "Plugin for fastify to add support for cookies",
+  "main": "plugin.js",
+  "scripts": {
+    "test": "tap 'test/**/*.test.js'",
+    "lint": "standard | snazzy"
+  },
+  "precommit": [
+    "lint",
+    "test"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/jsumners/fastify-cookie.git"
+  },
+  "keywords": [
+    "fastify",
+    "cookie"
+  ],
+  "author": "James Sumners <james.sumners@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jsumners/fastify-cookie/issues"
+  },
+  "homepage": "https://github.com/jsumners/fastify-cookie#readme",
+  "devDependencies": {
+    "abstract-logging": "^1.0.0",
+    "fastify": "^0.26.2",
+    "pre-commit": "^1.2.2",
+    "request": "^2.81.0",
+    "snazzy": "^7.0.0",
+    "standard": "^10.0.3",
+    "tap": "^10.7.2"
+  },
+  "dependencies": {
+    "cookie": "^0.3.1",
+    "fastify-plugin": "^0.1.1"
+  }
+}
