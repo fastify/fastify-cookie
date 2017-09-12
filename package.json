@@ -13,7 +13,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/jsumners/fastify-cookie.git"
+    "url": "git+ssh://git@github.com/fastify/fastify-cookie.git"
   },
   "keywords": [
     "fastify",
@@ -22,9 +22,9 @@
   "author": "James Sumners <james.sumners@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jsumners/fastify-cookie/issues"
+    "url": "https://github.com/fastify/fastify-cookie/issues"
   },
-  "homepage": "https://github.com/jsumners/fastify-cookie#readme",
+  "homepage": "https://github.com/fastify/fastify-cookie#readme",
   "devDependencies": {
     "abstract-logging": "^1.0.0",
     "fastify": "^0.26.2",
