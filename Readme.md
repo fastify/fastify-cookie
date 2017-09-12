@@ -3,9 +3,9 @@
 A plugin for [Fastify](http://fastify.io/) that adds support for reading and
 setting cookies.
 
-This plugin works via Fastify's `preHandler` hook. You should register it
-prior to any other `preHandler` hooks that will depend upon this plugin's
-actions.
+This plugin's cookie parsing works via Fastify's `preHandler` hook. Therefore,
+you should register it prior to any other `preHandler` hooks that will depend
+upon this plugin's actions.
 
 ## Example
 
@@ -39,7 +39,7 @@ as an object named `cookies`. Thus, if a request contains the header
 ### Sending
 
 The method `setCookie(name, value, options)` is added to the `reply` object
-via the Fastify `preHandler` hook. Thus, in a request handler,
+via the Fastify `decorateReply` API. Thus, in a request handler,
 `reply.setCookie('foo', 'foo', {path: '/'})` will set a cookie named `foo`
 with a value of `'foo'` on the cookie path `/`.
 
