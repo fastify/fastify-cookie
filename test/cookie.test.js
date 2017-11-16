@@ -3,26 +3,24 @@
 
 const tap = require('tap')
 const test = tap.test
-const fastify = require('fastify')({logger: require('abstract-logging')})
+const Fastify = require('fastify')
 const request = require('request')
 const plugin = require('../')
 
-fastify.register(plugin, (err) => {
-  if (err) throw err
-})
+test('cookies get set correctly', (t) => {
+  t.plan(7)
+  const fastify = Fastify()
+  fastify.register(plugin)
 
-fastify.listen(0, (err) => {
-  if (err) tap.error(err)
-  fastify.server.unref()
+  fastify.listen(0, (err) => {
+    if (err) tap.error(err)
+    fastify.server.unref()
 
-  const reqOpts = {
-    method: 'GET',
-    baseUrl: 'http://localhost:' + fastify.server.address().port
-  }
-  const req = request.defaults(reqOpts)
-
-  test('cookies get set correctly', (t) => {
-    t.plan(7)
+    const reqOpts = {
+      method: 'GET',
+      baseUrl: 'http://localhost:' + fastify.server.address().port
+    }
+    const req = request.defaults(reqOpts)
 
     fastify.get('/test1', (req, reply) => {
       reply
@@ -43,9 +41,23 @@ fastify.listen(0, (err) => {
       t.is(cookies[0].path, '/')
     })
   })
+})
 
-  test('parses incoming cookies', (t) => {
-    t.plan(6)
+test('parses incoming cookies', (t) => {
+  t.plan(6)
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  fastify.listen(0, (err) => {
+    if (err) tap.error(err)
+    fastify.server.unref()
+
+    const reqOpts = {
+      method: 'GET',
+      baseUrl: 'http://localhost:' + fastify.server.address().port
+    }
+    const req = request.defaults(reqOpts)
+
     fastify.get('/test2', (req, reply) => {
       t.ok(req.cookies)
       t.ok(req.cookies.bar)

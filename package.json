@@ -5,7 +5,9 @@
   "main": "plugin.js",
   "scripts": {
     "test": "tap 'test/**/*.test.js'",
-    "lint": "standard | snazzy"
+    "test-ci": "tap --cov 'test/**/*.test.js'",
+    "lint": "standard | snazzy",
+    "lint-ci": "standard"
   },
   "precommit": [
     "lint",
@@ -26,8 +28,7 @@
   },
   "homepage": "https://github.com/fastify/fastify-cookie#readme",
   "devDependencies": {
-    "abstract-logging": "^1.0.0",
-    "fastify": "^0.26.2",
+    "fastify": "^0.34.0",
     "pre-commit": "^1.2.2",
     "request": "^2.81.0",
     "snazzy": "^7.0.0",
