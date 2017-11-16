@@ -3,26 +3,22 @@
 const fp = require('fastify-plugin')
 const cookie = require('cookie')
 
+function fastifyCookieSetCookie (name, value, options) {
+  const seriaized = cookie.serialize(name, value, options || {})
+  this.header('Set-Cookie', seriaized)
+  return this
+}
+
+function fastifyCookiePreHandler (fastifyReq, fastifyRes, done) {
+  const cookieHeader = fastifyReq.req.headers.cookie
+  fastifyReq.cookies = (cookieHeader) ? cookie.parse(cookieHeader) : {}
+  done()
+}
+
 function plugin (fastify, options, next) {
-  fastify.decorateRequest('cookies', [])
-
-  fastify.decorateReply('setCookie', function (name, value, options) {
-    const seriaized = cookie.serialize(name, value, options || {})
-    this.header('Set-Cookie', seriaized)
-    return this
-  })
-
-  fastify.addHook('preHandler', (fastifyReq, fastifyRes, done) => {
-    if (fastifyReq.cookies.length > 0) done()
-    if (!fastifyReq.req.headers) fastifyReq.req.headers = {}
-
-    const cookieHeader = fastifyReq.req.headers.cookie
-    const cookies = (cookieHeader) ? cookie.parse(cookieHeader) : []
-    fastifyReq.cookies = cookies
-
-    done()
-  })
-
+  fastify.decorateRequest('cookies', {})
+  fastify.decorateReply('setCookie', fastifyCookieSetCookie)
+  fastify.addHook('preHandler', fastifyCookiePreHandler)
   next()
 }
 
