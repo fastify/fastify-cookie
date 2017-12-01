@@ -4,8 +4,12 @@ const fp = require('fastify-plugin')
 const cookie = require('cookie')
 
 function fastifyCookieSetCookie (name, value, options) {
-  const seriaized = cookie.serialize(name, value, options || {})
-  this.header('Set-Cookie', seriaized)
+  const opts = options || {}
+  if (opts.expires && Number.isInteger(opts.expires)) {
+    opts.expires = new Date(opts.expires)
+  }
+  const serialized = cookie.serialize(name, value, opts)
+  this.header('Set-Cookie', serialized)
   return this
 }
 

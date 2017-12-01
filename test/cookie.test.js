@@ -43,6 +43,44 @@ test('cookies get set correctly', (t) => {
   })
 })
 
+test('cookies get set correctly with millisecond dates', (t) => {
+  t.plan(8)
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  fastify.listen(0, (err) => {
+    if (err) tap.error(err)
+    fastify.server.unref()
+
+    const reqOpts = {
+      method: 'GET',
+      baseUrl: 'http://localhost:' + fastify.server.address().port
+    }
+    const req = request.defaults(reqOpts)
+
+    fastify.get('/test1', (req, reply) => {
+      reply
+        .setCookie('foo', 'foo', {path: '/', expires: Date.now() + 1000})
+        .send({hello: 'world'})
+    })
+
+    const jar = request.jar()
+    req({uri: '/test1', jar}, (err, response, body) => {
+      t.error(err)
+      t.strictEqual(response.statusCode, 200)
+      t.deepEqual(JSON.parse(body), {hello: 'world'})
+
+      const cookies = jar.getCookies(reqOpts.baseUrl + '/test1')
+      t.is(cookies.length, 1)
+      t.is(cookies[0].key, 'foo')
+      t.is(cookies[0].value, 'foo')
+      t.is(cookies[0].path, '/')
+      const expires = new Date(cookies[0].expires)
+      t.ok(expires < new Date(Date.now() + 5000))
+    })
+  })
+})
+
 test('parses incoming cookies', (t) => {
   t.plan(6)
   const fastify = Fastify()
