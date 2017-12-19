@@ -9,7 +9,19 @@ function fastifyCookieSetCookie (name, value, options) {
     opts.expires = new Date(opts.expires)
   }
   const serialized = cookie.serialize(name, value, opts)
-  this.header('Set-Cookie', serialized)
+
+  let setCookie = this.res.getHeader('Set-Cookie')
+  if (!setCookie) {
+    this.header('Set-Cookie', serialized)
+    return this
+  }
+
+  if (typeof setCookie === 'string') {
+    setCookie = [setCookie]
+  }
+
+  setCookie.push(serialized)
+  this.header('Set-Cookie', setCookie)
   return this
 }
 
