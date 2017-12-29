@@ -38,4 +38,7 @@ function plugin (fastify, options, next) {
   next()
 }
 
-module.exports = fp(plugin, '>=0.34.0')
+module.exports = fp(plugin, {
+  fastify: '>=0.36.0',
+  name: 'fastify-cookie'
+})
