@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/fastify/fastify-cookie#readme",
   "devDependencies": {
-    "fastify": "^0.34.0",
+    "fastify": "^0.37.0",
     "pre-commit": "^1.2.2",
     "request": "^2.81.0",
     "snazzy": "^7.0.0",
@@ -37,6 +37,6 @@
   },
   "dependencies": {
     "cookie": "^0.3.1",
-    "fastify-plugin": "^0.1.1"
+    "fastify-plugin": "^0.2.1"
   }
 }

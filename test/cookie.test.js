@@ -12,6 +12,12 @@ test('cookies get set correctly', (t) => {
   const fastify = Fastify()
   fastify.register(plugin)
 
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .setCookie('foo', 'foo', {path: '/'})
+      .send({hello: 'world'})
+  })
+
   fastify.listen(0, (err) => {
     if (err) tap.error(err)
     fastify.server.unref()
@@ -21,12 +27,6 @@ test('cookies get set correctly', (t) => {
       baseUrl: 'http://localhost:' + fastify.server.address().port
     }
     const req = request.defaults(reqOpts)
-
-    fastify.get('/test1', (req, reply) => {
-      reply
-        .setCookie('foo', 'foo', {path: '/'})
-        .send({hello: 'world'})
-    })
 
     const jar = request.jar()
     req({uri: '/test1', jar}, (err, response, body) => {
@@ -48,6 +48,13 @@ test('should set multiple cookies', (t) => {
   const fastify = Fastify()
   fastify.register(plugin)
 
+  fastify.get('/', (req, reply) => {
+    reply
+      .setCookie('foo', 'foo')
+      .setCookie('bar', 'test')
+      .send({hello: 'world'})
+  })
+
   fastify.listen(0, (err) => {
     if (err) tap.error(err)
     fastify.server.unref()
@@ -57,13 +64,6 @@ test('should set multiple cookies', (t) => {
       baseUrl: 'http://localhost:' + fastify.server.address().port
     }
     const req = request.defaults(reqOpts)
-
-    fastify.get('/', (req, reply) => {
-      reply
-        .setCookie('foo', 'foo')
-        .setCookie('bar', 'test')
-        .send({hello: 'world'})
-    })
 
     const jar = request.jar()
     req({uri: '/', jar}, (err, response, body) => {
@@ -86,6 +86,12 @@ test('cookies get set correctly with millisecond dates', (t) => {
   const fastify = Fastify()
   fastify.register(plugin)
 
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .setCookie('foo', 'foo', {path: '/', expires: Date.now() + 1000})
+      .send({hello: 'world'})
+  })
+
   fastify.listen(0, (err) => {
     if (err) tap.error(err)
     fastify.server.unref()
@@ -95,12 +101,6 @@ test('cookies get set correctly with millisecond dates', (t) => {
       baseUrl: 'http://localhost:' + fastify.server.address().port
     }
     const req = request.defaults(reqOpts)
-
-    fastify.get('/test1', (req, reply) => {
-      reply
-        .setCookie('foo', 'foo', {path: '/', expires: Date.now() + 1000})
-        .send({hello: 'world'})
-    })
 
     const jar = request.jar()
     req({uri: '/test1', jar}, (err, response, body) => {
@@ -124,6 +124,13 @@ test('parses incoming cookies', (t) => {
   const fastify = Fastify()
   fastify.register(plugin)
 
+  fastify.get('/test2', (req, reply) => {
+    t.ok(req.cookies)
+    t.ok(req.cookies.bar)
+    t.is(req.cookies.bar, 'bar')
+    reply.send({hello: 'world'})
+  })
+
   fastify.listen(0, (err) => {
     if (err) tap.error(err)
     fastify.server.unref()
@@ -133,13 +140,6 @@ test('parses incoming cookies', (t) => {
       baseUrl: 'http://localhost:' + fastify.server.address().port
     }
     const req = request.defaults(reqOpts)
-
-    fastify.get('/test2', (req, reply) => {
-      t.ok(req.cookies)
-      t.ok(req.cookies.bar)
-      t.is(req.cookies.bar, 'bar')
-      reply.send({hello: 'world'})
-    })
 
     const headers = {
       cookie: 'bar=bar'
