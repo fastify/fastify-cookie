@@ -28,15 +28,15 @@
   },
   "homepage": "https://github.com/fastify/fastify-cookie#readme",
   "devDependencies": {
-    "fastify": "^0.37.0",
+    "fastify": "^1.0.0-rc.1",
     "pre-commit": "^1.2.2",
-    "request": "^2.81.0",
+    "request": "^2.83.0",
     "snazzy": "^7.0.0",
     "standard": "^10.0.3",
-    "tap": "^11.0.1"
+    "tap": "^11.1.0"
   },
   "dependencies": {
     "cookie": "^0.3.1",
-    "fastify-plugin": "^0.2.1"
+    "fastify-plugin": "^0.2.2"
   }
 }
