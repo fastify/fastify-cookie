@@ -1,5 +1,7 @@
 # fastify-cookie
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/fastify/fastify-cookie.svg)](https://greenkeeper.io/)
+
 A plugin for [Fastify](http://fastify.io/) that adds support for reading and
 setting cookies.
 
