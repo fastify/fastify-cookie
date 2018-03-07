@@ -10,7 +10,7 @@ function fastifyCookieSetCookie (name, value, options) {
   }
   const serialized = cookie.serialize(name, value, opts)
 
-  let setCookie = this.res.getHeader('Set-Cookie')
+  let setCookie = this._headers['set-cookie']
   if (!setCookie) {
     this.header('Set-Cookie', serialized)
     return this
@@ -39,6 +39,6 @@ function plugin (fastify, options, next) {
 }
 
 module.exports = fp(plugin, {
-  fastify: '>=1.0.0-rc.1',
+  fastify: '>=1.0.0-rc.3',
   name: 'fastify-cookie'
 })
