@@ -4,7 +4,7 @@ const fp = require('fastify-plugin')
 const cookie = require('cookie')
 
 function fastifyCookieSetCookie (name, value, options) {
-  const opts = options || {}
+  const opts = Object.assign({}, options || {})
   if (opts.expires && Number.isInteger(opts.expires)) {
     opts.expires = new Date(opts.expires)
   }
