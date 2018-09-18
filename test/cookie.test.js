@@ -44,7 +44,7 @@ test('cookies get set correctly', (t) => {
 })
 
 test('should set multiple cookies', (t) => {
-  t.plan(8)
+  t.plan(10)
   const fastify = Fastify()
   fastify.register(plugin)
 
@@ -52,6 +52,7 @@ test('should set multiple cookies', (t) => {
     reply
       .setCookie('foo', 'foo')
       .setCookie('bar', 'test')
+      .setCookie('wee', 'woo')
       .send({hello: 'world'})
   })
 
@@ -72,11 +73,13 @@ test('should set multiple cookies', (t) => {
       t.deepEqual(JSON.parse(body), {hello: 'world'})
 
       const cookies = jar.getCookies(reqOpts.baseUrl + '/')
-      t.is(cookies.length, 2)
+      t.is(cookies.length, 3)
       t.is(cookies[0].key, 'foo')
       t.is(cookies[0].value, 'foo')
       t.is(cookies[1].key, 'bar')
       t.is(cookies[1].value, 'test')
+      t.is(cookies[2].key, 'wee')
+      t.is(cookies[2].value, 'woo')
     })
   })
 })
