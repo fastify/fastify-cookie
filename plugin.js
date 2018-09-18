@@ -10,7 +10,7 @@ function fastifyCookieSetCookie (name, value, options) {
   }
   const serialized = cookie.serialize(name, value, opts)
 
-  let setCookie = this.res.getHeader('Set-Cookie')
+  let setCookie = this.getHeader('Set-Cookie')
   if (!setCookie) {
     this.header('Set-Cookie', serialized)
     return this
@@ -21,6 +21,7 @@ function fastifyCookieSetCookie (name, value, options) {
   }
 
   setCookie.push(serialized)
+  this.removeHeader('Set-Cookie')
   this.header('Set-Cookie', setCookie)
   return this
 }
