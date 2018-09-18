@@ -151,3 +151,41 @@ test('parses incoming cookies', (t) => {
     })
   })
 })
+
+test('does not modify supplied cookie options object', (t) => {
+  t.plan(3)
+  const expireDate = Date.now() + 1000
+  const cookieOptions = {
+    path: '/',
+    expires: expireDate
+  }
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .setCookie('foo', 'foo', cookieOptions)
+      .send({hello: 'world'})
+  })
+
+  fastify.listen(0, (err) => {
+    if (err) tap.error(err)
+    fastify.server.unref()
+
+    const reqOpts = {
+      method: 'GET',
+      baseUrl: 'http://localhost:' + fastify.server.address().port
+    }
+    const req = request.defaults(reqOpts)
+
+    const jar = request.jar()
+    req({uri: '/test1', jar}, (err, response, body) => {
+      t.error(err)
+      t.strictEqual(response.statusCode, 200)
+      t.strictDeepEqual(cookieOptions, {
+        path: '/',
+        expires: expireDate
+      })
+    })
+  })
+})

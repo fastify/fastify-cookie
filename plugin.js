@@ -4,7 +4,7 @@ const fp = require('fastify-plugin')
 const cookie = require('cookie')
 
 function fastifyCookieSetCookie (name, value, options) {
-  const opts = options || {}
+  const opts = Object.assign({}, options || {})
   if (opts.expires && Number.isInteger(opts.expires)) {
     opts.expires = new Date(opts.expires)
   }
@@ -39,6 +39,6 @@ function plugin (fastify, options, next) {
 }
 
 module.exports = fp(plugin, {
-  fastify: '>=1.0.0-rc.1',
+  fastify: '^1.1.0',
   name: 'fastify-cookie'
 })
