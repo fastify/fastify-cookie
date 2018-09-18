@@ -14,8 +14,8 @@ test('cookies get set correctly', (t) => {
 
   fastify.get('/test1', (req, reply) => {
     reply
-      .setCookie('foo', 'foo', {path: '/'})
-      .send({hello: 'world'})
+      .setCookie('foo', 'foo', { path: '/' })
+      .send({ hello: 'world' })
   })
 
   fastify.listen(0, (err) => {
@@ -29,10 +29,10 @@ test('cookies get set correctly', (t) => {
     const req = request.defaults(reqOpts)
 
     const jar = request.jar()
-    req({uri: '/test1', jar}, (err, response, body) => {
+    req({ uri: '/test1', jar }, (err, response, body) => {
       t.error(err)
       t.strictEqual(response.statusCode, 200)
-      t.deepEqual(JSON.parse(body), {hello: 'world'})
+      t.deepEqual(JSON.parse(body), { hello: 'world' })
 
       const cookies = jar.getCookies(reqOpts.baseUrl + '/test1')
       t.is(cookies.length, 1)
@@ -53,7 +53,7 @@ test('should set multiple cookies', (t) => {
       .setCookie('foo', 'foo')
       .setCookie('bar', 'test')
       .setCookie('wee', 'woo')
-      .send({hello: 'world'})
+      .send({ hello: 'world' })
   })
 
   fastify.listen(0, (err) => {
@@ -67,10 +67,10 @@ test('should set multiple cookies', (t) => {
     const req = request.defaults(reqOpts)
 
     const jar = request.jar()
-    req({uri: '/', jar}, (err, response, body) => {
+    req({ uri: '/', jar }, (err, response, body) => {
       t.error(err)
       t.strictEqual(response.statusCode, 200)
-      t.deepEqual(JSON.parse(body), {hello: 'world'})
+      t.deepEqual(JSON.parse(body), { hello: 'world' })
 
       const cookies = jar.getCookies(reqOpts.baseUrl + '/')
       t.is(cookies.length, 3)
@@ -91,8 +91,8 @@ test('cookies get set correctly with millisecond dates', (t) => {
 
   fastify.get('/test1', (req, reply) => {
     reply
-      .setCookie('foo', 'foo', {path: '/', expires: Date.now() + 1000})
-      .send({hello: 'world'})
+      .setCookie('foo', 'foo', { path: '/', expires: Date.now() + 1000 })
+      .send({ hello: 'world' })
   })
 
   fastify.listen(0, (err) => {
@@ -106,10 +106,10 @@ test('cookies get set correctly with millisecond dates', (t) => {
     const req = request.defaults(reqOpts)
 
     const jar = request.jar()
-    req({uri: '/test1', jar}, (err, response, body) => {
+    req({ uri: '/test1', jar }, (err, response, body) => {
       t.error(err)
       t.strictEqual(response.statusCode, 200)
-      t.deepEqual(JSON.parse(body), {hello: 'world'})
+      t.deepEqual(JSON.parse(body), { hello: 'world' })
 
       const cookies = jar.getCookies(reqOpts.baseUrl + '/test1')
       t.is(cookies.length, 1)
@@ -131,7 +131,7 @@ test('parses incoming cookies', (t) => {
     t.ok(req.cookies)
     t.ok(req.cookies.bar)
     t.is(req.cookies.bar, 'bar')
-    reply.send({hello: 'world'})
+    reply.send({ hello: 'world' })
   })
 
   fastify.listen(0, (err) => {
@@ -147,10 +147,10 @@ test('parses incoming cookies', (t) => {
     const headers = {
       cookie: 'bar=bar'
     }
-    req({uri: '/test2', headers}, (err, response, body) => {
+    req({ uri: '/test2', headers }, (err, response, body) => {
       t.error(err)
       t.strictEqual(response.statusCode, 200)
-      t.deepEqual(JSON.parse(body), {hello: 'world'})
+      t.deepEqual(JSON.parse(body), { hello: 'world' })
     })
   })
 })
@@ -168,7 +168,7 @@ test('does not modify supplied cookie options object', (t) => {
   fastify.get('/test1', (req, reply) => {
     reply
       .setCookie('foo', 'foo', cookieOptions)
-      .send({hello: 'world'})
+      .send({ hello: 'world' })
   })
 
   fastify.listen(0, (err) => {
@@ -182,7 +182,7 @@ test('does not modify supplied cookie options object', (t) => {
     const req = request.defaults(reqOpts)
 
     const jar = request.jar()
-    req({uri: '/test1', jar}, (err, response, body) => {
+    req({ uri: '/test1', jar }, (err, response, body) => {
       t.error(err)
       t.strictEqual(response.statusCode, 200)
       t.strictDeepEqual(cookieOptions, {
