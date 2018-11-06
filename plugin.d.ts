@@ -14,9 +14,18 @@ declare module 'fastify' {
     Headers = fastify.DefaultHeaders,
     Body = any
   > {
+    /**
+     * Request cookies
+     */
     cookies: {[cookieName: string]: string};
   }
   interface FastifyReply<HttpResponse = ServerResponse> {
+    /**
+     * Set response cookie
+     * @param name Cookie name
+     * @param value Cookie value
+     * @param options Serialize options
+     */
     setCookie(
       name: string,
       value: string,
