@@ -3,11 +3,13 @@
   "version": "2.0.2",
   "description": "Plugin for fastify to add support for cookies",
   "main": "plugin.js",
+  "types": "plugin.d.ts",
   "scripts": {
     "test": "tap 'test/**/*.test.js'",
     "test-ci": "tap --cov 'test/**/*.test.js'",
     "lint": "standard | snazzy",
-    "lint-ci": "standard"
+    "lint-ci": "standard",
+    "typescript": "tsc --project ./tsconfig.json"
   },
   "precommit": [
     "lint",
@@ -28,12 +30,14 @@
   },
   "homepage": "https://github.com/fastify/fastify-cookie#readme",
   "devDependencies": {
+    "@types/cookie": "^0.3.1",
     "fastify": "^1.1.0",
     "pre-commit": "^1.2.2",
     "request": "^2.83.0",
     "snazzy": "^8.0.0",
     "standard": "^12.0.1",
-    "tap": "^12.0.1"
+    "tap": "^12.0.1",
+    "typescript": "^3.1.6"
   },
   "dependencies": {
     "cookie": "^0.3.1",
