@@ -30,7 +30,7 @@ declare module 'fastify' {
       name: string,
       value: string,
       options?: CookieSerializeOptions
-    ): fastify.FastifyInstance<Server, IncomingMessage, ServerResponse>;
+    ): fastify.FastifyReply<HttpResponse>;
   }
 }
 
