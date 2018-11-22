@@ -5,8 +5,8 @@
   "main": "plugin.js",
   "types": "plugin.d.ts",
   "scripts": {
-    "test": "tap 'test/**/*.test.js'",
-    "test-ci": "tap --cov 'test/**/*.test.js'",
+    "test": "tap test/*.test.js && npm run typescript",
+    "test-ci": "tap --cov test/*.test.js && npm run typescript",
     "lint": "standard | snazzy",
     "lint-ci": "standard",
     "typescript": "tsc --project ./tsconfig.json"
@@ -39,7 +39,6 @@
     "typescript": "^3.1.6"
   },
   "dependencies": {
-    "@types/cookie": "^0.3.1",
     "cookie": "^0.3.1",
     "fastify-plugin": "^1.2.1"
   }

@@ -2,7 +2,6 @@
 import * as fastify from 'fastify';
 import {IncomingMessage, ServerResponse, Server} from 'http';
 import {FastifyRequest, DefaultQuery, Plugin} from 'fastify';
-import {CookieSerializeOptions} from 'cookie';
 
 interface FastifyCookieOptions {}
 
@@ -19,6 +18,18 @@ declare module 'fastify' {
      */
     cookies: {[cookieName: string]: string};
   }
+
+  interface CookieSerializeOptions {
+    domain?: string;
+    encode?(val: string): string;
+    expires?: Date;
+    httpOnly?: boolean;
+    maxAge?: number;
+    path?: string;
+    sameSite?: boolean | 'lax' | 'strict';
+    secure?: boolean;
+  }
+
   interface FastifyReply<HttpResponse = ServerResponse> {
     /**
      * Set response cookie
