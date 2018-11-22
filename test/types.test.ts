@@ -8,6 +8,6 @@ app
   .after(() => {
     app.get('/', (request, reply) => {
       const test = request.cookies.test;
-      reply.setCookie('test', test).send({hello: 'world'});
+      reply.setCookie('test', test, { domain: 'example.com', path: '/' }).send({hello: 'world'});
     })
   });
