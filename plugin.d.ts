@@ -2,7 +2,6 @@
 import * as fastify from 'fastify';
 import {IncomingMessage, ServerResponse, Server} from 'http';
 import {FastifyRequest, DefaultQuery, Plugin} from 'fastify';
-import {CookieSerializeOptions} from 'cookie';
 
 interface FastifyCookieOptions {}
 
