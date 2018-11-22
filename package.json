@@ -5,8 +5,8 @@
   "main": "plugin.js",
   "types": "plugin.d.ts",
   "scripts": {
-    "test": "tap test/**/*.test.js && npm run typescript",
-    "test-ci": "tap --cov test/**/*.test.js",
+    "test": "tap test/*.test.js && npm run typescript",
+    "test-ci": "tap --cov test/*.test.js",
     "lint": "standard | snazzy",
     "lint-ci": "standard",
     "typescript": "tsc --project ./tsconfig.json"
