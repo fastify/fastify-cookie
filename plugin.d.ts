@@ -1,13 +1,18 @@
 /// <reference types="node" />
 import * as fastify from 'fastify';
 import {IncomingMessage, ServerResponse, Server} from 'http';
+import {Http2ServerRequest, Http2ServerResponse, Http2Server} from 'http2';
 import {FastifyRequest, DefaultQuery, Plugin} from 'fastify';
 
 interface FastifyCookieOptions {}
 
+type HttpServer  = Server | Http2Server;
+type HttpRequest = IncomingMessage | Http2ServerRequest;
+type HttpResponse = ServerResponse | Http2ServerResponse;
+
 declare module 'fastify' {
   interface FastifyRequest<
-    HttpRequest = IncomingMessage,
+    HttpRequest = HttpRequest,
     Query = fastify.DefaultQuery,
     Params = fastify.DefaultParams,
     Headers = fastify.DefaultHeaders,
@@ -30,7 +35,7 @@ declare module 'fastify' {
     secure?: boolean;
   }
 
-  interface FastifyReply<HttpResponse = ServerResponse> {
+  interface FastifyReply<HttpResponse = HttpResponse> {
     /**
      * Set response cookie
      * @param name Cookie name
@@ -45,5 +50,5 @@ declare module 'fastify' {
   }
 }
 
-declare const plugin: Plugin<Server, IncomingMessage, ServerResponse, FastifyCookieOptions>;
+declare const plugin: Plugin<HttpServer, HttpRequest, HttpResponse, FastifyCookieOptions>;
 export = plugin;
