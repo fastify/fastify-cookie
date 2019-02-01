@@ -9,7 +9,7 @@ type HttpResponse = ServerResponse | Http2ServerResponse;
 
 declare module 'fastify' {
   interface FastifyRequest<
-    HttpRequest = HttpRequest,
+    HttpRequest,
     Query = fastify.DefaultQuery,
     Params = fastify.DefaultParams,
     Headers = fastify.DefaultHeaders,
