@@ -26,7 +26,7 @@ function fastifyCookieSetCookie (name, value, options) {
   return this
 }
 
-function fastifyCookiePreHandler (fastifyReq, fastifyRes, done) {
+function fastifyCookieOnReqHandler (fastifyReq, fastifyRes, done) {
   const cookieHeader = fastifyReq.req.headers.cookie
   fastifyReq.cookies = (cookieHeader) ? cookie.parse(cookieHeader) : {}
   done()
@@ -35,7 +35,7 @@ function fastifyCookiePreHandler (fastifyReq, fastifyRes, done) {
 function plugin (fastify, options, next) {
   fastify.decorateRequest('cookies', {})
   fastify.decorateReply('setCookie', fastifyCookieSetCookie)
-  fastify.addHook('preHandler', fastifyCookiePreHandler)
+  fastify.addHook('onRequest', fastifyCookieOnReqHandler)
   next()
 }
 
