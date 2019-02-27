@@ -5,8 +5,8 @@
 A plugin for [Fastify](http://fastify.io/) that adds support for reading and
 setting cookies.
 
-This plugin's cookie parsing works via Fastify's `preHandler` hook. Therefore,
-you should register it prior to any other `preHandler` hooks that will depend
+This plugin's cookie parsing works via Fastify's `onRequest` hook. Therefore,
+you should register it prior to any other `onRequest` hooks that will depend
 upon this plugin's actions.
 
 ## Example
@@ -33,7 +33,7 @@ fastify.get('/', (req, reply) => {
 
 ### Parsing
 
-Cookies are parsed in the `preHandler` Fastify hook and attached to the request
+Cookies are parsed in the `onRequest` Fastify hook and attached to the request
 as an object named `cookies`. Thus, if a request contains the header
 `Cookie: foo=foo` then, within your handler, `req.cookies.foo` would equal
 `'foo'`.
