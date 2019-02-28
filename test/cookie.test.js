@@ -123,9 +123,19 @@ test('cookies get set correctly with millisecond dates', (t) => {
 })
 
 test('parses incoming cookies', (t) => {
-  t.plan(6)
+  t.plan(6 + 3 * 3)
   const fastify = Fastify()
   fastify.register(plugin)
+
+  // check that it parses the cookies in the onRequest hook
+  for (let hook of ['preParsing', 'preValidation', 'preHandler']) {
+    fastify.addHook(hook, (req, reply, done) => {
+      t.ok(req.cookies)
+      t.ok(req.cookies.bar)
+      t.is(req.cookies.bar, 'bar')
+      done()
+    })
+  }
 
   fastify.get('/test2', (req, reply) => {
     t.ok(req.cookies)
