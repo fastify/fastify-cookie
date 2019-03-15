@@ -18,9 +18,7 @@ supports both Fastify@1 and Fastify@2.
 ```js
 const fastify = require('fastify')()
 
-fastify.register(require('fastify-cookie'), (err) => {
-  if (err) throw err
-})
+fastify.register(require('fastify-cookie'))
 
 fastify.get('/', (req, reply) => {
   const aCookieValue = req.cookies.cookieName
