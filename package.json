@@ -36,11 +36,16 @@
     "request": "^2.83.0",
     "snazzy": "^8.0.0",
     "standard": "^12.0.1",
-    "tap": "^12.5.2",
+    "tap": "^12.6.6",
     "typescript": "^3.3.1"
   },
   "dependencies": {
     "cookie": "^0.3.1",
     "fastify-plugin": "^1.4.0"
+  },
+  "greenkeeper": {
+    "ignore": [
+      "tap"
+    ]
   }
 }
