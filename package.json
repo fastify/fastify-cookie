@@ -40,7 +40,7 @@
     "typescript": "^3.3.1"
   },
   "dependencies": {
-    "cookie": "^0.3.1",
+    "cookie": "^0.4.0",
     "fastify-plugin": "^1.4.0"
   },
   "greenkeeper": {
