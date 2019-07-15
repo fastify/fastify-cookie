@@ -128,7 +128,7 @@ test('parses incoming cookies', (t) => {
   fastify.register(plugin)
 
   // check that it parses the cookies in the onRequest hook
-  for (let hook of ['preParsing', 'preValidation', 'preHandler']) {
+  for (const hook of ['preParsing', 'preValidation', 'preHandler']) {
     fastify.addHook(hook, (req, reply, done) => {
       t.ok(req.cookies)
       t.ok(req.cookies.bar)
