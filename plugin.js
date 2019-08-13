@@ -26,6 +26,11 @@ function fastifyCookieSetCookie (name, value, options) {
   return this
 }
 
+function fastifyCookieClearCookie (name, options) {
+  const opts = Object.assign({ expires: new Date(1), path: '/' }, options || {})
+  return fastifyCookieSetCookie (name, '', opts);
+}
+
 function fastifyCookieOnReqHandler (fastifyReq, fastifyRes, done) {
   const cookieHeader = fastifyReq.req.headers.cookie
   fastifyReq.cookies = (cookieHeader) ? cookie.parse(cookieHeader) : {}
@@ -35,6 +40,7 @@ function fastifyCookieOnReqHandler (fastifyReq, fastifyRes, done) {
 function plugin (fastify, options, next) {
   fastify.decorateRequest('cookies', {})
   fastify.decorateReply('setCookie', fastifyCookieSetCookie)
+  fastify.decorateReply('clearCookie', fastifyCookieClearCookie)
   fastify.addHook('onRequest', fastifyCookieOnReqHandler)
   next()
 }
