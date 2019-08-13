@@ -202,3 +202,36 @@ test('does not modify supplied cookie options object', (t) => {
     })
   })
 })
+
+test('cookies gets cleared correctly', (t) => {
+  t.plan(4)
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .clearCookie('foo')
+      .send({ hello: 'world' })
+  })
+
+  fastify.listen(0, (err) => {
+    if (err) tap.error(err)
+    fastify.server.unref()
+
+    const reqOpts = {
+      method: 'GET',
+      baseUrl: 'http://localhost:' + fastify.server.address().port
+    }
+    const req = request.defaults(reqOpts)
+
+    const jar = request.jar()
+    req({ uri: '/test1', jar }, (err, response, body) => {
+      t.error(err)
+      t.strictEqual(response.statusCode, 200)
+      t.deepEqual(JSON.parse(body), { hello: 'world' })
+
+      const cookies = jar.getCookies(reqOpts.baseUrl + '/test1')
+      t.is(cookies.length, 0)
+    })
+  })
+})

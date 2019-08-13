@@ -9,7 +9,10 @@ appWithImplicitHttp
   .after(() => {
     appWithImplicitHttp.get('/', (request, reply) => {
       const test = request.cookies.test;
-      reply.setCookie('test', test, { domain: 'example.com', path: '/' }).send({hello: 'world'});
+      reply
+      .setCookie('test', test, { domain: 'example.com', path: '/' })
+      .clearCookie('foo')
+      .send({hello: 'world'});
     })
   });
 
@@ -25,6 +28,9 @@ appWithHttp2
   .after(() => {
     appWithHttp2.get('/', (request, reply) => {
       const test = request.cookies.test;
-      reply.setCookie('test', test, { domain: 'example.com', path: '/' }).send({hello: 'world'});
+      reply
+      .setCookie('test', test, { domain: 'example.com', path: '/' })
+      .clearCookie('foo')
+      .send({hello: 'world'});
     })
   });
