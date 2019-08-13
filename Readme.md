@@ -61,7 +61,7 @@ on the cookie path `/`.
 
 + `name`: a string name for the cookie to be cleared
 + `options`: an options object as described in the [cookie serialize][cs]
-documentation
+documentation. Its optional to pass `options` object
 
 [cs]: https://www.npmjs.com/package/cookie#options-1
 
