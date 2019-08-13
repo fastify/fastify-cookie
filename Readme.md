@@ -52,14 +52,14 @@ with a value of `'foo'` on the cookie path `/`.
 + `options`: an options object as described in the [cookie serialize][cs]
 documentation
 
-### Clear 
+### Clearing 
 
 The method `clearCookie(name, options)` is added to the `reply` object
 via the Fastify `decorateReply` API. Thus, in a request handler,
 `reply.clearCookie('foo', {path: '/'})` will clear a cookie named `foo`
 on the cookie path `/`.
 
-+ `name`: a string name for the cookie to be set
++ `name`: a string name for the cookie to be cleared
 + `options`: an options object as described in the [cookie serialize][cs]
 documentation
 
