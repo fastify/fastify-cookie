@@ -44,6 +44,16 @@ declare module 'fastify' {
       value: string,
       options?: CookieSerializeOptions
     ): fastify.FastifyReply<HttpResponse>;
+
+    /**
+     * clear response cookie
+     * @param name Cookie name
+     * @param options Serialize options
+     */
+    clearCookie(
+      name: string,
+      options?: CookieSerializeOptions
+    ): fastify.FastifyReply<HttpResponse>;
   }
 }
 

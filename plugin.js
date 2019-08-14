@@ -8,8 +8,8 @@ function fastifyCookieSetCookie (name, value, options) {
   if (opts.expires && Number.isInteger(opts.expires)) {
     opts.expires = new Date(opts.expires)
   }
-  const serialized = cookie.serialize(name, value, opts)
 
+  const serialized = cookie.serialize(name, value, opts)
   let setCookie = this.getHeader('Set-Cookie')
   if (!setCookie) {
     this.header('Set-Cookie', serialized)
@@ -26,6 +26,11 @@ function fastifyCookieSetCookie (name, value, options) {
   return this
 }
 
+function fastifyCookieClearCookie (name, options) {
+  const opts = Object.assign({ expires: new Date(1), path: '/' }, options || {})
+  return fastifyCookieSetCookie.call(this, name, '', opts)
+}
+
 function fastifyCookieOnReqHandler (fastifyReq, fastifyRes, done) {
   const cookieHeader = fastifyReq.req.headers.cookie
   fastifyReq.cookies = (cookieHeader) ? cookie.parse(cookieHeader) : {}
@@ -35,6 +40,7 @@ function fastifyCookieOnReqHandler (fastifyReq, fastifyRes, done) {
 function plugin (fastify, options, next) {
   fastify.decorateRequest('cookies', {})
   fastify.decorateReply('setCookie', fastifyCookieSetCookie)
+  fastify.decorateReply('clearCookie', fastifyCookieClearCookie)
   fastify.addHook('onRequest', fastifyCookieOnReqHandler)
   next()
 }
