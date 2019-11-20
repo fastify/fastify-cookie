@@ -18,14 +18,21 @@ supports both Fastify@1 and Fastify@2.
 ```js
 const fastify = require('fastify')()
 
-fastify.register(require('fastify-cookie'))
+fastify.register(require('fastify-cookie'), {
+  secret: "my-secret" // for cookies signature
+})
 
 fastify.get('/', (req, reply) => {
   const aCookieValue = req.cookies.cookieName
+  const bCookieValue = reply.unsignCookie(req.cookies.cookieSigned);
   reply
     .setCookie('foo', 'foo', {
       domain: 'example.com',
       path: '/'
+    })
+    setCookie('bar', 'bar', {
+      path: '/',
+      signed: true
     })
     .send({hello: 'world'})
 })
@@ -50,9 +57,10 @@ with a value of `'foo'` on the cookie path `/`.
 + `name`: a string name for the cookie to be set
 + `value`: a string value for the cookie
 + `options`: an options object as described in the [cookie serialize][cs]
+  with a extra param "signed" for signed cookie
 documentation
 
-### Clearing 
+### Clearing
 
 The method `clearCookie(name, options)` is added to the `reply` object
 via the Fastify `decorateReply` API. Thus, in a request handler,

@@ -5,7 +5,7 @@ const tap = require('tap')
 const test = tap.test
 const Fastify = require('fastify')
 const request = require('request')
-const cookieSignature = require("cookie-signature")
+const cookieSignature = require('cookie-signature')
 const plugin = require('../')
 
 test('cookies get set correctly', (t) => {
@@ -240,7 +240,7 @@ test('cookies gets cleared correctly', (t) => {
 test('cookies signature', (t) => {
   t.plan(6)
   const fastify = Fastify()
-  const secret = "bar";
+  const secret = 'bar'
   fastify.register(plugin, { secret })
 
   fastify.get('/test1', (req, reply) => {
@@ -269,7 +269,6 @@ test('cookies signature', (t) => {
       t.is(cookies.length, 1)
       t.is(cookies[0].key, 'foo')
       t.is(cookieSignature.unsign(cookies[0].value, secret), 'foo')
-      //t.is(cookies[0].value, 'foo')
     })
   })
 })

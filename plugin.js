@@ -2,9 +2,9 @@
 
 const fp = require('fastify-plugin')
 const cookie = require('cookie')
-const cookieSignature = require("cookie-signature")
+const cookieSignature = require('cookie-signature')
 
-let signSecret = '';
+let signSecret = ''
 
 function fastifyCookieSetCookie (name, value, options) {
   const opts = Object.assign({}, options || {})
@@ -12,9 +12,9 @@ function fastifyCookieSetCookie (name, value, options) {
     opts.expires = new Date(opts.expires)
   }
 
-  if(opts.signed){
-    value = cookieSignature.sign(value, signSecret);
-    delete opts.signed;
+  if (opts.signed) {
+    value = cookieSignature.sign(value, signSecret)
+    delete opts.signed
   }
 
   const serialized = cookie.serialize(name, value, opts)
@@ -34,8 +34,8 @@ function fastifyCookieSetCookie (name, value, options) {
   return this
 }
 
-function fastifyCookieUnsignCookie(value){
-  return cookieSignature.unsign(value, signSecret);
+function fastifyCookieUnsignCookie (value) {
+  return cookieSignature.unsign(value, signSecret)
 }
 
 function fastifyCookieClearCookie (name, options) {
@@ -50,8 +50,9 @@ function fastifyCookieOnReqHandler (fastifyReq, fastifyRes, done) {
 }
 
 function plugin (fastify, options, next) {
-  if(options.secret)
-    signSecret = options.secret;
+  if (options.secret) {
+    signSecret = options.secret
+  }
 
   fastify.decorateRequest('cookies', {})
   fastify.decorateReply('setCookie', fastifyCookieSetCookie)
