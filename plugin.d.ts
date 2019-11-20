@@ -30,6 +30,7 @@ declare module 'fastify' {
     path?: string;
     sameSite?: boolean | 'lax' | 'strict';
     secure?: boolean;
+    signed?: boolean;
   }
 
   interface FastifyReply<HttpResponse> {

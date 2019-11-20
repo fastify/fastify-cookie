@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "cookie": "^0.4.0",
+    "cookie-signature": "^1.1.0",
     "fastify-plugin": "^1.4.0"
   },
   "greenkeeper": {
