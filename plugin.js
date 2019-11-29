@@ -2,18 +2,23 @@
 
 const fp = require('fastify-plugin')
 const cookie = require('cookie')
+const cookieSignature = require('cookie-signature')
 
-function fastifyCookieSetCookie (name, value, options) {
+function fastifyCookieSetCookie (reply, name, value, options, secret) {
   const opts = Object.assign({}, options || {})
   if (opts.expires && Number.isInteger(opts.expires)) {
     opts.expires = new Date(opts.expires)
   }
 
+  if (opts.signed) {
+    value = cookieSignature.sign(value, secret)
+  }
+
   const serialized = cookie.serialize(name, value, opts)
-  let setCookie = this.getHeader('Set-Cookie')
+  let setCookie = reply.getHeader('Set-Cookie')
   if (!setCookie) {
-    this.header('Set-Cookie', serialized)
-    return this
+    reply.header('Set-Cookie', serialized)
+    return reply
   }
 
   if (typeof setCookie === 'string') {
@@ -21,14 +26,14 @@ function fastifyCookieSetCookie (name, value, options) {
   }
 
   setCookie.push(serialized)
-  this.removeHeader('Set-Cookie')
-  this.header('Set-Cookie', setCookie)
-  return this
+  reply.removeHeader('Set-Cookie')
+  reply.header('Set-Cookie', setCookie)
+  return reply
 }
 
-function fastifyCookieClearCookie (name, options) {
+function fastifyCookieClearCookie (reply, name, options) {
   const opts = Object.assign({ expires: new Date(1), path: '/' }, options || {})
-  return fastifyCookieSetCookie.call(this, name, '', opts)
+  return fastifyCookieSetCookie(reply, name, '', opts)
 }
 
 function fastifyCookieOnReqHandler (fastifyReq, fastifyRes, done) {
@@ -38,9 +43,18 @@ function fastifyCookieOnReqHandler (fastifyReq, fastifyRes, done) {
 }
 
 function plugin (fastify, options, next) {
+  const secret = options ? options.secret || '' : ''
+
   fastify.decorateRequest('cookies', {})
-  fastify.decorateReply('setCookie', fastifyCookieSetCookie)
-  fastify.decorateReply('clearCookie', fastifyCookieClearCookie)
+  fastify.decorateReply('setCookie', function setCookieWrapper (name, value, options) {
+    return fastifyCookieSetCookie(this, name, value, options, secret)
+  })
+  fastify.decorateReply('clearCookie', function clearCookieWrapper (name, options) {
+    return fastifyCookieClearCookie(this, name, options)
+  })
+  fastify.decorateReply('unsignCookie', function unsignCookieWrapper (value) {
+    return cookieSignature.unsign(value, secret)
+  })
   fastify.addHook('onRequest', fastifyCookieOnReqHandler)
   next()
 }

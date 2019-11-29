@@ -5,6 +5,7 @@ const tap = require('tap')
 const test = tap.test
 const Fastify = require('fastify')
 const request = require('request')
+const cookieSignature = require('cookie-signature')
 const plugin = require('../')
 
 test('cookies get set correctly', (t) => {
@@ -232,6 +233,42 @@ test('cookies gets cleared correctly', (t) => {
 
       const cookies = jar.getCookies(reqOpts.baseUrl + '/test1')
       t.is(cookies.length, 0)
+    })
+  })
+})
+
+test('cookies signature', (t) => {
+  t.plan(6)
+  const fastify = Fastify()
+  const secret = 'bar'
+  fastify.register(plugin, { secret })
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .setCookie('foo', 'foo', { signed: true })
+      .send({ hello: 'world' })
+  })
+
+  fastify.listen(0, (err) => {
+    if (err) tap.error(err)
+    fastify.server.unref()
+
+    const reqOpts = {
+      method: 'GET',
+      baseUrl: 'http://localhost:' + fastify.server.address().port
+    }
+    const req = request.defaults(reqOpts)
+
+    const jar = request.jar()
+    req({ uri: '/test1', jar }, (err, response, body) => {
+      t.error(err)
+      t.strictEqual(response.statusCode, 200)
+      t.deepEqual(JSON.parse(body), { hello: 'world' })
+
+      const cookies = jar.getCookies(reqOpts.baseUrl + '/test1')
+      t.is(cookies.length, 1)
+      t.is(cookies[0].key, 'foo')
+      t.is(cookieSignature.unsign(cookies[0].value, secret), 'foo')
     })
   })
 })
