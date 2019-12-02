@@ -39,7 +39,9 @@ function fastifyCookieClearCookie (reply, name, options) {
 function onReqHandlerWrapper (options) {
   return function fastifyCookieOnReqHandler (fastifyReq, fastifyRes, done) {
     const cookieHeader = fastifyReq.req.headers.cookie
-    fastifyReq.cookies = (cookieHeader) ? cookie.parse(cookieHeader, options) : {}
+    if (cookieHeader) {
+      fastifyReq.cookies = cookie.parse(cookieHeader, options)
+    }
     done()
   }
 }
