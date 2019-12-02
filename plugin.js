@@ -36,10 +36,14 @@ function fastifyCookieClearCookie (reply, name, options) {
   return fastifyCookieSetCookie(reply, name, '', opts)
 }
 
-function fastifyCookieOnReqHandler (fastifyReq, fastifyRes, done) {
-  const cookieHeader = fastifyReq.req.headers.cookie
-  fastifyReq.cookies = (cookieHeader) ? cookie.parse(cookieHeader) : {}
-  done()
+function onReqHandlerWrapper (options) {
+  return function fastifyCookieOnReqHandler (fastifyReq, fastifyRes, done) {
+    const cookieHeader = fastifyReq.req.headers.cookie
+    if (cookieHeader) {
+      fastifyReq.cookies = cookie.parse(cookieHeader, options)
+    }
+    done()
+  }
 }
 
 function plugin (fastify, options, next) {
@@ -55,7 +59,7 @@ function plugin (fastify, options, next) {
   fastify.decorateReply('unsignCookie', function unsignCookieWrapper (value) {
     return cookieSignature.unsign(value, secret)
   })
-  fastify.addHook('onRequest', fastifyCookieOnReqHandler)
+  fastify.addHook('onRequest', onReqHandlerWrapper(options.parseOptions))
   next()
 }
 

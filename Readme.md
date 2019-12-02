@@ -19,7 +19,8 @@ supports both Fastify@1 and Fastify@2.
 const fastify = require('fastify')()
 
 fastify.register(require('fastify-cookie'), {
-  secret: "my-secret" // for cookies signature
+  secret: "my-secret", // for cookies signature
+  parseOptions: {}     // options for parsing cookies
 })
 
 fastify.get('/', (req, reply) => {
@@ -46,6 +47,8 @@ Cookies are parsed in the `onRequest` Fastify hook and attached to the request
 as an object named `cookies`. Thus, if a request contains the header
 `Cookie: foo=foo` then, within your handler, `req.cookies.foo` would equal
 `'foo'`.
+
+You can pass options to the [cookie parse](https://github.com/jshttp/cookie#cookieparsestr-options) by setting an object named `parseOptions` in the plugin config object.
 
 ### Sending
 
