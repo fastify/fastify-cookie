@@ -31,6 +31,7 @@ declare module 'fastify' {
     sameSite?: boolean | 'lax' | 'strict';
     secure?: boolean;
     signed?: boolean;
+    secret?: string;
   }
 
   interface FastifyReply<HttpResponse> {

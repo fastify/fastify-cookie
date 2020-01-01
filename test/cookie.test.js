@@ -273,6 +273,42 @@ test('cookies signature', (t) => {
   })
 })
 
+test('cookies local signature', (t) => {
+  t.plan(6)
+  const fastify = Fastify()
+  const secret = 'bar'
+  fastify.register(plugin)
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .setCookie('foo', 'foo', { signed: true, secret })
+      .send({ hello: 'world' })
+  })
+
+  fastify.listen(0, (err) => {
+    if (err) tap.error(err)
+    fastify.server.unref()
+
+    const reqOpts = {
+      method: 'GET',
+      baseUrl: 'http://localhost:' + fastify.server.address().port
+    }
+    const req = request.defaults(reqOpts)
+
+    const jar = request.jar()
+    req({ uri: '/test1', jar }, (err, response, body) => {
+      t.error(err)
+      t.strictEqual(response.statusCode, 200)
+      t.deepEqual(JSON.parse(body), { hello: 'world' })
+
+      const cookies = jar.getCookies(reqOpts.baseUrl + '/test1')
+      t.is(cookies.length, 1)
+      t.is(cookies[0].key, 'foo')
+      t.is(cookieSignature.unsign(cookies[0].value, secret), 'foo')
+    })
+  })
+})
+
 test('pass options to `cookies.parse`', (t) => {
   t.plan(6)
   const fastify = Fastify()
