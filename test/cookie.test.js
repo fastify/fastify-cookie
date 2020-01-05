@@ -312,3 +312,27 @@ test('pass options to `cookies.parse`', (t) => {
     return str + 'test'
   }
 })
+
+test('issue 53', async t => {
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  let cookies
+  let count = 1
+  fastify.get('/foo', (req, reply) => {
+    if (count > 1) {
+      t.notEqual(cookies, req.cookies)
+      return reply.send('done')
+    }
+
+    count += 1
+    cookies = req.cookies
+    reply.send('done')
+  })
+
+  const response1 = await fastify.inject({ url: '/foo' })
+  t.is(response1.body, 'done')
+
+  const response2 = await fastify.inject({ url: '/foo' })
+  t.is(response2.body, 'done')
+})
