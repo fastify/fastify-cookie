@@ -312,3 +312,32 @@ test('pass options to `cookies.parse`', (t) => {
     return str + 'test'
   }
 })
+
+test('issue 53', (t) => {
+  t.plan(5)
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  let cookies
+  let count = 1
+  fastify.get('/foo', (req, reply) => {
+    if (count > 1) {
+      t.notEqual(cookies, req.cookies)
+      return reply.send('done')
+    }
+
+    count += 1
+    cookies = req.cookies
+    reply.send('done')
+  })
+
+  fastify.inject({ url: '/foo' }, (err, response) => {
+    t.error(err)
+    t.is(response.body, 'done')
+  })
+
+  fastify.inject({ url: '/foo' }, (err, response) => {
+    t.error(err)
+    t.is(response.body, 'done')
+  })
+})
