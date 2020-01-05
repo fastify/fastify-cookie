@@ -313,7 +313,8 @@ test('pass options to `cookies.parse`', (t) => {
   }
 })
 
-test('issue 53', async t => {
+test('issue 53', (t) => {
+  t.plan(5)
   const fastify = Fastify()
   fastify.register(plugin)
 
@@ -330,9 +331,13 @@ test('issue 53', async t => {
     reply.send('done')
   })
 
-  const response1 = await fastify.inject({ url: '/foo' })
-  t.is(response1.body, 'done')
+  fastify.inject({ url: '/foo' }, (err, response) => {
+    t.error(err)
+    t.is(response.body, 'done')
+  })
 
-  const response2 = await fastify.inject({ url: '/foo' })
-  t.is(response2.body, 'done')
+  fastify.inject({ url: '/foo' }, (err, response) => {
+    t.error(err)
+    t.is(response.body, 'done')
+  })
 })
