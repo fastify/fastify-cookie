@@ -3,7 +3,6 @@
 const tap = require('tap')
 const test = tap.test
 const Fastify = require('fastify')
-const request = require('request')
 const cookieSignature = require('cookie-signature')
 const plugin = require('../')
 
@@ -19,7 +18,7 @@ function parseCookies (cookies) {
     const expiration = parts.length > 2 ? parts[2].trim().split('=') : null
     const breakout = {
       key: decodeURIComponent(keyvalue[0]),
-      value: decodeURIComponent(keyvalue[1]),
+      value: decodeURIComponent(keyvalue[1])
     }
 
     if (path) {
