@@ -33,7 +33,6 @@
     "@types/node": "^12.0.6",
     "fastify": "^2.0.0",
     "pre-commit": "^1.2.2",
-    "request": "^2.83.0",
     "snazzy": "^8.0.0",
     "standard": "^14.0.2",
     "tap": "^12.6.6",

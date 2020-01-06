@@ -1,4 +1,3 @@
-
 'use strict'
 
 const tap = require('tap')
@@ -7,6 +6,38 @@ const Fastify = require('fastify')
 const request = require('request')
 const cookieSignature = require('cookie-signature')
 const plugin = require('../')
+
+function parseCookies (cookies) {
+  if (!cookies) return []
+
+  var list = []
+  const cookiesList = Array.isArray(cookies) ? cookies : [cookies]
+  cookiesList.forEach(c => {
+    const parts = c.split(';')
+    const keyvalue = parts[0].split('=')
+    const path = parts.length > 1 ? parts[1].trim().split('=') : null
+    const expiration = parts.length > 2 ? parts[2].trim().split('=') : null
+    const breakout = {
+      key: decodeURIComponent(keyvalue[0]),
+      value: decodeURIComponent(keyvalue[1]),
+    }
+
+    if (path) {
+      breakout.path = path[1]
+    }
+
+    if (expiration) {
+      breakout.expires = expiration[1]
+    }
+
+    // do not return expired cookies, similiar to cookie jar parsers
+    if (!breakout.expires || new Date(breakout.expires) > new Date()) {
+      list.push(breakout)
+    }
+  })
+
+  return list
+}
 
 test('cookies get set correctly', (t) => {
   t.plan(7)
@@ -23,19 +54,15 @@ test('cookies get set correctly', (t) => {
     if (err) tap.error(err)
     fastify.server.unref()
 
-    const reqOpts = {
+    fastify.inject({
       method: 'GET',
-      baseUrl: 'http://localhost:' + fastify.server.address().port
-    }
-    const req = request.defaults(reqOpts)
-
-    const jar = request.jar()
-    req({ uri: '/test1', jar }, (err, response, body) => {
+      url: '/test1'
+    }, (err, res) => {
       t.error(err)
-      t.strictEqual(response.statusCode, 200)
-      t.deepEqual(JSON.parse(body), { hello: 'world' })
+      t.strictEqual(res.statusCode, 200)
+      t.deepEqual(JSON.parse(res.body), { hello: 'world' })
 
-      const cookies = jar.getCookies(reqOpts.baseUrl + '/test1')
+      const cookies = parseCookies(res.headers['set-cookie'])
       t.is(cookies.length, 1)
       t.is(cookies[0].key, 'foo')
       t.is(cookies[0].value, 'foo')
@@ -61,19 +88,15 @@ test('should set multiple cookies', (t) => {
     if (err) tap.error(err)
     fastify.server.unref()
 
-    const reqOpts = {
+    fastify.inject({
       method: 'GET',
-      baseUrl: 'http://localhost:' + fastify.server.address().port
-    }
-    const req = request.defaults(reqOpts)
-
-    const jar = request.jar()
-    req({ uri: '/', jar }, (err, response, body) => {
+      url: '/'
+    }, (err, res) => {
       t.error(err)
-      t.strictEqual(response.statusCode, 200)
-      t.deepEqual(JSON.parse(body), { hello: 'world' })
+      t.strictEqual(res.statusCode, 200)
+      t.deepEqual(JSON.parse(res.body), { hello: 'world' })
 
-      const cookies = jar.getCookies(reqOpts.baseUrl + '/')
+      const cookies = parseCookies(res.headers['set-cookie'])
       t.is(cookies.length, 3)
       t.is(cookies[0].key, 'foo')
       t.is(cookies[0].value, 'foo')
@@ -100,19 +123,15 @@ test('cookies get set correctly with millisecond dates', (t) => {
     if (err) tap.error(err)
     fastify.server.unref()
 
-    const reqOpts = {
+    fastify.inject({
       method: 'GET',
-      baseUrl: 'http://localhost:' + fastify.server.address().port
-    }
-    const req = request.defaults(reqOpts)
-
-    const jar = request.jar()
-    req({ uri: '/test1', jar }, (err, response, body) => {
+      url: '/test1'
+    }, (err, res) => {
       t.error(err)
-      t.strictEqual(response.statusCode, 200)
-      t.deepEqual(JSON.parse(body), { hello: 'world' })
+      t.strictEqual(res.statusCode, 200)
+      t.deepEqual(JSON.parse(res.body), { hello: 'world' })
 
-      const cookies = jar.getCookies(reqOpts.baseUrl + '/test1')
+      const cookies = parseCookies(res.headers['set-cookie'])
       t.is(cookies.length, 1)
       t.is(cookies[0].key, 'foo')
       t.is(cookies[0].value, 'foo')
@@ -149,19 +168,16 @@ test('parses incoming cookies', (t) => {
     if (err) tap.error(err)
     fastify.server.unref()
 
-    const reqOpts = {
+    fastify.inject({
       method: 'GET',
-      baseUrl: 'http://localhost:' + fastify.server.address().port
-    }
-    const req = request.defaults(reqOpts)
-
-    const headers = {
-      cookie: 'bar=bar'
-    }
-    req({ uri: '/test2', headers }, (err, response, body) => {
+      url: '/test2',
+      headers: {
+        cookie: 'bar=bar'
+      }
+    }, (err, res) => {
       t.error(err)
-      t.strictEqual(response.statusCode, 200)
-      t.deepEqual(JSON.parse(body), { hello: 'world' })
+      t.strictEqual(res.statusCode, 200)
+      t.deepEqual(JSON.parse(res.body), { hello: 'world' })
     })
   })
 })
@@ -186,16 +202,12 @@ test('does not modify supplied cookie options object', (t) => {
     if (err) tap.error(err)
     fastify.server.unref()
 
-    const reqOpts = {
+    fastify.inject({
       method: 'GET',
-      baseUrl: 'http://localhost:' + fastify.server.address().port
-    }
-    const req = request.defaults(reqOpts)
-
-    const jar = request.jar()
-    req({ uri: '/test1', jar }, (err, response, body) => {
+      url: '/test1'
+    }, (err, res) => {
       t.error(err)
-      t.strictEqual(response.statusCode, 200)
+      t.strictEqual(res.statusCode, 200)
       t.strictDeepEqual(cookieOptions, {
         path: '/',
         expires: expireDate
@@ -219,19 +231,15 @@ test('cookies gets cleared correctly', (t) => {
     if (err) tap.error(err)
     fastify.server.unref()
 
-    const reqOpts = {
+    fastify.inject({
       method: 'GET',
-      baseUrl: 'http://localhost:' + fastify.server.address().port
-    }
-    const req = request.defaults(reqOpts)
-
-    const jar = request.jar()
-    req({ uri: '/test1', jar }, (err, response, body) => {
+      url: '/test1'
+    }, (err, res) => {
       t.error(err)
-      t.strictEqual(response.statusCode, 200)
-      t.deepEqual(JSON.parse(body), { hello: 'world' })
+      t.strictEqual(res.statusCode, 200)
+      t.deepEqual(JSON.parse(res.body), { hello: 'world' })
 
-      const cookies = jar.getCookies(reqOpts.baseUrl + '/test1')
+      const cookies = parseCookies(res.headers['set-cookie'])
       t.is(cookies.length, 0)
     })
   })
@@ -253,19 +261,15 @@ test('cookies signature', (t) => {
     if (err) tap.error(err)
     fastify.server.unref()
 
-    const reqOpts = {
+    fastify.inject({
       method: 'GET',
-      baseUrl: 'http://localhost:' + fastify.server.address().port
-    }
-    const req = request.defaults(reqOpts)
-
-    const jar = request.jar()
-    req({ uri: '/test1', jar }, (err, response, body) => {
+      url: '/test1'
+    }, (err, res) => {
       t.error(err)
-      t.strictEqual(response.statusCode, 200)
-      t.deepEqual(JSON.parse(body), { hello: 'world' })
+      t.strictEqual(res.statusCode, 200)
+      t.deepEqual(JSON.parse(res.body), { hello: 'world' })
 
-      const cookies = jar.getCookies(reqOpts.baseUrl + '/test1')
+      const cookies = parseCookies(res.headers['set-cookie'])
       t.is(cookies.length, 1)
       t.is(cookies[0].key, 'foo')
       t.is(cookieSignature.unsign(cookies[0].value, secret), 'foo')
@@ -293,18 +297,16 @@ test('pass options to `cookies.parse`', (t) => {
     if (err) tap.error(err)
     fastify.server.unref()
 
-    const reqOpts = {
+    fastify.inject({
       method: 'GET',
-      baseUrl: 'http://localhost:' + fastify.server.address().port
-    }
-    const req = request.defaults(reqOpts)
-    const headers = {
-      cookie: 'foo=bar'
-    }
-    req({ uri: '/test1', headers }, (err, response, body) => {
+      url: '/test1',
+      headers: {
+        cookie: 'foo=bar'
+      }
+    }, (err, res) => {
       t.error(err)
-      t.strictEqual(response.statusCode, 200)
-      t.deepEqual(JSON.parse(body), { hello: 'world' })
+      t.strictEqual(res.statusCode, 200)
+      t.deepEqual(JSON.parse(res.body), { hello: 'world' })
     })
   })
 
