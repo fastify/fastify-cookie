@@ -17,24 +17,19 @@ test('cookies get set correctly', (t) => {
       .send({ hello: 'world' })
   })
 
-  fastify.listen(0, (err) => {
-    if (err) tap.error(err)
-    fastify.server.unref()
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.strictEqual(res.statusCode, 200)
+    t.deepEqual(JSON.parse(res.body), { hello: 'world' })
 
-    fastify.inject({
-      method: 'GET',
-      url: '/test1'
-    }, (err, res) => {
-      t.error(err)
-      t.strictEqual(res.statusCode, 200)
-      t.deepEqual(JSON.parse(res.body), { hello: 'world' })
-
-      const cookies = res.cookies
-      t.is(cookies.length, 1)
-      t.is(cookies[0].name, 'foo')
-      t.is(cookies[0].value, 'foo')
-      t.is(cookies[0].path, '/')
-    })
+    const cookies = res.cookies
+    t.is(cookies.length, 1)
+    t.is(cookies[0].name, 'foo')
+    t.is(cookies[0].value, 'foo')
+    t.is(cookies[0].path, '/')
   })
 })
 
@@ -51,27 +46,22 @@ test('should set multiple cookies', (t) => {
       .send({ hello: 'world' })
   })
 
-  fastify.listen(0, (err) => {
-    if (err) tap.error(err)
-    fastify.server.unref()
+  fastify.inject({
+    method: 'GET',
+    url: '/'
+  }, (err, res) => {
+    t.error(err)
+    t.strictEqual(res.statusCode, 200)
+    t.deepEqual(JSON.parse(res.body), { hello: 'world' })
 
-    fastify.inject({
-      method: 'GET',
-      url: '/'
-    }, (err, res) => {
-      t.error(err)
-      t.strictEqual(res.statusCode, 200)
-      t.deepEqual(JSON.parse(res.body), { hello: 'world' })
-
-      const cookies = res.cookies
-      t.is(cookies.length, 3)
-      t.is(cookies[0].name, 'foo')
-      t.is(cookies[0].value, 'foo')
-      t.is(cookies[1].name, 'bar')
-      t.is(cookies[1].value, 'test')
-      t.is(cookies[2].name, 'wee')
-      t.is(cookies[2].value, 'woo')
-    })
+    const cookies = res.cookies
+    t.is(cookies.length, 3)
+    t.is(cookies[0].name, 'foo')
+    t.is(cookies[0].value, 'foo')
+    t.is(cookies[1].name, 'bar')
+    t.is(cookies[1].value, 'test')
+    t.is(cookies[2].name, 'wee')
+    t.is(cookies[2].value, 'woo')
   })
 })
 
@@ -86,26 +76,21 @@ test('cookies get set correctly with millisecond dates', (t) => {
       .send({ hello: 'world' })
   })
 
-  fastify.listen(0, (err) => {
-    if (err) tap.error(err)
-    fastify.server.unref()
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.strictEqual(res.statusCode, 200)
+    t.deepEqual(JSON.parse(res.body), { hello: 'world' })
 
-    fastify.inject({
-      method: 'GET',
-      url: '/test1'
-    }, (err, res) => {
-      t.error(err)
-      t.strictEqual(res.statusCode, 200)
-      t.deepEqual(JSON.parse(res.body), { hello: 'world' })
-
-      const cookies = res.cookies
-      t.is(cookies.length, 1)
-      t.is(cookies[0].name, 'foo')
-      t.is(cookies[0].value, 'foo')
-      t.is(cookies[0].path, '/')
-      const expires = new Date(cookies[0].expires)
-      t.ok(expires < new Date(Date.now() + 5000))
-    })
+    const cookies = res.cookies
+    t.is(cookies.length, 1)
+    t.is(cookies[0].name, 'foo')
+    t.is(cookies[0].value, 'foo')
+    t.is(cookies[0].path, '/')
+    const expires = new Date(cookies[0].expires)
+    t.ok(expires < new Date(Date.now() + 5000))
   })
 })
 
@@ -131,21 +116,16 @@ test('parses incoming cookies', (t) => {
     reply.send({ hello: 'world' })
   })
 
-  fastify.listen(0, (err) => {
-    if (err) tap.error(err)
-    fastify.server.unref()
-
-    fastify.inject({
-      method: 'GET',
-      url: '/test2',
-      headers: {
-        cookie: 'bar=bar'
-      }
-    }, (err, res) => {
-      t.error(err)
-      t.strictEqual(res.statusCode, 200)
-      t.deepEqual(JSON.parse(res.body), { hello: 'world' })
-    })
+  fastify.inject({
+    method: 'GET',
+    url: '/test2',
+    headers: {
+      cookie: 'bar=bar'
+    }
+  }, (err, res) => {
+    t.error(err)
+    t.strictEqual(res.statusCode, 200)
+    t.deepEqual(JSON.parse(res.body), { hello: 'world' })
   })
 })
 
@@ -165,20 +145,15 @@ test('does not modify supplied cookie options object', (t) => {
       .send({ hello: 'world' })
   })
 
-  fastify.listen(0, (err) => {
-    if (err) tap.error(err)
-    fastify.server.unref()
-
-    fastify.inject({
-      method: 'GET',
-      url: '/test1'
-    }, (err, res) => {
-      t.error(err)
-      t.strictEqual(res.statusCode, 200)
-      t.strictDeepEqual(cookieOptions, {
-        path: '/',
-        expires: expireDate
-      })
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.strictEqual(res.statusCode, 200)
+    t.strictDeepEqual(cookieOptions, {
+      path: '/',
+      expires: expireDate
     })
   })
 })
@@ -194,22 +169,17 @@ test('cookies gets cleared correctly', (t) => {
       .send({ hello: 'world' })
   })
 
-  fastify.listen(0, (err) => {
-    if (err) tap.error(err)
-    fastify.server.unref()
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.strictEqual(res.statusCode, 200)
+    t.deepEqual(JSON.parse(res.body), { hello: 'world' })
 
-    fastify.inject({
-      method: 'GET',
-      url: '/test1'
-    }, (err, res) => {
-      t.error(err)
-      t.strictEqual(res.statusCode, 200)
-      t.deepEqual(JSON.parse(res.body), { hello: 'world' })
-
-      const cookies = res.cookies
-      t.is(cookies.length, 1)
-      t.is(new Date(cookies[0].expires) < new Date(), true)
-    })
+    const cookies = res.cookies
+    t.is(cookies.length, 1)
+    t.is(new Date(cookies[0].expires) < new Date(), true)
   })
 })
 
@@ -225,23 +195,18 @@ test('cookies signature', (t) => {
       .send({ hello: 'world' })
   })
 
-  fastify.listen(0, (err) => {
-    if (err) tap.error(err)
-    fastify.server.unref()
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.strictEqual(res.statusCode, 200)
+    t.deepEqual(JSON.parse(res.body), { hello: 'world' })
 
-    fastify.inject({
-      method: 'GET',
-      url: '/test1'
-    }, (err, res) => {
-      t.error(err)
-      t.strictEqual(res.statusCode, 200)
-      t.deepEqual(JSON.parse(res.body), { hello: 'world' })
-
-      const cookies = res.cookies
-      t.is(cookies.length, 1)
-      t.is(cookies[0].name, 'foo')
-      t.is(cookieSignature.unsign(cookies[0].value, secret), 'foo')
-    })
+    const cookies = res.cookies
+    t.is(cookies.length, 1)
+    t.is(cookies[0].name, 'foo')
+    t.is(cookieSignature.unsign(cookies[0].value, secret), 'foo')
   })
 })
 
@@ -261,21 +226,16 @@ test('pass options to `cookies.parse`', (t) => {
     reply.send({ hello: 'world' })
   })
 
-  fastify.listen(0, (err) => {
-    if (err) tap.error(err)
-    fastify.server.unref()
-
-    fastify.inject({
-      method: 'GET',
-      url: '/test1',
-      headers: {
-        cookie: 'foo=bar'
-      }
-    }, (err, res) => {
-      t.error(err)
-      t.strictEqual(res.statusCode, 200)
-      t.deepEqual(JSON.parse(res.body), { hello: 'world' })
-    })
+  fastify.inject({
+    method: 'GET',
+    url: '/test1',
+    headers: {
+      cookie: 'foo=bar'
+    }
+  }, (err, res) => {
+    t.error(err)
+    t.strictEqual(res.statusCode, 200)
+    t.deepEqual(JSON.parse(res.body), { hello: 'world' })
   })
 
   function decoder (str) {
