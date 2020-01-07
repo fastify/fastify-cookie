@@ -6,38 +6,6 @@ const Fastify = require('fastify')
 const cookieSignature = require('cookie-signature')
 const plugin = require('../')
 
-function parseCookies (cookies) {
-  if (!cookies) return []
-
-  var list = []
-  const cookiesList = Array.isArray(cookies) ? cookies : [cookies]
-  cookiesList.forEach(c => {
-    const parts = c.split(';')
-    const keyvalue = parts[0].split('=')
-    const path = parts.length > 1 ? parts[1].trim().split('=') : null
-    const expiration = parts.length > 2 ? parts[2].trim().split('=') : null
-    const breakout = {
-      key: decodeURIComponent(keyvalue[0]),
-      value: decodeURIComponent(keyvalue[1])
-    }
-
-    if (path) {
-      breakout.path = path[1]
-    }
-
-    if (expiration) {
-      breakout.expires = expiration[1]
-    }
-
-    // do not return expired cookies, similiar to cookie jar parsers
-    if (!breakout.expires || new Date(breakout.expires) > new Date()) {
-      list.push(breakout)
-    }
-  })
-
-  return list
-}
-
 test('cookies get set correctly', (t) => {
   t.plan(7)
   const fastify = Fastify()
@@ -61,9 +29,9 @@ test('cookies get set correctly', (t) => {
       t.strictEqual(res.statusCode, 200)
       t.deepEqual(JSON.parse(res.body), { hello: 'world' })
 
-      const cookies = parseCookies(res.headers['set-cookie'])
+      const cookies = res.cookies
       t.is(cookies.length, 1)
-      t.is(cookies[0].key, 'foo')
+      t.is(cookies[0].name, 'foo')
       t.is(cookies[0].value, 'foo')
       t.is(cookies[0].path, '/')
     })
@@ -95,13 +63,13 @@ test('should set multiple cookies', (t) => {
       t.strictEqual(res.statusCode, 200)
       t.deepEqual(JSON.parse(res.body), { hello: 'world' })
 
-      const cookies = parseCookies(res.headers['set-cookie'])
+      const cookies = res.cookies
       t.is(cookies.length, 3)
-      t.is(cookies[0].key, 'foo')
+      t.is(cookies[0].name, 'foo')
       t.is(cookies[0].value, 'foo')
-      t.is(cookies[1].key, 'bar')
+      t.is(cookies[1].name, 'bar')
       t.is(cookies[1].value, 'test')
-      t.is(cookies[2].key, 'wee')
+      t.is(cookies[2].name, 'wee')
       t.is(cookies[2].value, 'woo')
     })
   })
@@ -130,9 +98,9 @@ test('cookies get set correctly with millisecond dates', (t) => {
       t.strictEqual(res.statusCode, 200)
       t.deepEqual(JSON.parse(res.body), { hello: 'world' })
 
-      const cookies = parseCookies(res.headers['set-cookie'])
+      const cookies = res.cookies
       t.is(cookies.length, 1)
-      t.is(cookies[0].key, 'foo')
+      t.is(cookies[0].name, 'foo')
       t.is(cookies[0].value, 'foo')
       t.is(cookies[0].path, '/')
       const expires = new Date(cookies[0].expires)
@@ -216,7 +184,7 @@ test('does not modify supplied cookie options object', (t) => {
 })
 
 test('cookies gets cleared correctly', (t) => {
-  t.plan(4)
+  t.plan(5)
   const fastify = Fastify()
   fastify.register(plugin)
 
@@ -238,8 +206,9 @@ test('cookies gets cleared correctly', (t) => {
       t.strictEqual(res.statusCode, 200)
       t.deepEqual(JSON.parse(res.body), { hello: 'world' })
 
-      const cookies = parseCookies(res.headers['set-cookie'])
-      t.is(cookies.length, 0)
+      const cookies = res.cookies
+      t.is(cookies.length, 1)
+      t.is(new Date(cookies[0].expires) < new Date(), true)
     })
   })
 })
@@ -268,9 +237,9 @@ test('cookies signature', (t) => {
       t.strictEqual(res.statusCode, 200)
       t.deepEqual(JSON.parse(res.body), { hello: 'world' })
 
-      const cookies = parseCookies(res.headers['set-cookie'])
+      const cookies = res.cookies
       t.is(cookies.length, 1)
-      t.is(cookies[0].key, 'foo')
+      t.is(cookies[0].name, 'foo')
       t.is(cookieSignature.unsign(cookies[0].value, secret), 'foo')
     })
   })
