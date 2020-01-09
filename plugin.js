@@ -38,6 +38,7 @@ function fastifyCookieClearCookie (reply, name, options) {
 
 function onReqHandlerWrapper (options) {
   return function fastifyCookieOnReqHandler (fastifyReq, fastifyRes, done) {
+    fastifyReq.cookies = {} // New container per request. Issue #53
     const cookieHeader = fastifyReq.req.headers.cookie
     if (cookieHeader) {
       fastifyReq.cookies = cookie.parse(cookieHeader, options)
