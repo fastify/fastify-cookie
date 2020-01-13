@@ -28,7 +28,7 @@ declare module 'fastify' {
     httpOnly?: boolean;
     maxAge?: number;
     path?: string;
-    sameSite?: boolean | 'lax' | 'strict';
+    sameSite?: boolean | 'lax' | 'strict' | 'none';
     secure?: boolean;
     signed?: boolean;
   }
