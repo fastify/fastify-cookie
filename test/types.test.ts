@@ -34,3 +34,41 @@ appWithHttp2
       .send({hello: 'world'});
     })
   });
+
+
+const testSamesiteOptionsApp = fastify();
+
+testSamesiteOptionsApp
+.register(cookie)
+.after(() => {
+  appWithImplicitHttp.get('/test-samesite-option-true', (request, reply) => {
+    const test = request.cookies.test;
+    reply
+    .setCookie('test', test, { sameSite: true })
+    .send({hello: 'world'});
+  })
+  appWithImplicitHttp.get('/test-samesite-option-false', (request, reply) => {
+    const test = request.cookies.test;
+    reply
+    .setCookie('test', test, { sameSite: false })
+    .send({hello: 'world'});
+  })
+  appWithImplicitHttp.get('/test-samesite-option-lax', (request, reply) => {
+    const test = request.cookies.test;
+    reply
+    .setCookie('test', test, { sameSite: 'lax' })
+    .send({hello: 'world'});
+  })
+  appWithImplicitHttp.get('/test-samesite-option-strict', (request, reply) => {
+    const test = request.cookies.test;
+    reply
+    .setCookie('test', test, { sameSite: 'strict' })
+    .send({hello: 'world'});
+  })
+  appWithImplicitHttp.get('/test-samesite-option-none', (request, reply) => {
+    const test = request.cookies.test;
+    reply
+    .setCookie('test', test, { sameSite: 'none' })
+    .send({hello: 'world'});
+  })
+});
