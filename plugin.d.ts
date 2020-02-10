@@ -62,7 +62,7 @@ declare module 'fastify' {
      */
     unsignCookie(
       value: string,
-    ): fastify.FastifyReply<HttpResponse>
+    ): string | false;
   }
 }
 
