@@ -22,7 +22,6 @@ const appWithHttp2: fastify.FastifyInstance<
   http2.Http2ServerResponse
 > = fastify();
 
-
 appWithHttp2
   .register(cookie)
   .after(() => {
@@ -72,3 +71,19 @@ testSamesiteOptionsApp
     .send({hello: 'world'});
   })
 });
+
+const appWithImplicitHttpSigned = fastify();
+
+appWithImplicitHttpSigned
+  .register(cookie, {
+    secret: 'testsecret'
+  })
+  .after(() => {
+    appWithImplicitHttp.get('/', (request, reply) => {
+      reply.unsignCookie(request.cookies.test)
+      reply.unsignCookie('test')
+
+      reply
+      .send({ hello: 'world' });
+    })
+  });
