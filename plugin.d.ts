@@ -55,6 +55,14 @@ declare module 'fastify' {
       name: string,
       options?: CookieSerializeOptions
     ): fastify.FastifyReply<HttpResponse>;
+
+    /**
+     * Unsigns the specified cookie using the secret provided.
+     * @param value Cookie value
+     */
+    unsignCookie(
+      value: string,
+    ): string | false;
   }
 }
 
