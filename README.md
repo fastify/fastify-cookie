@@ -59,9 +59,9 @@ with a value of `'foo'` on the cookie path `/`.
 
 + `name`: a string name for the cookie to be set
 + `value`: a string value for the cookie
-+ `options`: an options object as described in the [cookie serialize][cs]
++ `options`: an options object as described in the [cookie serialize][cs] documentation
   with a extra param "signed" for signed cookie
-documentation
+
 
 ### Clearing
 
