@@ -31,7 +31,7 @@ fastify.get('/', (req, reply) => {
       domain: 'example.com',
       path: '/'
     })
-    setCookie('bar', 'bar', {
+    .setCookie('bar', 'bar', {
       path: '/',
       signed: true
     })
