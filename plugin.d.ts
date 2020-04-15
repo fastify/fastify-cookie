@@ -1,39 +1,16 @@
 /// <reference types="node" />
-import * as fastify from 'fastify';
-import {FastifyRequest, DefaultQuery, Plugin} from 'fastify';
-import {IncomingMessage, ServerResponse} from 'http';
-import {Http2ServerRequest, Http2ServerResponse} from 'http2';
 
-type HttpRequest = IncomingMessage | Http2ServerRequest;
-type HttpResponse = ServerResponse | Http2ServerResponse;
+import { FastifyPlugin } from 'fastify';
 
 declare module 'fastify' {
-  interface FastifyRequest<
-    HttpRequest,
-    Query = fastify.DefaultQuery,
-    Params = fastify.DefaultParams,
-    Headers = fastify.DefaultHeaders,
-    Body = any
-  > {
+  interface FastifyRequestInterface {
     /**
      * Request cookies
      */
-    cookies: {[cookieName: string]: string};
+    cookies: { [cookieName: string]: string };
   }
 
-  interface CookieSerializeOptions {
-    domain?: string;
-    encode?(val: string): string;
-    expires?: Date;
-    httpOnly?: boolean;
-    maxAge?: number;
-    path?: string;
-    sameSite?: boolean | 'lax' | 'strict' | 'none';
-    secure?: boolean;
-    signed?: boolean;
-  }
-
-  interface FastifyReply<HttpResponse> {
+  interface FastifyReplyInterface {
     /**
      * Set response cookie
      * @param name Cookie name
@@ -44,7 +21,7 @@ declare module 'fastify' {
       name: string,
       value: string,
       options?: CookieSerializeOptions
-    ): fastify.FastifyReply<HttpResponse>;
+    ): FastifyReplyInterface;
 
     /**
      * clear response cookie
@@ -54,7 +31,7 @@ declare module 'fastify' {
     clearCookie(
       name: string,
       options?: CookieSerializeOptions
-    ): fastify.FastifyReply<HttpResponse>;
+    ): FastifyReplyInterface;
 
     /**
      * Unsigns the specified cookie using the secret provided.
@@ -66,10 +43,22 @@ declare module 'fastify' {
   }
 }
 
-declare function fastifyCookie(): void;
-
-declare namespace fastifyCookie {
-  interface FastifyCookieOptions {}
+export interface CookieSerializeOptions {
+  domain?: string;
+  encode?(val: string): string;
+  expires?: Date;
+  httpOnly?: boolean;
+  maxAge?: number;
+  path?: string;
+  sameSite?: boolean | 'lax' | 'strict' | 'none';
+  secure?: boolean;
+  signed?: boolean;
 }
 
-export = fastifyCookie;
+export interface FastifyCookieOptions {
+  secret?: string;
+}
+
+declare const fastifyCookie: FastifyPlugin<FastifyCookieOptions>;
+
+export default fastifyCookie;
