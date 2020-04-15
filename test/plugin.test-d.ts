@@ -1,5 +1,5 @@
 import fastify from 'fastify';
-import cookie from './plugin';
+import cookie from '../plugin';
 
 const server = fastify();
 

@@ -48,5 +48,8 @@
     "ignore": [
       "tap"
     ]
+  },
+  "tsd": {
+    "directory": "test"
   }
 }
