@@ -3,6 +3,7 @@ import * as fastify from 'fastify';
 import {FastifyRequest, DefaultQuery, Plugin} from 'fastify';
 import {IncomingMessage, ServerResponse} from 'http';
 import {Http2ServerRequest, Http2ServerResponse} from 'http2';
+import {CookieParseOptions} from 'cookie'
 
 type HttpRequest = IncomingMessage | Http2ServerRequest;
 type HttpResponse = ServerResponse | Http2ServerResponse;
@@ -69,7 +70,17 @@ declare module 'fastify' {
 declare function fastifyCookie(): void;
 
 declare namespace fastifyCookie {
-  interface FastifyCookieOptions {}
+  interface FastifyCookieOptions {
+    /**
+     * Secret for cookies signature.
+     */
+    secret: string
+
+    /**
+     * Cookie parsing [options](https://github.com/jshttp/cookie#options).
+     */
+    parseOptions: CookieParseOptions
+  }
 }
 
 export = fastifyCookie;
