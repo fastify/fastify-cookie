@@ -76,7 +76,10 @@ const appWithImplicitHttpSigned = fastify();
 
 appWithImplicitHttpSigned
   .register(cookie, {
-    secret: 'testsecret'
+    secret: 'testsecret',
+    parseOptions: {
+      decode: () => ''
+    }
   })
   .after(() => {
     appWithImplicitHttp.get('/', (request, reply) => {
