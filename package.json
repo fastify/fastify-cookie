@@ -31,7 +31,7 @@
   "homepage": "https://github.com/fastify/fastify-cookie#readme",
   "devDependencies": {
     "@types/node": "^13.1.0",
-    "fastify": "github:thomheymann/fastify#fix-instance-types",
+    "fastify": "^3.0.0-alpha.1",
     "pre-commit": "^1.2.2",
     "snazzy": "^8.0.0",
     "standard": "^14.0.2",
@@ -42,12 +42,7 @@
   "dependencies": {
     "cookie": "^0.4.0",
     "cookie-signature": "^1.1.0",
-    "fastify-plugin": "github:thomheymann/fastify-plugin#next"
-  },
-  "greenkeeper": {
-    "ignore": [
-      "tap"
-    ]
+    "fastify-plugin": "^2.0.0"
   },
   "tsd": {
     "directory": "test"
