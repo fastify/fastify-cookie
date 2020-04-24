@@ -72,12 +72,12 @@ declare namespace fastifyCookie {
     /**
      * Secret for cookies signature.
      */
-    secret: string
+    secret?: string
 
     /**
      * Cookie parsing [options](https://github.com/jshttp/cookie#options).
      */
-    parseOptions: CookieParseOptions
+    parseOptions?: CookieParseOptions
   }
 }
 
