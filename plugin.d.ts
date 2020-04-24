@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import * as fastify from 'fastify';
 import {FastifyRequest, DefaultQuery, Plugin} from 'fastify';
-import {IncomingMessage, ServerResponse} from 'http';
+import {IncomingMessage, ServerResponse, Server} from 'http';
 import {Http2ServerRequest, Http2ServerResponse} from 'http2';
 import {CookieParseOptions} from 'cookie'
 
@@ -67,8 +67,6 @@ declare module 'fastify' {
   }
 }
 
-declare function fastifyCookie(): void;
-
 declare namespace fastifyCookie {
   interface FastifyCookieOptions {
     /**
@@ -82,5 +80,12 @@ declare namespace fastifyCookie {
     parseOptions: CookieParseOptions
   }
 }
+
+declare let fastifyCookie: Plugin<
+  Server,
+  HttpRequest,
+  HttpResponse,
+  fastifyCookie.FastifyCookieOptions
+>;
 
 export = fastifyCookie;
