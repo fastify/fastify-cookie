@@ -9,7 +9,7 @@
     "test-ci": "tap --cov test/*.test.js && npm run typescript",
     "lint": "standard | snazzy",
     "lint-ci": "standard",
-    "typescript": "tsc --project ./tsconfig.json"
+    "typescript": "tsd"
   },
   "precommit": [
     "lint",
@@ -31,21 +31,20 @@
   "homepage": "https://github.com/fastify/fastify-cookie#readme",
   "devDependencies": {
     "@types/node": "^13.1.0",
-    "fastify": "^2.11.0",
+    "fastify": "^3.0.0-rc.1",
     "pre-commit": "^1.2.2",
     "snazzy": "^8.0.0",
     "standard": "^14.0.2",
     "tap": "^12.6.6",
+    "tsd": "^0.11.0",
     "typescript": "^3.3.1"
   },
   "dependencies": {
     "cookie": "^0.4.0",
     "cookie-signature": "^1.1.0",
-    "fastify-plugin": "^1.4.0"
+    "fastify-plugin": "^2.0.0"
   },
-  "greenkeeper": {
-    "ignore": [
-      "tap"
-    ]
+  "tsd": {
+    "directory": "test"
   }
 }
