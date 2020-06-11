@@ -3,14 +3,14 @@
 import { FastifyPlugin } from 'fastify';
 
 declare module 'fastify' {
-  interface FastifyRequestInterface {
+  interface FastifyRequest {
     /**
      * Request cookies
      */
     cookies: { [cookieName: string]: string };
   }
 
-  interface FastifyReplyInterface {
+  interface FastifyReply {
     /**
      * Set response cookie
      * @param name Cookie name
@@ -21,7 +21,7 @@ declare module 'fastify' {
       name: string,
       value: string,
       options?: CookieSerializeOptions
-    ): FastifyReplyInterface;
+    ): FastifyReply;
 
     /**
      * clear response cookie
@@ -31,7 +31,7 @@ declare module 'fastify' {
     clearCookie(
       name: string,
       options?: CookieSerializeOptions
-    ): FastifyReplyInterface;
+    ): FastifyReply;
 
     /**
      * Unsigns the specified cookie using the secret provided.
