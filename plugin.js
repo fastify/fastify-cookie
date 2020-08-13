@@ -14,6 +14,11 @@ function fastifyCookieSetCookie (reply, name, value, options, secret) {
     value = cookieSignature.sign(value, secret)
   }
 
+  if (typeof opts.filter === 'function' && opts.filter(reply, name, value, options)) {
+    reply.removeHeader('Set-Cookie')
+    return reply
+  }
+
   const serialized = cookie.serialize(name, value, opts)
   let setCookie = reply.getHeader('Set-Cookie')
   if (!setCookie) {
