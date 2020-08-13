@@ -4,19 +4,20 @@ const fp = require('fastify-plugin')
 const cookie = require('cookie')
 const cookieSignature = require('cookie-signature')
 
-function fastifyCookieSetCookie (reply, name, value, options, secret) {
+function fastifyCookieSetCookie (reply, name, value, options, secret, filter) {
   const opts = Object.assign({}, options || {})
+
+  if (typeof filter === 'function' && filter(reply, name, value, options)) {
+    reply.removeHeader('Set-Cookie')
+    return reply
+  }
+  
   if (opts.expires && Number.isInteger(opts.expires)) {
     opts.expires = new Date(opts.expires)
   }
 
   if (opts.signed) {
     value = cookieSignature.sign(value, secret)
-  }
-
-  if (typeof opts.filter === 'function' && opts.filter(reply, name, value, options)) {
-    reply.removeHeader('Set-Cookie')
-    return reply
   }
 
   const serialized = cookie.serialize(name, value, opts)
@@ -54,6 +55,7 @@ function onReqHandlerWrapper (options) {
 
 function plugin (fastify, options, next) {
   const secret = options ? options.secret || '' : ''
+  const filter = options ? options.filter : undefined
 
   fastify.decorateRequest('cookies', {})
   fastify.decorateReply('setCookie', function setCookieWrapper (name, value, options) {
