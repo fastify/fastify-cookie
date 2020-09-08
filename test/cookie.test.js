@@ -278,3 +278,15 @@ test('issue 53', (t) => {
     t.is(response.body, 'done')
   })
 })
+
+test('parse cookie manually using decorator', (t) => {
+  t.plan(2)
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  fastify.ready(() => {
+    t.ok(fastify.parseCookie)
+    t.deepEqual(fastify.parseCookie('foo=bar', {}), { foo: 'bar' })
+    t.end()
+  })
+})
