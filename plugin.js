@@ -36,12 +36,12 @@ function fastifyCookieClearCookie (reply, name, options) {
   return fastifyCookieSetCookie(reply, name, '', opts)
 }
 
-function onReqHandlerWrapper (options) {
+function onReqHandlerWrapper (fastify) {
   return function fastifyCookieOnReqHandler (fastifyReq, fastifyRes, done) {
     fastifyReq.cookies = {} // New container per request. Issue #53
     const cookieHeader = fastifyReq.raw.headers.cookie
     if (cookieHeader) {
-      fastifyReq.cookies = cookie.parse(cookieHeader, options)
+      fastifyReq.cookies = fastify.parseCookie(cookieHeader)
     }
     done()
   }
@@ -50,6 +50,9 @@ function onReqHandlerWrapper (options) {
 function plugin (fastify, options, next) {
   const secret = options ? options.secret || '' : ''
 
+  fastify.decorate('parseCookie', function parseCookie (cookieHeader) {
+    return cookie.parse(cookieHeader, options.parseOptions)
+  })
   fastify.decorateRequest('cookies', {})
   fastify.decorateReply('setCookie', function setCookieWrapper (name, value, options) {
     return fastifyCookieSetCookie(this, name, value, options, secret)
@@ -60,7 +63,7 @@ function plugin (fastify, options, next) {
   fastify.decorateReply('unsignCookie', function unsignCookieWrapper (value) {
     return cookieSignature.unsign(value, secret)
   })
-  fastify.addHook('onRequest', onReqHandlerWrapper(options.parseOptions))
+  fastify.addHook('onRequest', onReqHandlerWrapper(fastify))
   next()
 }
 
