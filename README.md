@@ -74,7 +74,7 @@ on the cookie path `/`.
 + `options`: an options object as described in the [cookie serialize][cs]
 documentation. Its optional to pass `options` object
 
-### Manual cookie parse
+### Manual cookie parsing
 
 The method `parseCookie(cookieHeader)` is added to the `fastify` instance
 via the Fastify `decorate` API. Thus, `fastify.parseCookie('sessionId=aYb4uTIhdBXC')`
