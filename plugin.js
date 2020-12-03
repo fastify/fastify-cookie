@@ -53,7 +53,7 @@ function plugin (fastify, options, next) {
   fastify.decorate('parseCookie', function parseCookie (cookieHeader) {
     return cookie.parse(cookieHeader, options.parseOptions)
   })
-  fastify.decorateRequest('cookies', {})
+  fastify.decorateRequest('cookies', () => ({}))
   fastify.decorateReply('setCookie', function setCookieWrapper (name, value, options) {
     return fastifyCookieSetCookie(this, name, value, options, secret)
   })
