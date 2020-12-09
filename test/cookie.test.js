@@ -191,29 +191,58 @@ test('cookies gets cleared correctly', (t) => {
 })
 
 test('cookies signature', (t) => {
-  t.plan(6)
-  const fastify = Fastify()
-  const secret = 'bar'
-  fastify.register(plugin, { secret })
+  t.plan(2)
 
-  fastify.get('/test1', (req, reply) => {
-    reply
-      .setCookie('foo', 'foo', { signed: true })
-      .send({ hello: 'world' })
+  t.test('unsign', t => {
+    t.plan(6)
+    const fastify = Fastify()
+    const secret = 'bar'
+    fastify.register(plugin, { secret })
+
+    fastify.get('/test1', (req, reply) => {
+      reply
+        .setCookie('foo', 'foo', { signed: true })
+        .send({ hello: 'world' })
+    })
+
+    fastify.inject({
+      method: 'GET',
+      url: '/test1'
+    }, (err, res) => {
+      t.error(err)
+      t.strictEqual(res.statusCode, 200)
+      t.deepEqual(JSON.parse(res.body), { hello: 'world' })
+
+      const cookies = res.cookies
+      t.is(cookies.length, 1)
+      t.is(cookies[0].name, 'foo')
+      t.is(cookieSignature.unsign(cookies[0].value, secret), 'foo')
+    })
   })
 
-  fastify.inject({
-    method: 'GET',
-    url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.strictEqual(res.statusCode, 200)
-    t.deepEqual(JSON.parse(res.body), { hello: 'world' })
+  t.test('unsignCookie decorator', t => {
+    t.plan(3)
+    const fastify = Fastify()
+    const secret = 'bar'
+    fastify.register(plugin, { secret })
 
-    const cookies = res.cookies
-    t.is(cookies.length, 1)
-    t.is(cookies[0].name, 'foo')
-    t.is(cookieSignature.unsign(cookies[0].value, secret), 'foo')
+    fastify.get('/test1', (req, reply) => {
+      reply.send({
+        unsigned: reply.unsignCookie(req.cookies.foo, secret)
+      })
+    })
+
+    fastify.inject({
+      method: 'GET',
+      url: '/test1',
+      headers: {
+        cookie: `foo=${cookieSignature.sign('foo', secret)}`
+      }
+    }, (err, res) => {
+      t.error(err)
+      t.strictEqual(res.statusCode, 200)
+      t.deepEqual(JSON.parse(res.body), { unsigned: 'foo' })
+    })
   })
 })
 

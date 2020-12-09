@@ -48,7 +48,7 @@ function onReqHandlerWrapper (fastify) {
 }
 
 function plugin (fastify, options, next) {
-  const secret = options ? options.secret || '' : ''
+  const secret = options.secret || ''
 
   fastify.decorate('parseCookie', function parseCookie (cookieHeader) {
     return cookie.parse(cookieHeader, options.parseOptions)
