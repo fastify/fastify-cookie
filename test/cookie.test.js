@@ -3,6 +3,7 @@
 const tap = require('tap')
 const test = tap.test
 const Fastify = require('fastify')
+const sinon = require('sinon')
 const cookieSignature = require('cookie-signature')
 const plugin = require('../')
 
@@ -191,7 +192,7 @@ test('cookies gets cleared correctly', (t) => {
 })
 
 test('cookies signature', (t) => {
-  t.plan(2)
+  t.plan(4)
 
   t.test('unsign', t => {
     t.plan(6)
@@ -220,6 +221,36 @@ test('cookies signature', (t) => {
     })
   })
 
+  t.test('custom signer', t => {
+    t.plan(7)
+    const fastify = Fastify()
+    const signStub = sinon.stub().returns('SIGNED-VALUE')
+    const unsignStub = sinon.stub().returns('ORIGINAL VALUE')
+    const secret = { sign: signStub, unsign: unsignStub }
+    fastify.register(plugin, { secret })
+
+    fastify.get('/test1', (req, reply) => {
+      reply
+        .setCookie('foo', 'bar', { signed: true })
+        .send({ hello: 'world' })
+    })
+
+    fastify.inject({
+      method: 'GET',
+      url: '/test1'
+    }, (err, res) => {
+      t.error(err)
+      t.strictEqual(res.statusCode, 200)
+      t.deepEqual(JSON.parse(res.body), { hello: 'world' })
+
+      const cookies = res.cookies
+      t.is(cookies.length, 1)
+      t.is(cookies[0].name, 'foo')
+      t.is(cookies[0].value, 'SIGNED-VALUE')
+      t.ok(signStub.calledOnceWithExactly('bar'))
+    })
+  })
+
   t.test('unsignCookie decorator', t => {
     t.plan(3)
     const fastify = Fastify()
@@ -242,6 +273,34 @@ test('cookies signature', (t) => {
       t.error(err)
       t.strictEqual(res.statusCode, 200)
       t.deepEqual(JSON.parse(res.body), { unsigned: 'foo' })
+    })
+  })
+
+  t.test('unsignCookie decorator with custom signer', t => {
+    t.plan(4)
+    const fastify = Fastify()
+    const signStub = sinon.stub().returns('SIGNED-VALUE')
+    const unsignStub = sinon.stub().returns('ORIGINAL VALUE')
+    const secret = { sign: signStub, unsign: unsignStub }
+    fastify.register(plugin, { secret })
+
+    fastify.get('/test1', (req, reply) => {
+      reply.send({
+        unsigned: reply.unsignCookie(req.cookies.foo, secret)
+      })
+    })
+
+    fastify.inject({
+      method: 'GET',
+      url: '/test1',
+      headers: {
+        cookie: 'foo=SOME-SIGNED-VALUE'
+      }
+    }, (err, res) => {
+      t.error(err)
+      t.strictEqual(res.statusCode, 200)
+      t.deepEqual(JSON.parse(res.body), { unsigned: 'ORIGINAL VALUE' })
+      t.ok(unsignStub.calledOnceWithExactly('SOME-SIGNED-VALUE'))
     })
   })
 })
