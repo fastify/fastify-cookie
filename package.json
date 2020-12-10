@@ -1,6 +1,6 @@
 {
   "name": "fastify-cookie",
-  "version": "4.1.1",
+  "version": "4.2.0",
   "description": "Plugin for fastify to add support for cookies",
   "main": "plugin.js",
   "types": "plugin.d.ts",
