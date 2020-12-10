@@ -1,13 +1,10 @@
+'use strict'
+
 const cookieSignature = require('cookie-signature')
 
 module.exports = function (secret) {
-  const sign = (value) => {
-    return cookieSignature.sign(value, secret)
+  return {
+    sign: value => cookieSignature.sign(value, secret),
+    unsign: value => cookieSignature.unsign(value, secret)
   }
-
-  const unsign = (value) => {
-    return cookieSignature.unsign(value, secret)
-  }
-
-  return { sign, unsign }
 }
