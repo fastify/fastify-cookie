@@ -2,16 +2,17 @@
 
 const fp = require('fastify-plugin')
 const cookie = require('cookie')
-const cookieSignature = require('cookie-signature')
 
-function fastifyCookieSetCookie (reply, name, value, options, secret) {
+const signerFactory = require('./signer')
+
+function fastifyCookieSetCookie (reply, name, value, options, signer) {
   const opts = Object.assign({}, options || {})
   if (opts.expires && Number.isInteger(opts.expires)) {
     opts.expires = new Date(opts.expires)
   }
 
   if (opts.signed) {
-    value = cookieSignature.sign(value, secret)
+    value = signer.sign(value)
   }
 
   const serialized = cookie.serialize(name, value, opts)
@@ -50,18 +51,20 @@ function onReqHandlerWrapper (fastify) {
 function plugin (fastify, options, next) {
   const secret = options.secret || ''
 
+  const signer = typeof secret === 'string' ? signerFactory(secret) : secret
+
   fastify.decorate('parseCookie', function parseCookie (cookieHeader) {
     return cookie.parse(cookieHeader, options.parseOptions)
   })
   fastify.decorateRequest('cookies', null)
   fastify.decorateReply('setCookie', function setCookieWrapper (name, value, options) {
-    return fastifyCookieSetCookie(this, name, value, options, secret)
+    return fastifyCookieSetCookie(this, name, value, options, signer)
   })
   fastify.decorateReply('clearCookie', function clearCookieWrapper (name, options) {
     return fastifyCookieClearCookie(this, name, options)
   })
   fastify.decorateReply('unsignCookie', function unsignCookieWrapper (value) {
-    return cookieSignature.unsign(value, secret)
+    return signer.unsign(value)
   })
   fastify.addHook('onRequest', onReqHandlerWrapper(fastify))
   next()
