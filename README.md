@@ -39,6 +39,12 @@ fastify.get('/', (req, reply) => {
 })
 ```
 
+## Options
+
+- `secret`: A `String` to use as secret to sign the cookie using [`cookie-signature`](http://npm.im/cookie-signature). If you want to implement more sophisticated cookie signing mechanism, you can supply an `Object` instead. Read more about it in [Custom cookie signer](#custom-cookie-signer).
+
+- `parseOptions`: An `Object` to pass as options to [cookie parse](https://github.com/jshttp/cookie#cookieparsestr-options).
+
 ## API
 
 ### Parsing
@@ -81,6 +87,27 @@ via the Fastify `decorate` API. Thus, `fastify.parseCookie('sessionId=aYb4uTIhdB
 will parse the raw cookie header and return an object `{ "sessionId": "aYb4uTIhdBXC" }`.
 
 [cs]: https://www.npmjs.com/package/cookie#options-1
+
+<a name="custom-cookie-signer"></a>
+### Custom cookie signer
+
+The `secret` option optionally accepts an object with `sign` and `unsign` functions. Useful if you want to implement custom cookie signing mechanism with rotating signing key for example.
+
+**Example:**
+```js
+fastify.register(require('fastify-cookie'), {
+  secret: {
+    sign: (value) => {
+      // sign using custom logic
+      return signedValue
+    },
+    unsign: (value) => {
+      // unsign using custom logic
+      return unsignedValue
+    }
+  }
+})
+```
 
 ## License
 
