@@ -1,6 +1,6 @@
 # fastify-cookie
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/fastify/fastify-cookie.svg)](https://greenkeeper.io/) [![Build Status](https://travis-ci.org/fastify/fastify-cookie.svg?branch=master)](https://travis-ci.org/fastify/fastify-cookie)
+[![Build Status](https://travis-ci.org/fastify/fastify-cookie.svg?branch=master)](https://travis-ci.org/fastify/fastify-cookie)
 
 A plugin for [Fastify](http://fastify.io/) that adds support for reading and
 setting cookies.
