@@ -50,8 +50,8 @@ function onReqHandlerWrapper (fastify) {
 
 function plugin (fastify, options, next) {
   const secret = options.secret || ''
-
-  const signer = typeof secret === 'string' ? signerFactory(secret) : secret
+  const enableRotation = Array.isArray(secret)
+  const signer = typeof secret === 'string' || enableRotation ? signerFactory(secret) : secret
 
   fastify.decorate('parseCookie', function parseCookie (cookieHeader) {
     return cookie.parse(cookieHeader, options.parseOptions)
@@ -63,6 +63,7 @@ function plugin (fastify, options, next) {
   fastify.decorateReply('clearCookie', function clearCookieWrapper (name, options) {
     return fastifyCookieClearCookie(this, name, options)
   })
+
   fastify.decorateReply('unsignCookie', function unsignCookieWrapper (value) {
     return signer.unsign(value)
   })

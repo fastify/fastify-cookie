@@ -25,7 +25,7 @@ fastify.register(require('fastify-cookie'), {
 
 fastify.get('/', (req, reply) => {
   const aCookieValue = req.cookies.cookieName
-  const bCookieValue = reply.unsignCookie(req.cookies.cookieSigned);
+  const bCookie = reply.unsignCookie(req.cookies.cookieSigned);
   reply
     .setCookie('foo', 'foo', {
       domain: 'example.com',
@@ -35,13 +35,16 @@ fastify.get('/', (req, reply) => {
       path: '/',
       signed: true
     })
-    .send({hello: 'world'})
+    .send({ hello: 'world' })
 })
 ```
 
 ## Options
 
-- `secret`: A `String` to use as secret to sign the cookie using [`cookie-signature`](http://npm.im/cookie-signature). If you want to implement more sophisticated cookie signing mechanism, you can supply an `Object` instead. Read more about it in [Custom cookie signer](#custom-cookie-signer).
+- `secret` (`String` | `Array` | `Object`):
+  - A `String` can be passed to use as secret to sign the cookie using [`cookie-signature`](http://npm.im/cookie-signature).
+  - An `Array` can be passed if you wanna use key rotation. Read more about it in [Rotating signing secret](#rotating-secret).
+  - If you want to implement more sophisticated cookie signing mechanism, you can supply an `Object` here. Read more about it in [Custom cookie signer](#custom-cookie-signer).
 
 - `parseOptions`: An `Object` to pass as options to [cookie parse](https://github.com/jshttp/cookie#cookieparsestr-options).
 
@@ -87,6 +90,41 @@ via the Fastify `decorate` API. Thus, `fastify.parseCookie('sessionId=aYb4uTIhdB
 will parse the raw cookie header and return an object `{ "sessionId": "aYb4uTIhdBXC" }`.
 
 [cs]: https://www.npmjs.com/package/cookie#options-1
+
+<a name="rotating-secret"></a>
+### Rotating signing secret
+
+Key rotation is when you retire an encryption key and replace that old key by generating a new cryptographic key. To implement rotation, you can supply an `Array` of keys to `secret` option.
+
+**Example:**
+```js
+fastify.register(require('fastify-cookie'), {
+  secret: [key1, key2]
+})
+```
+
+Plugin will **always** use the first key to sign cookies. But to unsign, it will iterate over the supplied array to see if any of the available keys could decode the given signed cookie. This ensures that any old signed cookies are still valid after rotation.
+
+Note:
+- Key rotation is **only** achieved by redeploying the server again with the new `secret` array.
+- Iterating through all secrets is an expensive process, so you should try to keep the rotation list as small as possible.
+- Although previously signed cookies are valid even after rotation, you should make sure to resign them (simply another `setCookie`) as soon as possible to ensure that the subsequent request does not have to iterate over all keys to find the correct one. See example below.
+
+**Example:**
+```js
+fastify.get('/', (req, reply) => {
+  const result = reply.unsignCookie(req.cookies.myCookie)
+
+  if (result.valid && result.renew) {
+    // Setting the same cookie again, this time plugin will sign it with a new key
+    reply.setCookie('myCookie', result.value, {
+      domain: 'example.com', // same options as before
+      path: '/',
+      signed: true
+    })
+  }
+})
+```
 
 <a name="custom-cookie-signer"></a>
 ### Custom cookie signer
