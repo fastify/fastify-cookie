@@ -143,7 +143,7 @@ fastify.register(require('fastify-cookie'), {
       // unsign using custom logic
       return {
         valid: true,
-        renew: false,
+        renew: false, // the cookie has been unsigned with an old secret
         value: 'unsignedValue'
       }
     }
