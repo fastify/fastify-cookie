@@ -107,8 +107,8 @@ The plugin will **always** use the first key (`key1`) to sign cookies. When pars
 
 Note:
 - Key rotation is **only** achieved by redeploying the server again with the new `secret` array.
-- Iterating through all secrets is an expensive process, it is recommended to keep the rotation list as small as possible. Also, old keys should be completely removed after sufficient time has passed to allow "in the wild" cookies to have been replaced.
-- Although previously signed cookies are valid even after rotation, you should make sure to resign them (simply another `setCookie`) as soon as possible to ensure that the subsequent request does not have to iterate over all keys to find the correct one. See example below.
+- Iterating through all secrets is an expensive process, so the rotation list should contain as few keys as possible. Ideally, only the current key and the most recently retired key.
+- Although previously signed cookies are valid even after rotation, cookies should be updated with the new key as soon as possible. See the following example for how to accomplish this.
 
 **Example:**
 ```js
@@ -126,7 +126,7 @@ fastify.get('/', (req, reply) => {
 })
 ```
 
-<a name="custom-cookie-signer"></a>
+<a id="custom-cookie-signer"></a>
 ### Custom cookie signer
 
 The `secret` option optionally accepts an object with `sign` and `unsign` functions. Useful if you want to implement custom cookie signing mechanism with rotating signing key for example.
