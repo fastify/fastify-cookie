@@ -43,8 +43,8 @@ fastify.get('/', (req, reply) => {
 
 - `secret` (`String` | `Array` | `Object`):
   - A `String` can be passed to use as secret to sign the cookie using [`cookie-signature`](http://npm.im/cookie-signature).
-  - An `Array` can be passed if you wanna use key rotation. Read more about it in [Rotating signing secret](#rotating-secret).
-  - If you want to implement more sophisticated cookie signing mechanism, you can supply an `Object` here. Read more about it in [Custom cookie signer](#custom-cookie-signer).
+  - An `Array` can be passed if key rotation is desired. Read more about it in [Rotating signing secret](#rotating-secret).
+  - More sophisticated cookie signing mechanisms can be implemented by supplying an `Object`. Read more about it in [Custom cookie signer](#custom-cookie-signer).
 
 - `parseOptions`: An `Object` to pass as options to [cookie parse](https://github.com/jshttp/cookie#cookieparsestr-options).
 
@@ -91,10 +91,10 @@ will parse the raw cookie header and return an object `{ "sessionId": "aYb4uTIhd
 
 [cs]: https://www.npmjs.com/package/cookie#options-1
 
-<a name="rotating-secret"></a>
+<a id="rotating-secret"></a>
 ### Rotating signing secret
 
-Key rotation is when you retire an encryption key and replace that old key by generating a new cryptographic key. To implement rotation, you can supply an `Array` of keys to `secret` option.
+Key rotation is when an encryption key is retired and replaced by a generating a new cryptographic key. To implement rotation, supply an `Array` of keys to `secret` option.
 
 **Example:**
 ```js
@@ -103,11 +103,11 @@ fastify.register(require('fastify-cookie'), {
 })
 ```
 
-Plugin will **always** use the first key to sign cookies. But to unsign, it will iterate over the supplied array to see if any of the available keys could decode the given signed cookie. This ensures that any old signed cookies are still valid after rotation.
+The plugin will **always** use the first key (`key1`) to sign cookies. When parsing incoming cookies, it will iterate over the supplied array to see if any of the available keys are able to decode the given signed cookie. This ensures that any old signed cookies are still valid.
 
 Note:
 - Key rotation is **only** achieved by redeploying the server again with the new `secret` array.
-- Iterating through all secrets is an expensive process, so you should try to keep the rotation list as small as possible.
+- Iterating through all secrets is an expensive process, it is recommended to keep the rotation list as small as possible. Also, old keys should be completely removed after sufficient time has passed to allow "in the wild" cookies to have been replaced.
 - Although previously signed cookies are valid even after rotation, you should make sure to resign them (simply another `setCookie`) as soon as possible to ensure that the subsequent request does not have to iterate over all keys to find the correct one. See example below.
 
 **Example:**
