@@ -129,7 +129,7 @@ fastify.get('/', (req, reply) => {
 <a id="custom-cookie-signer"></a>
 ### Custom cookie signer
 
-The `secret` option optionally accepts an object with `sign` and `unsign` functions. Useful if you want to implement custom cookie signing mechanism with rotating signing key for example.
+The `secret` option optionally accepts an object with `sign` and `unsign` functions. Useful if you want to implement custom cookie signing mechanism other than what you can achieve using [Rotating signing secret](#rotating-secret). See the example below.
 
 **Example:**
 ```js
@@ -141,7 +141,11 @@ fastify.register(require('fastify-cookie'), {
     },
     unsign: (value) => {
       // unsign using custom logic
-      return unsignedValue
+      return {
+        valid: true,
+        renew: false,
+        value: 'unsignedValue'
+      }
     }
   }
 })
