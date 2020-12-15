@@ -21,7 +21,7 @@ test('default', (t) => {
   })
 
   t.test('signer.unsign', (t) => {
-    t.plan(2)
+    t.plan(3)
 
     const input = cookieSignature.sign('some-value', secret)
     const result = signer.unsign(input)
