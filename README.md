@@ -94,7 +94,7 @@ will parse the raw cookie header and return an object `{ "sessionId": "aYb4uTIhd
 <a id="rotating-secret"></a>
 ### Rotating signing secret
 
-Key rotation is when an encryption key is retired and replaced by a generating a new cryptographic key. To implement rotation, supply an `Array` of keys to `secret` option.
+Key rotation is when an encryption key is retired and replaced by generating a new cryptographic key. To implement rotation, supply an `Array` of keys to `secret` option.
 
 **Example:**
 ```js
