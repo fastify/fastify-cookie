@@ -1,27 +1,80 @@
 'use strict'
 
-const tap = require('tap')
-const test = tap.test
+const { test } = require('tap')
+const sinon = require('sinon')
 const cookieSignature = require('cookie-signature')
 const signerFactory = require('../signer')
 
-const secret = 'my-secret'
-const signer = signerFactory(secret)
+test('default', (t) => {
+  t.plan(2)
 
-test('signer.sign', (t) => {
-  t.plan(1)
+  const secret = 'my-secret'
+  const signer = signerFactory(secret)
 
-  const input = 'some-value'
-  const result = signer.sign(input)
+  t.test('signer.sign', (t) => {
+    t.plan(1)
 
-  t.is(result, cookieSignature.sign(input, secret))
+    const input = 'some-value'
+    const result = signer.sign(input)
+
+    t.is(result, cookieSignature.sign(input, secret))
+  })
+
+  t.test('signer.unsign', (t) => {
+    t.plan(3)
+
+    const input = cookieSignature.sign('some-value', secret)
+    const result = signer.unsign(input)
+
+    t.is(result.valid, true)
+    t.is(result.renew, false)
+    t.is(result.value, 'some-value')
+  })
 })
 
-test('signer.unsign', (t) => {
-  t.plan(1)
+test('key rotation', (t) => {
+  t.plan(3)
+  const secret1 = 'my-secret-1'
+  const secret2 = 'my-secret-2'
+  const secret3 = 'my-secret-3'
+  const signer = signerFactory([secret1, secret2, secret3])
+  const unsignSpy = sinon.spy(cookieSignature, 'unsign')
 
-  const input = cookieSignature.sign('some-value', secret)
-  const result = signer.unsign(input)
+  t.beforeEach((done) => {
+    unsignSpy.resetHistory()
+    done()
+  })
 
-  t.is(result, 'some-value')
+  t.test('signer.sign always signs using first key', (t) => {
+    t.plan(1)
+
+    const input = 'some-value'
+    const result = signer.sign(input)
+
+    t.is(result, cookieSignature.sign(input, secret1))
+  })
+
+  t.test('signer.unsign tries to decode using all keys till it finds', (t) => {
+    t.plan(4)
+
+    const input = cookieSignature.sign('some-value', secret2)
+    const result = signer.unsign(input)
+
+    t.is(result.valid, true)
+    t.is(result.renew, true)
+    t.is(result.value, 'some-value')
+    t.is(unsignSpy.callCount, 2) // should have returned early when the right key was found
+  })
+
+  t.test('signer.unsign failure response', (t) => {
+    t.plan(4)
+
+    const input = cookieSignature.sign('some-value', 'invalid-secret')
+    const result = signer.unsign(input)
+
+    t.is(result.valid, false)
+    t.is(result.renew, false)
+    t.is(result.value, null)
+    t.is(unsignSpy.callCount, 3) // should have tried all 3
+  })
 })

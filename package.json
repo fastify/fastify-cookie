@@ -24,6 +24,12 @@
     "cookie"
   ],
   "author": "James Sumners <james.sumners@gmail.com>",
+  "contributors": [
+    {
+      "name": "Salman Mitha",
+      "email": "SalmanMitha@gmail.com"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/fastify/fastify-cookie/issues"
