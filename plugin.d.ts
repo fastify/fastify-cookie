@@ -39,7 +39,11 @@ declare module 'fastify' {
      */
     unsignCookie(
       value: string,
-    ): string | false;
+    ): {
+      valid: boolean;
+      renew: boolean;
+      value: string | null;
+    };
   }
 }
 
@@ -56,7 +60,7 @@ export interface CookieSerializeOptions {
 }
 
 export interface FastifyCookieOptions {
-  secret?: string;
+  secret?: string | string[];
 }
 
 declare const fastifyCookie: FastifyPlugin<FastifyCookieOptions>;
