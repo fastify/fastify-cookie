@@ -1,5 +1,6 @@
 import fastify from 'fastify';
 import cookie from '../plugin';
+import { expectType } from 'tsd'
 
 const server = fastify();
 
@@ -80,3 +81,23 @@ appWithImplicitHttpSigned.after(() => {
       .send({ hello: 'world' });
   })
 });
+
+const appWithRotationSecret = fastify()
+
+appWithRotationSecret
+  .register(cookie, {
+    secret: ['testsecret']
+  })
+appWithRotationSecret.after(() => {
+  server.get('/', (request, reply) => {
+    reply.unsignCookie(request.cookies.test)
+    const { valid, renew, value } = reply.unsignCookie('test')
+
+    expectType<boolean>(valid)
+    expectType<boolean>(renew)
+    expectType<string | null>(value)
+
+    reply
+      .send({ hello: 'world' });
+  })
+})
