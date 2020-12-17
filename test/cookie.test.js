@@ -95,6 +95,45 @@ test('cookies get set correctly with millisecond dates', (t) => {
   })
 })
 
+test('share options for setCookie and clearCookie', (t) => {
+  t.plan(11)
+  const fastify = Fastify()
+  const secret = 'testsecret'
+  fastify.register(plugin, { secret })
+
+  const cookieOptions = {
+    signed: true,
+    maxAge: 36000
+  }
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .setCookie('foo', 'foo', cookieOptions)
+      .clearCookie('foo', cookieOptions)
+      .send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.strictEqual(res.statusCode, 200)
+    t.deepEqual(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.is(cookies.length, 2)
+    t.is(cookies[0].name, 'foo')
+    t.is(cookies[0].value, cookieSignature.sign('foo', secret))
+    t.is(cookies[0].maxAge, 36000)
+
+    t.is(cookies[1].name, 'foo')
+    t.is(cookies[1].value, '')
+    t.is(cookies[1].path, '/')
+    t.ok(new Date(cookies[1].expires) < new Date())
+  })
+})
+
 test('parses incoming cookies', (t) => {
   t.plan(6 + 3 * 3)
   const fastify = Fastify()
