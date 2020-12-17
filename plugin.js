@@ -33,13 +33,11 @@ function fastifyCookieSetCookie (reply, name, value, options, signer) {
 }
 
 function fastifyCookieClearCookie (reply, name, options) {
-  const opts = Object.assign({ expires: new Date(1), path: '/' }, options || {})
-  if (opts.signed) {
-    opts.signed = undefined
-  }
-  if (opts.maxAge) {
-    opts.maxAge = undefined
-  }
+  const opts = Object.assign({ path: '/' }, options || { }, {
+    expires: new Date(1),
+    signed: undefined,
+    maxAge: undefined
+  })
   return fastifyCookieSetCookie(reply, name, '', opts)
 }
 

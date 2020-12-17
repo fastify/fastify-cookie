@@ -134,6 +134,46 @@ test('share options for setCookie and clearCookie', (t) => {
   })
 })
 
+test('expires should not be overridden in clearCookie', (t) => {
+  t.plan(11)
+  const fastify = Fastify()
+  const secret = 'testsecret'
+  fastify.register(plugin, { secret })
+
+  const cookieOptions = {
+    signed: true,
+    expires: Date.now() + 1000
+  }
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .setCookie('foo', 'foo', cookieOptions)
+      .clearCookie('foo', cookieOptions)
+      .send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.strictEqual(res.statusCode, 200)
+    t.deepEqual(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.is(cookies.length, 2)
+    t.is(cookies[0].name, 'foo')
+    t.is(cookies[0].value, cookieSignature.sign('foo', secret))
+    const expires = new Date(cookies[0].expires)
+    t.ok(expires < new Date(Date.now() + 5000))
+
+    t.is(cookies[1].name, 'foo')
+    t.is(cookies[1].value, '')
+    t.is(cookies[1].path, '/')
+    t.is(Number(cookies[1].expires), 0)
+  })
+})
+
 test('parses incoming cookies', (t) => {
   t.plan(6 + 3 * 3)
   const fastify = Fastify()
