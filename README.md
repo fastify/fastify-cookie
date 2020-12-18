@@ -78,7 +78,7 @@ Following are _some_ of the precautions that should be taken to ensure the integ
 - It's important to use `options.httpOnly` cookies to prevent attacks like XSS.
 - Use signed cookies (`options.signed`) to ensure they are not getting tampered with on client-side by an attacker.
 - Use `__Host-` [Cookie Prefix](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#Attributes) to avoid Cookie Tossing attacks.
-
+- it's important to [use HTTPS for your website/app](https://letsencrypt.org/) to avoid a bunch of other potential security issues like [MITM](https://en.wikipedia.org/wiki/Man-in-the-middle_attack) etc. 
 
 ### Clearing
 
