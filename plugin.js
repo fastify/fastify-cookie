@@ -75,7 +75,21 @@ function plugin (fastify, options, next) {
   next()
 }
 
-module.exports = fp(plugin, {
+const fastifyCookie = fp(plugin, {
   fastify: '>=3',
   name: 'fastify-cookie'
 })
+
+/**
+ * These export configurations enable JS and TS developers
+ * to consume fastify-cookie in whatever way best suits their needs.
+ * Some examples of supported import syntax includes:
+ * - `const fastifyCookie = require('fastify-cookie')`
+ * - `const { fastifyCookie } = require('fastify-cookie')`
+ * - `import * as fastifyCookie from 'fastify-cookie'`
+ * - `import { fastifyCookie } from 'fastify-cookie'`
+ * - `import fastifyCookie from 'fastify-cookie'`
+ */
+fastifyCookie.fastifyCookie = fastifyCookie
+fastifyCookie.default = fastifyCookie
+module.exports = fastifyCookie

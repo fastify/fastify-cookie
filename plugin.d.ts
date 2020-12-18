@@ -1,6 +1,6 @@
 /// <reference types="node" />
 
-import { FastifyPlugin } from 'fastify';
+import { FastifyPluginCallback } from 'fastify';
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -63,6 +63,7 @@ export interface FastifyCookieOptions {
   secret?: string | string[];
 }
 
-declare const fastifyCookie: FastifyPlugin<FastifyCookieOptions>;
+declare const fastifyCookie: FastifyPluginCallback<NonNullable<FastifyCookieOptions>>;
 
 export default fastifyCookie;
+export { fastifyCookie }

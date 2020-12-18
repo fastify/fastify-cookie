@@ -1,6 +1,34 @@
-import fastify from 'fastify';
-import cookie from '../plugin';
+import fastify, {FastifyInstance, FastifyPluginCallback} from 'fastify';
+import cookie, {FastifyCookieOptions} from '../plugin';
 import { expectType } from 'tsd'
+
+import { fastifyCookie as fastifyCookieNamed } from "../";
+import fastifyCookieDefault from "../";
+import * as fastifyCookieStar from "../";
+import fastifyCookieCjsImport = require("../");
+import {Server} from "http";
+const fastifyCookieCjs = require("../");
+
+const app: FastifyInstance = fastify();
+app.register(fastifyCookieNamed);
+app.register(fastifyCookieDefault);
+app.register(fastifyCookieCjs);
+app.register(fastifyCookieCjsImport.default);
+app.register(fastifyCookieCjsImport.fastifyCookie);
+app.register(fastifyCookieStar.default);
+app.register(fastifyCookieStar.fastifyCookie);
+
+expectType<FastifyPluginCallback<FastifyCookieOptions, Server>>(fastifyCookieNamed);
+expectType<FastifyPluginCallback<FastifyCookieOptions, Server>>(fastifyCookieDefault);
+expectType<FastifyPluginCallback<FastifyCookieOptions, Server>>(fastifyCookieCjsImport.default);
+expectType<FastifyPluginCallback<FastifyCookieOptions, Server>>(
+  fastifyCookieCjsImport.fastifyCookie
+);
+expectType<FastifyPluginCallback<FastifyCookieOptions, Server>>(fastifyCookieStar.default);
+expectType<FastifyPluginCallback<FastifyCookieOptions, Server>>(
+  fastifyCookieStar.fastifyCookie
+);
+expectType<any>(fastifyCookieCjs);
 
 const server = fastify();
 
