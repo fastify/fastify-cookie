@@ -73,7 +73,7 @@ with a value of `'foo'` on the cookie path `/`.
 
 #### Securing the cookie
 
-Following are _some_ of the precautions you could take to ensure safety of your application.
+Following are _some_ of the precautions that should be taken to ensure the integrity of an application:
 
 - It's important to use `options.httpOnly` cookies to prevent attacks like XSS.
 - Use signed cookies (`options.signed`) to ensure they are not getting tampered with on client-side by an attacker.
