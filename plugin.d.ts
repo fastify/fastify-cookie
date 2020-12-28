@@ -8,6 +8,18 @@ declare module 'fastify' {
      * Request cookies
      */
     cookies: { [cookieName: string]: string };
+
+    /**
+     * Unsigns the specified cookie using the secret provided.
+     * @param value Cookie value
+     */
+    unsignCookie(
+      value: string,
+    ): {
+      valid: boolean;
+      renew: boolean;
+      value: string | null;
+    };
   }
 
   interface FastifyReply {
