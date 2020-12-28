@@ -105,6 +105,9 @@ appWithImplicitHttpSigned.after(() => {
     reply.unsignCookie(request.cookies.test)
     reply.unsignCookie('test')
 
+    request.unsignCookie(request.cookies.anotherTest);
+    request.unsignCookie('anotherTest');
+
     reply
       .send({ hello: 'world' });
   })

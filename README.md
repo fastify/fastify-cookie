@@ -25,7 +25,8 @@ fastify.register(require('fastify-cookie'), {
 
 fastify.get('/', (req, reply) => {
   const aCookieValue = req.cookies.cookieName
-  const bCookie = reply.unsignCookie(req.cookies.cookieSigned);
+  // `reply.unsingCookie()` is also available
+  const bCookie = req.unsignCookie(req.cookies.cookieSigned); 
   reply
     .setCookie('foo', 'foo', {
       domain: 'example.com',

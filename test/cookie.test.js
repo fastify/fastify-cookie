@@ -271,7 +271,7 @@ test('cookies gets cleared correctly', (t) => {
 })
 
 test('cookies signature', (t) => {
-  t.plan(5)
+  t.plan(8)
 
   t.test('unsign', t => {
     t.plan(6)
@@ -328,7 +328,32 @@ test('cookies signature', (t) => {
     })
   })
 
-  t.test('unsignCookie decorator', t => {
+  t.test('unsignCookie via request decorator', t => {
+    t.plan(3)
+    const fastify = Fastify()
+    const secret = 'bar'
+    fastify.register(plugin, { secret })
+
+    fastify.get('/test1', (req, reply) => {
+      reply.send({
+        unsigned: req.unsignCookie(req.cookies.foo)
+      })
+    })
+
+    fastify.inject({
+      method: 'GET',
+      url: '/test1',
+      headers: {
+        cookie: `foo=${cookieSignature.sign('foo', secret)}`
+      }
+    }, (err, res) => {
+      t.error(err)
+      t.strictEqual(res.statusCode, 200)
+      t.deepEqual(JSON.parse(res.body), { unsigned: { value: 'foo', renew: false, valid: true } })
+    })
+  })
+
+  t.test('unsignCookie via reply decorator', t => {
     t.plan(3)
     const fastify = Fastify()
     const secret = 'bar'
@@ -353,7 +378,33 @@ test('cookies signature', (t) => {
     })
   })
 
-  t.test('unsignCookie decorator after rotation', t => {
+  t.test('unsignCookie via request decorator after rotation', t => {
+    t.plan(3)
+    const fastify = Fastify()
+    const secret1 = 'sec-1'
+    const secret2 = 'sec-2'
+    fastify.register(plugin, { secret: [secret1, secret2] })
+
+    fastify.get('/test1', (req, reply) => {
+      reply.send({
+        unsigned: req.unsignCookie(req.cookies.foo)
+      })
+    })
+
+    fastify.inject({
+      method: 'GET',
+      url: '/test1',
+      headers: {
+        cookie: `foo=${cookieSignature.sign('foo', secret2)}`
+      }
+    }, (err, res) => {
+      t.error(err)
+      t.strictEqual(res.statusCode, 200)
+      t.deepEqual(JSON.parse(res.body), { unsigned: { value: 'foo', renew: true, valid: true } })
+    })
+  })
+
+  t.test('unsignCookie via reply decorator after rotation', t => {
     t.plan(3)
     const fastify = Fastify()
     const secret1 = 'sec-1'
@@ -379,7 +430,33 @@ test('cookies signature', (t) => {
     })
   })
 
-  t.test('unsignCookie decorator failure response', t => {
+  t.test('unsignCookie via request decorator failure response', t => {
+    t.plan(3)
+    const fastify = Fastify()
+    const secret1 = 'sec-1'
+    const secret2 = 'sec-2'
+    fastify.register(plugin, { secret: [secret1, secret2] })
+
+    fastify.get('/test1', (req, reply) => {
+      reply.send({
+        unsigned: req.unsignCookie(req.cookies.foo)
+      })
+    })
+
+    fastify.inject({
+      method: 'GET',
+      url: '/test1',
+      headers: {
+        cookie: `foo=${cookieSignature.sign('foo', 'invalid-secret')}`
+      }
+    }, (err, res) => {
+      t.error(err)
+      t.strictEqual(res.statusCode, 200)
+      t.deepEqual(JSON.parse(res.body), { unsigned: { value: null, renew: false, valid: false } })
+    })
+  })
+
+  t.test('unsignCookie reply decorator failure response', t => {
     t.plan(3)
     const fastify = Fastify()
     const secret1 = 'sec-1'

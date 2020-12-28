@@ -61,6 +61,9 @@ function plugin (fastify, options, next) {
     return cookie.parse(cookieHeader, options.parseOptions)
   })
   fastify.decorateRequest('cookies', null)
+  fastify.decorateRequest('unsignCookie', function unsignCookieRequestWrapper (value) {
+    return signer.unsign(value)
+  })
   fastify.decorateReply('setCookie', function setCookieWrapper (name, value, options) {
     return fastifyCookieSetCookie(this, name, value, options, signer)
   })
@@ -68,7 +71,7 @@ function plugin (fastify, options, next) {
     return fastifyCookieClearCookie(this, name, options)
   })
 
-  fastify.decorateReply('unsignCookie', function unsignCookieWrapper (value) {
+  fastify.decorateReply('unsignCookie', function unsignCookieReplyWrapper (value) {
     return signer.unsign(value)
   })
   fastify.addHook('onRequest', onReqHandlerWrapper(fastify))
