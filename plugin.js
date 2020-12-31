@@ -61,8 +61,8 @@ function plugin (fastify, options, next) {
     return cookie.parse(cookieHeader, options.parseOptions)
   })
 
-  fastify.decorate('unsignCookie', function unsignCookie (val) {
-    return signer.unsign(val)
+  fastify.decorate('unsignCookie', function unsignCookie (value) {
+    return signer.unsign(value)
   })
 
   fastify.decorateRequest('cookies', null)
