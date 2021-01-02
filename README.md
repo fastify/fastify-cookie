@@ -163,8 +163,8 @@ fastify.register(require('fastify-cookie'), {
 ### Manual cookie unsigning 
 
 The method `unsignCookie(value)` is added to the `fastify` instance and the `reply` object 
-via the Fastify `decorate` & `decorateReply` APIs. using it on a signed cookie will call the
-the provided signer's (or the default signer if no custom implementation is provided) unsign method on the cookie.
+via the Fastify `decorate` & `decorateReply` APIs. Using it on a signed cookie will call the
+the provided signer's (or the default signer if no custom implementation is provided) `unsign` method on the cookie.
 
 **Example:**
 
@@ -172,7 +172,7 @@ the provided signer's (or the default signer if no custom implementation is prov
 fastify.register(require('fastify-cookie'), { secret: 'my-secret' })
 
 fastify.get('/', (req, rep) => {
-  if (!fastify.unsign(req.cookie.foo).valid) {
+  if (fastify.unsign(req.cookie.foo).valid === false) {
     rep.send('cookie is invalid')
     return
   }
