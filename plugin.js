@@ -58,14 +58,14 @@ function plugin (fastify, options, next) {
   const signer = typeof secret === 'string' || enableRotation ? signerFactory(secret) : secret
 
   fastify.decorate('parseCookie', parseCookie)
-  fastify.decorate('unsignCookie', unsginCookie)
+  fastify.decorate('unsignCookie', unsignCookie)
 
   fastify.decorateRequest('cookies', null)
-  fastify.decorateRequest('unsignCookie', unsginCookie)
+  fastify.decorateRequest('unsignCookie', unsignCookie)
 
   fastify.decorateReply('setCookie', setCookie)
   fastify.decorateReply('clearCookie', clearCookie)
-  fastify.decorateReply('unsignCookie', unsginCookie)
+  fastify.decorateReply('unsignCookie', unsignCookie)
 
   fastify.addHook('onRequest', onReqHandlerWrapper(fastify))
 
@@ -76,7 +76,7 @@ function plugin (fastify, options, next) {
     return cookie.parse(cookieHeader, options.parseOptions)
   }
 
-  function unsginCookie (value) {
+  function unsignCookie (value) {
     return signer.unsign(value)
   }
 
