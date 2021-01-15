@@ -57,30 +57,36 @@ function plugin (fastify, options, next) {
   const enableRotation = Array.isArray(secret)
   const signer = typeof secret === 'string' || enableRotation ? signerFactory(secret) : secret
 
-  fastify.decorate('parseCookie', function parseCookie (cookieHeader) {
-    return cookie.parse(cookieHeader, options.parseOptions)
-  })
-
-  fastify.decorate('unsignCookie', function unsignCookie (value) {
-    return signer.unsign(value)
-  })
+  fastify.decorate('parseCookie', parseCookie)
+  fastify.decorate('unsignCookie', unsginCookie)
 
   fastify.decorateRequest('cookies', null)
-  fastify.decorateRequest('unsignCookie', function unsignCookieRequestWrapper (value) {
-    return signer.unsign(value)
-  })
-  fastify.decorateReply('setCookie', function setCookieWrapper (name, value, options) {
-    return fastifyCookieSetCookie(this, name, value, options, signer)
-  })
-  fastify.decorateReply('clearCookie', function clearCookieWrapper (name, options) {
-    return fastifyCookieClearCookie(this, name, options)
-  })
+  fastify.decorateRequest('unsignCookie', unsginCookie)
 
-  fastify.decorateReply('unsignCookie', function unsignCookieReplyWrapper (value) {
-    return signer.unsign(value)
-  })
+  fastify.decorateReply('setCookie', setCookie)
+  fastify.decorateReply('clearCookie', clearCookie)
+  fastify.decorateReply('unsignCookie', unsginCookie)
+
   fastify.addHook('onRequest', onReqHandlerWrapper(fastify))
+
   next()
+
+  // ***************************
+  function parseCookie (cookieHeader) {
+    return cookie.parse(cookieHeader, options.parseOptions)
+  }
+
+  function unsginCookie (value) {
+    return signer.unsign(value)
+  }
+
+  function setCookie (name, value, options) {
+    return fastifyCookieSetCookie(this, name, value, options, signer)
+  }
+
+  function clearCookie (name, options) {
+    return fastifyCookieClearCookie(this, name, options)
+  }
 }
 
 const fastifyCookie = fp(plugin, {
