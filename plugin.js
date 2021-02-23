@@ -67,6 +67,9 @@ function plugin (fastify, options, next) {
   fastify.decorateReply('setCookie', function setCookieWrapper (name, value, options) {
     return fastifyCookieSetCookie(this, name, value, options, signer)
   })
+  fastify.decorateReply('cookie', function setCookieWrapper (name, value, options) {
+    return fastifyCookieSetCookie(this, name, value, options, signer)
+  })
   fastify.decorateReply('clearCookie', function clearCookieWrapper (name, options) {
     return fastifyCookieClearCookie(this, name, options)
   })
