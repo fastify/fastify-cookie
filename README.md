@@ -65,7 +65,7 @@ You can pass options to the [cookie parse](https://github.com/jshttp/cookie#cook
 
 The method `setCookie(name, value, options)`, and its alias `cookie(name, value, options)`, are added to the `reply` object
 via the Fastify `decorateReply` API. Thus, in a request handler,
-`reply.setCookie('foo', 'foo', {path: '/'})` or `reply.cookie('foo', 'foo', {path: '/'})` will set a cookie named `foo`
+`reply.setCookie('foo', 'foo', {path: '/'})` will set a cookie named `foo`
 with a value of `'foo'` on the cookie path `/`.
 
 + `name`: a string name for the cookie to be set
