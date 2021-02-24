@@ -56,6 +56,9 @@ function plugin (fastify, options, next) {
   const secret = options.secret || ''
   const enableRotation = Array.isArray(secret)
   const signer = typeof secret === 'string' || enableRotation ? signerFactory(secret) : secret
+  function setCookieWrapper (name, value, options) {
+    return fastifyCookieSetCookie(this, name, value, options, signer)
+  }
 
   fastify.decorate('parseCookie', function parseCookie (cookieHeader) {
     return cookie.parse(cookieHeader, options.parseOptions)
@@ -64,12 +67,8 @@ function plugin (fastify, options, next) {
   fastify.decorateRequest('unsignCookie', function unsignCookieRequestWrapper (value) {
     return signer.unsign(value)
   })
-  fastify.decorateReply('setCookie', function setCookieWrapper (name, value, options) {
-    return fastifyCookieSetCookie(this, name, value, options, signer)
-  })
-  fastify.decorateReply('cookie', function setCookieWrapper (name, value, options) {
-    return fastifyCookieSetCookie(this, name, value, options, signer)
-  })
+  fastify.decorateReply('setCookie', setCookieWrapper)
+  fastify.decorateReply('cookie', setCookieWrapper)
   fastify.decorateReply('clearCookie', function clearCookieWrapper (name, options) {
     return fastifyCookieClearCookie(this, name, options)
   })
