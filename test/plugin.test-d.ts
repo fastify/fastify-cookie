@@ -1,4 +1,4 @@
-import fastify, {FastifyInstance, FastifyPluginCallback, FastifyReply} from 'fastify';
+import fastify, {FastifyInstance, FastifyPluginCallback, setCookieWrapper} from 'fastify';
 import cookie, {FastifyCookieOptions} from '../plugin';
 import { expectType } from 'tsd'
 
@@ -38,7 +38,8 @@ server.after((_err) => {
   server.get('/', (request, reply) => {
     const test = request.cookies.test;
 
-    expectType<FastifyReply>(reply.cookie('bar', 'bar'))
+    expectType<setCookieWrapper>(reply.cookie)
+    expectType<setCookieWrapper>(reply.setCookie)
 
     reply
       .setCookie('test', test, { domain: 'example.com', path: '/' })
