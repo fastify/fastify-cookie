@@ -34,6 +34,33 @@ test('cookies get set correctly', (t) => {
   })
 })
 
+test('express cookie compatibility', (t) => {
+  t.plan(7)
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  fastify.get('/espresso', (req, reply) => {
+    reply
+      .cookie('foo', 'foo', { path: '/' })
+      .send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/espresso'
+  }, (err, res) => {
+    t.error(err)
+    t.strictEqual(res.statusCode, 200)
+    t.deepEqual(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.is(cookies.length, 1)
+    t.is(cookies[0].name, 'foo')
+    t.is(cookies[0].value, 'foo')
+    t.is(cookies[0].path, '/')
+  })
+})
+
 test('should set multiple cookies', (t) => {
   t.plan(10)
   const fastify = Fastify()
@@ -42,7 +69,7 @@ test('should set multiple cookies', (t) => {
   fastify.get('/', (req, reply) => {
     reply
       .setCookie('foo', 'foo')
-      .setCookie('bar', 'test')
+      .cookie('bar', 'test')
       .setCookie('wee', 'woo')
       .send({ hello: 'world' })
   })

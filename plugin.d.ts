@@ -22,19 +22,26 @@ declare module 'fastify' {
     };
   }
 
-  interface FastifyReply {
-    /**
-     * Set response cookie
-     * @param name Cookie name
-     * @param value Cookie value
-     * @param options Serialize options
-     */
-    setCookie(
-      name: string,
-      value: string,
-      options?: CookieSerializeOptions
-    ): FastifyReply;
+  type setCookieWrapper = (
+    name: string,
+    value: string,
+    options?: CookieSerializeOptions
+  ) => FastifyReply
 
+  interface FastifyReply {
+  /**
+   * Set response cookie
+   * @name setCookie
+   * @param name Cookie name
+   * @param value Cookie value
+   * @param options Serialize options
+   */
+    setCookie: setCookieWrapper;
+
+    /**
+     * @alias setCookie
+     */
+    cookie: setCookieWrapper
     /**
      * clear response cookie
      * @param name Cookie name
