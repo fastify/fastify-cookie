@@ -298,7 +298,7 @@ test('cookies gets cleared correctly', (t) => {
 })
 
 test('cookies signature', (t) => {
-  t.plan(8)
+  t.plan(9)
 
   t.test('unsign', t => {
     t.plan(6)
@@ -352,6 +352,32 @@ test('cookies signature', (t) => {
       t.is(cookies.length, 1)
       t.is(cookies[0].name, 'foo')
       t.is(cookieSignature.unsign(cookies[0].value, secret1), 'cookieVal') // decode using first key
+    })
+  })
+
+  t.test('unsginCookie via fastify instance', t => {
+    t.plan(3)
+    const fastify = Fastify()
+    const secret = 'bar'
+
+    fastify.register(plugin, { secret })
+
+    fastify.get('/test1', (req, rep) => {
+      rep.send({
+        unsigned: fastify.unsignCookie(req.cookies.foo)
+      })
+    })
+
+    fastify.inject({
+      method: 'GET',
+      url: '/test1',
+      headers: {
+        cookie: `foo=${cookieSignature.sign('foo', secret)}`
+      }
+    }, (err, res) => {
+      t.error(err)
+      t.strictEqual(res.statusCode, 200)
+      t.deepEqual(JSON.parse(res.body), { unsigned: { value: 'foo', renew: false, valid: true } })
     })
   })
 
