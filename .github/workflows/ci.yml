@@ -37,7 +37,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          npm run test:ci
+          npm run test
 
   automerge:
     needs: test
