@@ -1,29 +1,49 @@
-name: Continuous Integration
-on: [push, pull_request]
+name: CI
+
+on:
+  push:
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  test:
+    runs-on: ${{ matrix.os }}
+
     strategy:
       matrix:
-        node: [10.x, 12.x, 14.x]
-    name: Node ${{ matrix.node }}
+        node-version: [10.x, 12.x, 14.x]
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
     steps:
-      - uses: actions/checkout@v2.3.4
-      - name: Setup node
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js
         uses: actions/setup-node@v2.1.5
         with:
-          node-version: ${{ matrix.node }}
-      - run: npm install
-      - run: npm run lint-ci
-      - run: npm run test-ci
-      - run: npm run typescript
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install Dependencies
+        run: |
+          npm install --ignore-scripts
+
+      - name: Lint
+        run: |
+          npm run lint:ci
+
+      - name: Run Tests
+        run: |
+          npm run test
 
   automerge:
-    needs: build
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: fastify/github-action-merge-dependabot@v2.0.0
         if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request' }}
         with:
-          github-token: ${{secrets.github_token}}
+          github-token: ${{ secrets.GITHUB_TOKEN }}

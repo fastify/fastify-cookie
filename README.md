@@ -1,6 +1,9 @@
 # fastify-cookie
 
-[![Build Status](https://travis-ci.org/fastify/fastify-cookie.svg?branch=master)](https://travis-ci.org/fastify/fastify-cookie)
+![CI](https://github.com/fastify/fastify-cookie/workflows/CI/badge.svg)
+[![NPM version](https://img.shields.io/npm/v/fastify-cookie.svg?style=flat)](https://www.npmjs.com/package/fastify-cookie)
+[![Known Vulnerabilities](https://snyk.io/test/github/fastify/fastify-cookie/badge.svg)](https://snyk.io/test/github/fastify/fastify-cookie)
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://standardjs.com/)
 
 A plugin for [Fastify](http://fastify.io/) that adds support for reading and
 setting cookies.
