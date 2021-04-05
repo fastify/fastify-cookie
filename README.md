@@ -44,6 +44,21 @@ fastify.get('/', (req, reply) => {
 })
 ```
 
+## TypeScript Example
+
+```ts
+import { FastifyCookieOptions } from 'fastify-cookie'
+import cookie from 'fastify-cookie'
+import fastify from 'fastify'
+
+const app = fastify()
+
+app.register(cookie, {
+  secret: "my-secret", // for cookies signature
+  parseOptions: {}     // options for parsing cookies
+} as FastifyCookieOptions)
+```
+
 ## Options
 
 - `secret` (`String` | `Array` | `Object`):
@@ -164,9 +179,9 @@ fastify.register(require('fastify-cookie'), {
 })
 ```
 
-### Manual cookie unsigning 
+### Manual cookie unsigning
 
-The method `unsignCookie(value)` is added to the `fastify` instance and the `reply` object 
+The method `unsignCookie(value)` is added to the `fastify` instance and the `reply` object
 via the Fastify `decorate` & `decorateReply` APIs. Using it on a signed cookie will call the
 the provided signer's (or the default signer if no custom implementation is provided) `unsign` method on the cookie.
 
