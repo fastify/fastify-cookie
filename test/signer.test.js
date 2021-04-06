@@ -40,9 +40,8 @@ test('key rotation', (t) => {
   const signer = signerFactory([secret1, secret2, secret3])
   const unsignSpy = sinon.spy(cookieSignature, 'unsign')
 
-  t.beforeEach((done) => {
+  t.beforeEach(() => {
     unsignSpy.resetHistory()
-    done()
   })
 
   t.test('signer.sign always signs using first key', (t) => {
