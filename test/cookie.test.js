@@ -23,14 +23,14 @@ test('cookies get set correctly', (t) => {
     url: '/test1'
   }, (err, res) => {
     t.error(err)
-    t.strictEqual(res.statusCode, 200)
-    t.deepEqual(JSON.parse(res.body), { hello: 'world' })
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.is(cookies.length, 1)
-    t.is(cookies[0].name, 'foo')
-    t.is(cookies[0].value, 'foo')
-    t.is(cookies[0].path, '/')
+    t.equal(cookies.length, 1)
+    t.equal(cookies[0].name, 'foo')
+    t.equal(cookies[0].value, 'foo')
+    t.equal(cookies[0].path, '/')
   })
 })
 
@@ -50,14 +50,14 @@ test('express cookie compatibility', (t) => {
     url: '/espresso'
   }, (err, res) => {
     t.error(err)
-    t.strictEqual(res.statusCode, 200)
-    t.deepEqual(JSON.parse(res.body), { hello: 'world' })
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.is(cookies.length, 1)
-    t.is(cookies[0].name, 'foo')
-    t.is(cookies[0].value, 'foo')
-    t.is(cookies[0].path, '/')
+    t.equal(cookies.length, 1)
+    t.equal(cookies[0].name, 'foo')
+    t.equal(cookies[0].value, 'foo')
+    t.equal(cookies[0].path, '/')
   })
 })
 
@@ -79,17 +79,17 @@ test('should set multiple cookies', (t) => {
     url: '/'
   }, (err, res) => {
     t.error(err)
-    t.strictEqual(res.statusCode, 200)
-    t.deepEqual(JSON.parse(res.body), { hello: 'world' })
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.is(cookies.length, 3)
-    t.is(cookies[0].name, 'foo')
-    t.is(cookies[0].value, 'foo')
-    t.is(cookies[1].name, 'bar')
-    t.is(cookies[1].value, 'test')
-    t.is(cookies[2].name, 'wee')
-    t.is(cookies[2].value, 'woo')
+    t.equal(cookies.length, 3)
+    t.equal(cookies[0].name, 'foo')
+    t.equal(cookies[0].value, 'foo')
+    t.equal(cookies[1].name, 'bar')
+    t.equal(cookies[1].value, 'test')
+    t.equal(cookies[2].name, 'wee')
+    t.equal(cookies[2].value, 'woo')
   })
 })
 
@@ -109,14 +109,14 @@ test('cookies get set correctly with millisecond dates', (t) => {
     url: '/test1'
   }, (err, res) => {
     t.error(err)
-    t.strictEqual(res.statusCode, 200)
-    t.deepEqual(JSON.parse(res.body), { hello: 'world' })
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.is(cookies.length, 1)
-    t.is(cookies[0].name, 'foo')
-    t.is(cookies[0].value, 'foo')
-    t.is(cookies[0].path, '/')
+    t.equal(cookies.length, 1)
+    t.equal(cookies[0].name, 'foo')
+    t.equal(cookies[0].value, 'foo')
+    t.equal(cookies[0].path, '/')
     const expires = new Date(cookies[0].expires)
     t.ok(expires < new Date(Date.now() + 5000))
   })
@@ -145,18 +145,18 @@ test('share options for setCookie and clearCookie', (t) => {
     url: '/test1'
   }, (err, res) => {
     t.error(err)
-    t.strictEqual(res.statusCode, 200)
-    t.deepEqual(JSON.parse(res.body), { hello: 'world' })
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.is(cookies.length, 2)
-    t.is(cookies[0].name, 'foo')
-    t.is(cookies[0].value, cookieSignature.sign('foo', secret))
-    t.is(cookies[0].maxAge, 36000)
+    t.equal(cookies.length, 2)
+    t.equal(cookies[0].name, 'foo')
+    t.equal(cookies[0].value, cookieSignature.sign('foo', secret))
+    t.equal(cookies[0].maxAge, 36000)
 
-    t.is(cookies[1].name, 'foo')
-    t.is(cookies[1].value, '')
-    t.is(cookies[1].path, '/')
+    t.equal(cookies[1].name, 'foo')
+    t.equal(cookies[1].value, '')
+    t.equal(cookies[1].path, '/')
     t.ok(new Date(cookies[1].expires) < new Date())
   })
 })
@@ -184,20 +184,20 @@ test('expires should not be overridden in clearCookie', (t) => {
     url: '/test1'
   }, (err, res) => {
     t.error(err)
-    t.strictEqual(res.statusCode, 200)
-    t.deepEqual(JSON.parse(res.body), { hello: 'world' })
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.is(cookies.length, 2)
-    t.is(cookies[0].name, 'foo')
-    t.is(cookies[0].value, cookieSignature.sign('foo', secret))
+    t.equal(cookies.length, 2)
+    t.equal(cookies[0].name, 'foo')
+    t.equal(cookies[0].value, cookieSignature.sign('foo', secret))
     const expires = new Date(cookies[0].expires)
     t.ok(expires < new Date(Date.now() + 5000))
 
-    t.is(cookies[1].name, 'foo')
-    t.is(cookies[1].value, '')
-    t.is(cookies[1].path, '/')
-    t.is(Number(cookies[1].expires), 0)
+    t.equal(cookies[1].name, 'foo')
+    t.equal(cookies[1].value, '')
+    t.equal(cookies[1].path, '/')
+    t.equal(Number(cookies[1].expires), 0)
   })
 })
 
@@ -211,7 +211,7 @@ test('parses incoming cookies', (t) => {
     fastify.addHook(hook, (req, reply, done) => {
       t.ok(req.cookies)
       t.ok(req.cookies.bar)
-      t.is(req.cookies.bar, 'bar')
+      t.equal(req.cookies.bar, 'bar')
       done()
     })
   }
@@ -219,14 +219,14 @@ test('parses incoming cookies', (t) => {
   fastify.addHook('preParsing', (req, reply, payload, done) => {
     t.ok(req.cookies)
     t.ok(req.cookies.bar)
-    t.is(req.cookies.bar, 'bar')
+    t.equal(req.cookies.bar, 'bar')
     done()
   })
 
   fastify.get('/test2', (req, reply) => {
     t.ok(req.cookies)
     t.ok(req.cookies.bar)
-    t.is(req.cookies.bar, 'bar')
+    t.equal(req.cookies.bar, 'bar')
     reply.send({ hello: 'world' })
   })
 
@@ -238,8 +238,8 @@ test('parses incoming cookies', (t) => {
     }
   }, (err, res) => {
     t.error(err)
-    t.strictEqual(res.statusCode, 200)
-    t.deepEqual(JSON.parse(res.body), { hello: 'world' })
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
   })
 })
 
@@ -264,8 +264,8 @@ test('does not modify supplied cookie options object', (t) => {
     url: '/test1'
   }, (err, res) => {
     t.error(err)
-    t.strictEqual(res.statusCode, 200)
-    t.strictDeepEqual(cookieOptions, {
+    t.equal(res.statusCode, 200)
+    t.strictSame(cookieOptions, {
       path: '/',
       expires: expireDate
     })
@@ -288,12 +288,12 @@ test('cookies gets cleared correctly', (t) => {
     url: '/test1'
   }, (err, res) => {
     t.error(err)
-    t.strictEqual(res.statusCode, 200)
-    t.deepEqual(JSON.parse(res.body), { hello: 'world' })
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.is(cookies.length, 1)
-    t.is(new Date(cookies[0].expires) < new Date(), true)
+    t.equal(cookies.length, 1)
+    t.equal(new Date(cookies[0].expires) < new Date(), true)
   })
 })
 
@@ -317,13 +317,13 @@ test('cookies signature', (t) => {
       url: '/test1'
     }, (err, res) => {
       t.error(err)
-      t.strictEqual(res.statusCode, 200)
-      t.deepEqual(JSON.parse(res.body), { hello: 'world' })
+      t.equal(res.statusCode, 200)
+      t.same(JSON.parse(res.body), { hello: 'world' })
 
       const cookies = res.cookies
-      t.is(cookies.length, 1)
-      t.is(cookies[0].name, 'foo')
-      t.is(cookieSignature.unsign(cookies[0].value, secret), 'foo')
+      t.equal(cookies.length, 1)
+      t.equal(cookies[0].name, 'foo')
+      t.equal(cookieSignature.unsign(cookies[0].value, secret), 'foo')
     })
   })
 
@@ -345,13 +345,13 @@ test('cookies signature', (t) => {
       url: '/test1'
     }, (err, res) => {
       t.error(err)
-      t.strictEqual(res.statusCode, 200)
-      t.deepEqual(JSON.parse(res.body), { hello: 'world' })
+      t.equal(res.statusCode, 200)
+      t.same(JSON.parse(res.body), { hello: 'world' })
 
       const cookies = res.cookies
-      t.is(cookies.length, 1)
-      t.is(cookies[0].name, 'foo')
-      t.is(cookieSignature.unsign(cookies[0].value, secret1), 'cookieVal') // decode using first key
+      t.equal(cookies.length, 1)
+      t.equal(cookies[0].name, 'foo')
+      t.equal(cookieSignature.unsign(cookies[0].value, secret1), 'cookieVal') // decode using first key
     })
   })
 
@@ -376,8 +376,8 @@ test('cookies signature', (t) => {
       }
     }, (err, res) => {
       t.error(err)
-      t.strictEqual(res.statusCode, 200)
-      t.deepEqual(JSON.parse(res.body), { unsigned: { value: 'foo', renew: false, valid: true } })
+      t.equal(res.statusCode, 200)
+      t.same(JSON.parse(res.body), { unsigned: { value: 'foo', renew: false, valid: true } })
     })
   })
 
@@ -401,8 +401,8 @@ test('cookies signature', (t) => {
       }
     }, (err, res) => {
       t.error(err)
-      t.strictEqual(res.statusCode, 200)
-      t.deepEqual(JSON.parse(res.body), { unsigned: { value: 'foo', renew: false, valid: true } })
+      t.equal(res.statusCode, 200)
+      t.same(JSON.parse(res.body), { unsigned: { value: 'foo', renew: false, valid: true } })
     })
   })
 
@@ -426,8 +426,8 @@ test('cookies signature', (t) => {
       }
     }, (err, res) => {
       t.error(err)
-      t.strictEqual(res.statusCode, 200)
-      t.deepEqual(JSON.parse(res.body), { unsigned: { value: 'foo', renew: false, valid: true } })
+      t.equal(res.statusCode, 200)
+      t.same(JSON.parse(res.body), { unsigned: { value: 'foo', renew: false, valid: true } })
     })
   })
 
@@ -452,8 +452,8 @@ test('cookies signature', (t) => {
       }
     }, (err, res) => {
       t.error(err)
-      t.strictEqual(res.statusCode, 200)
-      t.deepEqual(JSON.parse(res.body), { unsigned: { value: 'foo', renew: true, valid: true } })
+      t.equal(res.statusCode, 200)
+      t.same(JSON.parse(res.body), { unsigned: { value: 'foo', renew: true, valid: true } })
     })
   })
 
@@ -478,8 +478,8 @@ test('cookies signature', (t) => {
       }
     }, (err, res) => {
       t.error(err)
-      t.strictEqual(res.statusCode, 200)
-      t.deepEqual(JSON.parse(res.body), { unsigned: { value: 'foo', renew: true, valid: true } })
+      t.equal(res.statusCode, 200)
+      t.same(JSON.parse(res.body), { unsigned: { value: 'foo', renew: true, valid: true } })
     })
   })
 
@@ -504,8 +504,8 @@ test('cookies signature', (t) => {
       }
     }, (err, res) => {
       t.error(err)
-      t.strictEqual(res.statusCode, 200)
-      t.deepEqual(JSON.parse(res.body), { unsigned: { value: null, renew: false, valid: false } })
+      t.equal(res.statusCode, 200)
+      t.same(JSON.parse(res.body), { unsigned: { value: null, renew: false, valid: false } })
     })
   })
 
@@ -530,8 +530,8 @@ test('cookies signature', (t) => {
       }
     }, (err, res) => {
       t.error(err)
-      t.strictEqual(res.statusCode, 200)
-      t.deepEqual(JSON.parse(res.body), { unsigned: { value: null, renew: false, valid: false } })
+      t.equal(res.statusCode, 200)
+      t.same(JSON.parse(res.body), { unsigned: { value: null, renew: false, valid: false } })
     })
   })
 })
@@ -555,13 +555,13 @@ test('custom signer', t => {
     url: '/test1'
   }, (err, res) => {
     t.error(err)
-    t.strictEqual(res.statusCode, 200)
-    t.deepEqual(JSON.parse(res.body), { hello: 'world' })
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.is(cookies.length, 1)
-    t.is(cookies[0].name, 'foo')
-    t.is(cookies[0].value, 'SIGNED-VALUE')
+    t.equal(cookies.length, 1)
+    t.equal(cookies[0].name, 'foo')
+    t.equal(cookies[0].value, 'SIGNED-VALUE')
     t.ok(signStub.calledOnceWithExactly('bar'))
   })
 })
@@ -588,8 +588,8 @@ test('unsignCookie decorator with custom signer', t => {
     }
   }, (err, res) => {
     t.error(err)
-    t.strictEqual(res.statusCode, 200)
-    t.deepEqual(JSON.parse(res.body), { unsigned: 'ORIGINAL VALUE' })
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { unsigned: 'ORIGINAL VALUE' })
     t.ok(unsignStub.calledOnceWithExactly('SOME-SIGNED-VALUE'))
   })
 })
@@ -606,7 +606,7 @@ test('pass options to `cookies.parse`', (t) => {
   fastify.get('/test1', (req, reply) => {
     t.ok(req.cookies)
     t.ok(req.cookies.foo)
-    t.is(req.cookies.foo, 'bartest')
+    t.equal(req.cookies.foo, 'bartest')
     reply.send({ hello: 'world' })
   })
 
@@ -618,8 +618,8 @@ test('pass options to `cookies.parse`', (t) => {
     }
   }, (err, res) => {
     t.error(err)
-    t.strictEqual(res.statusCode, 200)
-    t.deepEqual(JSON.parse(res.body), { hello: 'world' })
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
   })
 
   function decoder (str) {
@@ -636,7 +636,7 @@ test('issue 53', (t) => {
   let count = 1
   fastify.get('/foo', (req, reply) => {
     if (count > 1) {
-      t.notEqual(cookies, req.cookies)
+      t.not(cookies, req.cookies)
       return reply.send('done')
     }
 
@@ -647,12 +647,12 @@ test('issue 53', (t) => {
 
   fastify.inject({ url: '/foo' }, (err, response) => {
     t.error(err)
-    t.is(response.body, 'done')
+    t.equal(response.body, 'done')
   })
 
   fastify.inject({ url: '/foo' }, (err, response) => {
     t.error(err)
-    t.is(response.body, 'done')
+    t.equal(response.body, 'done')
   })
 })
 
@@ -663,7 +663,7 @@ test('parse cookie manually using decorator', (t) => {
 
   fastify.ready(() => {
     t.ok(fastify.parseCookie)
-    t.deepEqual(fastify.parseCookie('foo=bar', {}), { foo: 'bar' })
+    t.same(fastify.parseCookie('foo=bar', {}), { foo: 'bar' })
     t.end()
   })
 })
