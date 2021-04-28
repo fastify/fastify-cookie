@@ -106,6 +106,9 @@ appWithImplicitHttpSigned
   })
 appWithImplicitHttpSigned.after(() => {
   server.get('/', (request, reply) => {
+    appWithImplicitHttpSigned.unsignCookie(request.cookies.test)
+    appWithImplicitHttpSigned.unsignCookie('test')
+
     reply.unsignCookie(request.cookies.test)
     reply.unsignCookie('test')
 

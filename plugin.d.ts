@@ -3,6 +3,20 @@
 import { FastifyPluginCallback } from 'fastify';
 
 declare module 'fastify' {
+  interface FastifyInstance {
+    /**
+     * Unsigns the specified cookie using the secret provided.
+     * @param value Cookie value
+     */
+    unsignCookie(
+      value: string,
+    ): {
+      valid: boolean;
+      renew: boolean;
+      value: string | null;
+    };
+  }
+
   interface FastifyRequest {
     /**
      * Request cookies
