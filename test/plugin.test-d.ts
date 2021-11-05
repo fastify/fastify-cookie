@@ -1,13 +1,16 @@
-import fastify, {FastifyInstance, FastifyPluginCallback, setCookieWrapper} from 'fastify';
-import cookie, {FastifyCookieOptions} from '../plugin';
-import { expectType } from 'tsd'
+import fastify, {
+  FastifyInstance,
+  FastifyPluginCallback,
+  setCookieWrapper
+} from 'fastify';
+import { Server } from 'http';
+import { expectType } from 'tsd';
+import * as fastifyCookieStar from '../';
+import fastifyCookieDefault, { fastifyCookie as fastifyCookieNamed } from '../';
+import cookie, { FastifyCookieOptions } from '../plugin';
 
-import { fastifyCookie as fastifyCookieNamed } from "../";
-import fastifyCookieDefault from "../";
-import * as fastifyCookieStar from "../";
-import fastifyCookieCjsImport = require("../");
-import {Server} from "http";
-const fastifyCookieCjs = require("../");
+import fastifyCookieCjsImport = require('../');
+const fastifyCookieCjs = require('../');
 
 const app: FastifyInstance = fastify();
 app.register(fastifyCookieNamed);
@@ -35,6 +38,11 @@ const server = fastify();
 server.register(cookie);
 
 server.after((_err) => {
+  expectType<{ [key: string]: string }>(
+    // See https://github.com/fastify/fastify-cookie#manual-cookie-parsing
+    server.parseCookie('sessionId=aYb4uTIhdBXC')
+  );
+
   server.get('/', (request, reply) => {
     const test = request.cookies.test;
 

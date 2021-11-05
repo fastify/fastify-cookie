@@ -15,6 +15,15 @@ declare module 'fastify' {
       renew: boolean;
       value: string | null;
     };
+    /**
+     * Manual cookie parsing method
+     * @param cookieHeader Raw cookie header value
+     */
+    parseCookie(
+      cookieHeader: string
+    ): {
+      [key: string]: string;
+    }
   }
 
   interface FastifyRequest {
