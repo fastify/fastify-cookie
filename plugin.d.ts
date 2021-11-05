@@ -17,6 +17,7 @@ declare module 'fastify' {
     };
     /**
      * Manual cookie parsing method
+     * @docs https://github.com/fastify/fastify-cookie#manual-cookie-parsing
      * @param cookieHeader Raw cookie header value
      */
     parseCookie(
