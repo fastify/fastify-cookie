@@ -24,7 +24,7 @@ declare module 'fastify' {
       cookieHeader: string
     ): {
       [key: string]: string;
-    }
+    };
   }
 
   interface FastifyRequest {
