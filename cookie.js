@@ -22,7 +22,6 @@ exports.serialize = serialize
 
 const decode = decodeURIComponent
 const encode = encodeURIComponent
-const pairSplitRegExp = /; */
 
 /**
  * RegExp to match field-content in RFC 7230 sec 3.2
@@ -51,32 +50,42 @@ function parse (str, options) {
     throw new TypeError('argument str must be a string')
   }
 
-  const obj = {}
-  const opt = options || {}
-  const pairs = str.split(pairSplitRegExp)
-  const dec = opt.decode || decode
-  for (let i = 0; i < pairs.length; i++) {
-    const pair = pairs[i]
-    let eqIdx = pair.indexOf('=')
+  const result = {}
+  const dec = (options && options.decode) || decode
+
+  let pos = 0
+  let terminatorPos = 0
+  let eqIdx = 0
+
+  while (true) {
+    if (terminatorPos === str.length) {
+      break
+    }
+    terminatorPos = str.indexOf(';', pos)
+    terminatorPos = (terminatorPos === -1) ? str.length : terminatorPos
+    eqIdx = str.indexOf('=', pos)
+
     // skip things that don't look like key=value
-    if (eqIdx < 0) {
+    if (eqIdx === -1 || eqIdx > terminatorPos) {
+      pos = terminatorPos + 1
       continue
     }
 
-    const key = pair.substr(0, eqIdx).trim()
-    let val = pair.substr(++eqIdx, pair.length).trim()
-    // quoted values
-    if (val[0] === '"') {
-      val = val.slice(1, -1)
-    }
+    const key = str.substring(pos, eqIdx++).trim()
 
     // only assign once
-    if (undefined === obj[key]) {
-      obj[key] = tryDecode(val, dec)
-    }
-  }
+    if (undefined === result[key]) {
+      const val = (str.charCodeAt(eqIdx) === 0x22)
+        ? str.substring(eqIdx + 1, terminatorPos - 1).trim()
+        : str.substring(eqIdx, terminatorPos).trim()
 
-  return obj
+      result[key] = (dec !== decode || val.indexOf('%') !== -1)
+        ? tryDecode(val, dec)
+        : val
+    }
+    pos = terminatorPos + 1
+  }
+  return result
 }
 
 /**
