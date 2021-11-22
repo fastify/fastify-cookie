@@ -2,668 +2,204 @@
 
 const tap = require('tap')
 const test = tap.test
-const Fastify = require('fastify')
-const sinon = require('sinon')
-const cookieSignature = require('cookie-signature')
-const plugin = require('../')
 
-test('cookies get set correctly', (t) => {
-  t.plan(7)
-  const fastify = Fastify()
-  fastify.register(plugin)
+const cookie = require('../cookie')
 
-  fastify.get('/test1', (req, reply) => {
-    reply
-      .setCookie('foo', 'foo', { path: '/' })
-      .send({ hello: 'world' })
-  })
-
-  fastify.inject({
-    method: 'GET',
-    url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
-
-    const cookies = res.cookies
-    t.equal(cookies.length, 1)
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, 'foo')
-    t.equal(cookies[0].path, '/')
-  })
-})
-
-test('express cookie compatibility', (t) => {
-  t.plan(7)
-  const fastify = Fastify()
-  fastify.register(plugin)
-
-  fastify.get('/espresso', (req, reply) => {
-    reply
-      .cookie('foo', 'foo', { path: '/' })
-      .send({ hello: 'world' })
-  })
-
-  fastify.inject({
-    method: 'GET',
-    url: '/espresso'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
-
-    const cookies = res.cookies
-    t.equal(cookies.length, 1)
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, 'foo')
-    t.equal(cookies[0].path, '/')
-  })
-})
-
-test('should set multiple cookies', (t) => {
-  t.plan(10)
-  const fastify = Fastify()
-  fastify.register(plugin)
-
-  fastify.get('/', (req, reply) => {
-    reply
-      .setCookie('foo', 'foo')
-      .cookie('bar', 'test')
-      .setCookie('wee', 'woo')
-      .send({ hello: 'world' })
-  })
-
-  fastify.inject({
-    method: 'GET',
-    url: '/'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
-
-    const cookies = res.cookies
-    t.equal(cookies.length, 3)
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, 'foo')
-    t.equal(cookies[1].name, 'bar')
-    t.equal(cookies[1].value, 'test')
-    t.equal(cookies[2].name, 'wee')
-    t.equal(cookies[2].value, 'woo')
-  })
-})
-
-test('cookies get set correctly with millisecond dates', (t) => {
-  t.plan(8)
-  const fastify = Fastify()
-  fastify.register(plugin)
-
-  fastify.get('/test1', (req, reply) => {
-    reply
-      .setCookie('foo', 'foo', { path: '/', expires: Date.now() + 1000 })
-      .send({ hello: 'world' })
-  })
-
-  fastify.inject({
-    method: 'GET',
-    url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
-
-    const cookies = res.cookies
-    t.equal(cookies.length, 1)
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, 'foo')
-    t.equal(cookies[0].path, '/')
-    const expires = new Date(cookies[0].expires)
-    t.ok(expires < new Date(Date.now() + 5000))
-  })
-})
-
-test('share options for setCookie and clearCookie', (t) => {
-  t.plan(11)
-  const fastify = Fastify()
-  const secret = 'testsecret'
-  fastify.register(plugin, { secret })
-
-  const cookieOptions = {
-    signed: true,
-    maxAge: 36000
-  }
-
-  fastify.get('/test1', (req, reply) => {
-    reply
-      .setCookie('foo', 'foo', cookieOptions)
-      .clearCookie('foo', cookieOptions)
-      .send({ hello: 'world' })
-  })
-
-  fastify.inject({
-    method: 'GET',
-    url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
-
-    const cookies = res.cookies
-    t.equal(cookies.length, 2)
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, cookieSignature.sign('foo', secret))
-    t.equal(cookies[0].maxAge, 36000)
-
-    t.equal(cookies[1].name, 'foo')
-    t.equal(cookies[1].value, '')
-    t.equal(cookies[1].path, '/')
-    t.ok(new Date(cookies[1].expires) < new Date())
-  })
-})
-
-test('expires should not be overridden in clearCookie', (t) => {
-  t.plan(11)
-  const fastify = Fastify()
-  const secret = 'testsecret'
-  fastify.register(plugin, { secret })
-
-  const cookieOptions = {
-    signed: true,
-    expires: Date.now() + 1000
-  }
-
-  fastify.get('/test1', (req, reply) => {
-    reply
-      .setCookie('foo', 'foo', cookieOptions)
-      .clearCookie('foo', cookieOptions)
-      .send({ hello: 'world' })
-  })
-
-  fastify.inject({
-    method: 'GET',
-    url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
-
-    const cookies = res.cookies
-    t.equal(cookies.length, 2)
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, cookieSignature.sign('foo', secret))
-    const expires = new Date(cookies[0].expires)
-    t.ok(expires < new Date(Date.now() + 5000))
-
-    t.equal(cookies[1].name, 'foo')
-    t.equal(cookies[1].value, '')
-    t.equal(cookies[1].path, '/')
-    t.equal(Number(cookies[1].expires), 0)
-  })
-})
-
-test('parses incoming cookies', (t) => {
-  t.plan(6 + 3 * 3)
-  const fastify = Fastify()
-  fastify.register(plugin)
-
-  // check that it parses the cookies in the onRequest hook
-  for (const hook of ['preValidation', 'preHandler']) {
-    fastify.addHook(hook, (req, reply, done) => {
-      t.ok(req.cookies)
-      t.ok(req.cookies.bar)
-      t.equal(req.cookies.bar, 'bar')
-      done()
-    })
-  }
-
-  fastify.addHook('preParsing', (req, reply, payload, done) => {
-    t.ok(req.cookies)
-    t.ok(req.cookies.bar)
-    t.equal(req.cookies.bar, 'bar')
-    done()
-  })
-
-  fastify.get('/test2', (req, reply) => {
-    t.ok(req.cookies)
-    t.ok(req.cookies.bar)
-    t.equal(req.cookies.bar, 'bar')
-    reply.send({ hello: 'world' })
-  })
-
-  fastify.inject({
-    method: 'GET',
-    url: '/test2',
-    headers: {
-      cookie: 'bar=bar'
-    }
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
-  })
-})
-
-test('does not modify supplied cookie options object', (t) => {
-  t.plan(3)
-  const expireDate = Date.now() + 1000
-  const cookieOptions = {
-    path: '/',
-    expires: expireDate
-  }
-  const fastify = Fastify()
-  fastify.register(plugin)
-
-  fastify.get('/test1', (req, reply) => {
-    reply
-      .setCookie('foo', 'foo', cookieOptions)
-      .send({ hello: 'world' })
-  })
-
-  fastify.inject({
-    method: 'GET',
-    url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.strictSame(cookieOptions, {
-      path: '/',
-      expires: expireDate
-    })
-  })
-})
-
-test('cookies gets cleared correctly', (t) => {
-  t.plan(5)
-  const fastify = Fastify()
-  fastify.register(plugin)
-
-  fastify.get('/test1', (req, reply) => {
-    reply
-      .clearCookie('foo')
-      .send({ hello: 'world' })
-  })
-
-  fastify.inject({
-    method: 'GET',
-    url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
-
-    const cookies = res.cookies
-    t.equal(cookies.length, 1)
-    t.equal(new Date(cookies[0].expires) < new Date(), true)
-  })
-})
-
-test('cookies signature', (t) => {
-  t.plan(9)
-
-  t.test('unsign', t => {
-    t.plan(6)
-    const fastify = Fastify()
-    const secret = 'bar'
-    fastify.register(plugin, { secret })
-
-    fastify.get('/test1', (req, reply) => {
-      reply
-        .setCookie('foo', 'foo', { signed: true })
-        .send({ hello: 'world' })
-    })
-
-    fastify.inject({
-      method: 'GET',
-      url: '/test1'
-    }, (err, res) => {
-      t.error(err)
-      t.equal(res.statusCode, 200)
-      t.same(JSON.parse(res.body), { hello: 'world' })
-
-      const cookies = res.cookies
-      t.equal(cookies.length, 1)
-      t.equal(cookies[0].name, 'foo')
-      t.equal(cookieSignature.unsign(cookies[0].value, secret), 'foo')
-    })
-  })
-
-  t.test('key rotation uses first key to sign', t => {
-    t.plan(6)
-    const fastify = Fastify()
-    const secret1 = 'secret-1'
-    const secret2 = 'secret-2'
-    fastify.register(plugin, { secret: [secret1, secret2] })
-
-    fastify.get('/test1', (req, reply) => {
-      reply
-        .setCookie('foo', 'cookieVal', { signed: true })
-        .send({ hello: 'world' })
-    })
-
-    fastify.inject({
-      method: 'GET',
-      url: '/test1'
-    }, (err, res) => {
-      t.error(err)
-      t.equal(res.statusCode, 200)
-      t.same(JSON.parse(res.body), { hello: 'world' })
-
-      const cookies = res.cookies
-      t.equal(cookies.length, 1)
-      t.equal(cookies[0].name, 'foo')
-      t.equal(cookieSignature.unsign(cookies[0].value, secret1), 'cookieVal') // decode using first key
-    })
-  })
-
-  t.test('unsginCookie via fastify instance', t => {
-    t.plan(3)
-    const fastify = Fastify()
-    const secret = 'bar'
-
-    fastify.register(plugin, { secret })
-
-    fastify.get('/test1', (req, rep) => {
-      rep.send({
-        unsigned: fastify.unsignCookie(req.cookies.foo)
-      })
-    })
-
-    fastify.inject({
-      method: 'GET',
-      url: '/test1',
-      headers: {
-        cookie: `foo=${cookieSignature.sign('foo', secret)}`
-      }
-    }, (err, res) => {
-      t.error(err)
-      t.equal(res.statusCode, 200)
-      t.same(JSON.parse(res.body), { unsigned: { value: 'foo', renew: false, valid: true } })
-    })
-  })
-
-  t.test('unsignCookie via request decorator', t => {
-    t.plan(3)
-    const fastify = Fastify()
-    const secret = 'bar'
-    fastify.register(plugin, { secret })
-
-    fastify.get('/test1', (req, reply) => {
-      reply.send({
-        unsigned: req.unsignCookie(req.cookies.foo)
-      })
-    })
-
-    fastify.inject({
-      method: 'GET',
-      url: '/test1',
-      headers: {
-        cookie: `foo=${cookieSignature.sign('foo', secret)}`
-      }
-    }, (err, res) => {
-      t.error(err)
-      t.equal(res.statusCode, 200)
-      t.same(JSON.parse(res.body), { unsigned: { value: 'foo', renew: false, valid: true } })
-    })
-  })
-
-  t.test('unsignCookie via reply decorator', t => {
-    t.plan(3)
-    const fastify = Fastify()
-    const secret = 'bar'
-    fastify.register(plugin, { secret })
-
-    fastify.get('/test1', (req, reply) => {
-      reply.send({
-        unsigned: reply.unsignCookie(req.cookies.foo)
-      })
-    })
-
-    fastify.inject({
-      method: 'GET',
-      url: '/test1',
-      headers: {
-        cookie: `foo=${cookieSignature.sign('foo', secret)}`
-      }
-    }, (err, res) => {
-      t.error(err)
-      t.equal(res.statusCode, 200)
-      t.same(JSON.parse(res.body), { unsigned: { value: 'foo', renew: false, valid: true } })
-    })
-  })
-
-  t.test('unsignCookie via request decorator after rotation', t => {
-    t.plan(3)
-    const fastify = Fastify()
-    const secret1 = 'sec-1'
-    const secret2 = 'sec-2'
-    fastify.register(plugin, { secret: [secret1, secret2] })
-
-    fastify.get('/test1', (req, reply) => {
-      reply.send({
-        unsigned: req.unsignCookie(req.cookies.foo)
-      })
-    })
-
-    fastify.inject({
-      method: 'GET',
-      url: '/test1',
-      headers: {
-        cookie: `foo=${cookieSignature.sign('foo', secret2)}`
-      }
-    }, (err, res) => {
-      t.error(err)
-      t.equal(res.statusCode, 200)
-      t.same(JSON.parse(res.body), { unsigned: { value: 'foo', renew: true, valid: true } })
-    })
-  })
-
-  t.test('unsignCookie via reply decorator after rotation', t => {
-    t.plan(3)
-    const fastify = Fastify()
-    const secret1 = 'sec-1'
-    const secret2 = 'sec-2'
-    fastify.register(plugin, { secret: [secret1, secret2] })
-
-    fastify.get('/test1', (req, reply) => {
-      reply.send({
-        unsigned: reply.unsignCookie(req.cookies.foo)
-      })
-    })
-
-    fastify.inject({
-      method: 'GET',
-      url: '/test1',
-      headers: {
-        cookie: `foo=${cookieSignature.sign('foo', secret2)}`
-      }
-    }, (err, res) => {
-      t.error(err)
-      t.equal(res.statusCode, 200)
-      t.same(JSON.parse(res.body), { unsigned: { value: 'foo', renew: true, valid: true } })
-    })
-  })
-
-  t.test('unsignCookie via request decorator failure response', t => {
-    t.plan(3)
-    const fastify = Fastify()
-    const secret1 = 'sec-1'
-    const secret2 = 'sec-2'
-    fastify.register(plugin, { secret: [secret1, secret2] })
-
-    fastify.get('/test1', (req, reply) => {
-      reply.send({
-        unsigned: req.unsignCookie(req.cookies.foo)
-      })
-    })
-
-    fastify.inject({
-      method: 'GET',
-      url: '/test1',
-      headers: {
-        cookie: `foo=${cookieSignature.sign('foo', 'invalid-secret')}`
-      }
-    }, (err, res) => {
-      t.error(err)
-      t.equal(res.statusCode, 200)
-      t.same(JSON.parse(res.body), { unsigned: { value: null, renew: false, valid: false } })
-    })
-  })
-
-  t.test('unsignCookie reply decorator failure response', t => {
-    t.plan(3)
-    const fastify = Fastify()
-    const secret1 = 'sec-1'
-    const secret2 = 'sec-2'
-    fastify.register(plugin, { secret: [secret1, secret2] })
-
-    fastify.get('/test1', (req, reply) => {
-      reply.send({
-        unsigned: reply.unsignCookie(req.cookies.foo)
-      })
-    })
-
-    fastify.inject({
-      method: 'GET',
-      url: '/test1',
-      headers: {
-        cookie: `foo=${cookieSignature.sign('foo', 'invalid-secret')}`
-      }
-    }, (err, res) => {
-      t.error(err)
-      t.equal(res.statusCode, 200)
-      t.same(JSON.parse(res.body), { unsigned: { value: null, renew: false, valid: false } })
-    })
-  })
-})
-
-test('custom signer', t => {
-  t.plan(7)
-  const fastify = Fastify()
-  const signStub = sinon.stub().returns('SIGNED-VALUE')
-  const unsignStub = sinon.stub().returns('ORIGINAL VALUE')
-  const secret = { sign: signStub, unsign: unsignStub }
-  fastify.register(plugin, { secret })
-
-  fastify.get('/test1', (req, reply) => {
-    reply
-      .setCookie('foo', 'bar', { signed: true })
-      .send({ hello: 'world' })
-  })
-
-  fastify.inject({
-    method: 'GET',
-    url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
-
-    const cookies = res.cookies
-    t.equal(cookies.length, 1)
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, 'SIGNED-VALUE')
-    t.ok(signStub.calledOnceWithExactly('bar'))
-  })
-})
-
-test('unsignCookie decorator with custom signer', t => {
-  t.plan(4)
-  const fastify = Fastify()
-  const signStub = sinon.stub().returns('SIGNED-VALUE')
-  const unsignStub = sinon.stub().returns('ORIGINAL VALUE')
-  const secret = { sign: signStub, unsign: unsignStub }
-  fastify.register(plugin, { secret })
-
-  fastify.get('/test1', (req, reply) => {
-    reply.send({
-      unsigned: reply.unsignCookie(req.cookies.foo)
-    })
-  })
-
-  fastify.inject({
-    method: 'GET',
-    url: '/test1',
-    headers: {
-      cookie: 'foo=SOME-SIGNED-VALUE'
-    }
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { unsigned: 'ORIGINAL VALUE' })
-    t.ok(unsignStub.calledOnceWithExactly('SOME-SIGNED-VALUE'))
-  })
-})
-
-test('pass options to `cookies.parse`', (t) => {
-  t.plan(6)
-  const fastify = Fastify()
-  fastify.register(plugin, {
-    parseOptions: {
-      decode: decoder
-    }
-  })
-
-  fastify.get('/test1', (req, reply) => {
-    t.ok(req.cookies)
-    t.ok(req.cookies.foo)
-    t.equal(req.cookies.foo, 'bartest')
-    reply.send({ hello: 'world' })
-  })
-
-  fastify.inject({
-    method: 'GET',
-    url: '/test1',
-    headers: {
-      cookie: 'foo=bar'
-    }
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
-  })
-
-  function decoder (str) {
-    return str + 'test'
-  }
-})
-
-test('issue 53', (t) => {
-  t.plan(5)
-  const fastify = Fastify()
-  fastify.register(plugin)
-
-  let cookies
-  let count = 1
-  fastify.get('/foo', (req, reply) => {
-    if (count > 1) {
-      t.not(cookies, req.cookies)
-      return reply.send('done')
-    }
-
-    count += 1
-    cookies = req.cookies
-    reply.send('done')
-  })
-
-  fastify.inject({ url: '/foo' }, (err, response) => {
-    t.error(err)
-    t.equal(response.body, 'done')
-  })
-
-  fastify.inject({ url: '/foo' }, (err, response) => {
-    t.error(err)
-    t.equal(response.body, 'done')
-  })
-})
-
-test('parse cookie manually using decorator', (t) => {
+test('parse: argument validation', (t) => {
   t.plan(2)
-  const fastify = Fastify()
-  fastify.register(plugin)
+  t.throws(cookie.parse.bind(), /argument str must be a string/)
+  t.throws(cookie.parse.bind(null, 42), /argument str must be a string/)
+  t.end()
+})
 
-  fastify.ready(() => {
-    t.ok(fastify.parseCookie)
-    t.same(fastify.parseCookie('foo=bar', {}), { foo: 'bar' })
-    t.end()
-  })
+test('parse: basic', (t) => {
+  t.plan(2)
+  t.same(cookie.parse('foo=bar'), { foo: 'bar' })
+  t.same(cookie.parse('foo=123'), { foo: '123' })
+  t.end()
+})
+
+test('parse: ignore spaces', (t) => {
+  t.plan(1)
+  t.same(cookie.parse('FOO    = bar;   baz  =   raz'), { FOO: 'bar', baz: 'raz' })
+  t.end()
+})
+
+test('parse: escaping', (t) => {
+  t.plan(2)
+  t.same(cookie.parse('foo="bar=123456789&name=Magic+Mouse"'), { foo: 'bar=123456789&name=Magic+Mouse' })
+  t.same(cookie.parse('email=%20%22%2c%3b%2f'), { email: ' ",;/' })
+  t.end()
+})
+
+test('parse: ignore escaping error and return original value', (t) => {
+  t.plan(1)
+  t.same(cookie.parse('foo=%1;bar=bar'), { foo: '%1', bar: 'bar' })
+  t.end()
+})
+
+test('parse: ignore non values', (t) => {
+  t.plan(1)
+  t.same(cookie.parse('foo=%1;bar=bar;HttpOnly;Secure'),
+    { foo: '%1', bar: 'bar' })
+  t.end()
+})
+
+test('parse: unencoded', (t) => {
+  t.plan(2)
+  t.same(cookie.parse('foo="bar=123456789&name=Magic+Mouse"', {
+    decode: function (v) { return v }
+  }), { foo: 'bar=123456789&name=Magic+Mouse' })
+
+  t.same(cookie.parse('email=%20%22%2c%3b%2f', {
+    decode: function (v) { return v }
+  }), { email: '%20%22%2c%3b%2f' })
+  t.end()
+})
+
+test('parse: dates', (t) => {
+  t.plan(1)
+  t.same(cookie.parse('priority=true; expires=Wed, 29 Jan 2014 17:43:25 GMT; Path=/', {
+    decode: function (v) { return v }
+  }), { priority: 'true', Path: '/', expires: 'Wed, 29 Jan 2014 17:43:25 GMT' })
+  t.end()
+})
+
+test('parse: missing value', (t) => {
+  t.plan(1)
+  t.same(cookie.parse('foo; bar=1; fizz= ; buzz=2', {
+    decode: function (v) { return v }
+  }), { bar: '1', fizz: '', buzz: '2' })
+  t.end()
+})
+
+test('parse: assign only once', (t) => {
+  t.plan(3)
+  t.same(cookie.parse('foo=%1;bar=bar;foo=boo'), { foo: '%1', bar: 'bar' })
+  t.same(cookie.parse('foo=false;bar=bar;foo=true'), { foo: 'false', bar: 'bar' })
+  t.same(cookie.parse('foo=;bar=bar;foo=boo'), { foo: '', bar: 'bar' })
+  t.end()
+})
+
+test('serializer: basic', (t) => {
+  t.plan(6)
+  t.same(cookie.serialize('foo', 'bar'), 'foo=bar')
+  t.same(cookie.serialize('foo', 'bar baz'), 'foo=bar%20baz')
+  t.same(cookie.serialize('foo', ''), 'foo=')
+  t.throws(cookie.serialize.bind(cookie, 'foo\n', 'bar'), /argument name is invalid/)
+  t.throws(cookie.serialize.bind(cookie, 'foo\u280a', 'bar'), /argument name is invalid/)
+  t.throws(cookie.serialize.bind(cookie, 'foo', 'bar', { encode: 42 }), /option encode is invalid/)
+  t.end()
+})
+
+test('serializer: path', (t) => {
+  t.plan(2)
+  t.same(cookie.serialize('foo', 'bar', { path: '/' }), 'foo=bar; Path=/')
+  t.throws(cookie.serialize.bind(cookie, 'foo', 'bar', {
+    path: '/\n'
+  }), /option path is invalid/)
+  t.end()
+})
+
+test('serializer: secure', (t) => {
+  t.plan(2)
+  t.same(cookie.serialize('foo', 'bar', { secure: true }), 'foo=bar; Secure')
+  t.same(cookie.serialize('foo', 'bar', { secure: false }), 'foo=bar')
+  t.end()
+})
+
+test('serializer: domain', (t) => {
+  t.plan(2)
+  t.same(cookie.serialize('foo', 'bar', { domain: 'example.com' }), 'foo=bar; Domain=example.com')
+  t.throws(cookie.serialize.bind(cookie, 'foo', 'bar', {
+    domain: 'example.com\n'
+  }), /option domain is invalid/)
+  t.end()
+})
+
+test('serializer: httpOnly', (t) => {
+  t.plan(1)
+  t.same(cookie.serialize('foo', 'bar', { httpOnly: true }), 'foo=bar; HttpOnly')
+  t.end()
+})
+
+test('serializer: maxAge', (t) => {
+  t.plan(9)
+  t.throws(function () {
+    cookie.serialize('foo', 'bar', {
+      maxAge: 'buzz'
+    })
+  }, /option maxAge is invalid/)
+
+  t.throws(function () {
+    cookie.serialize('foo', 'bar', {
+      maxAge: Infinity
+    })
+  }, /option maxAge is invalid/)
+
+  t.same(cookie.serialize('foo', 'bar', { maxAge: 1000 }), 'foo=bar; Max-Age=1000')
+  t.same(cookie.serialize('foo', 'bar', { maxAge: '1000' }), 'foo=bar; Max-Age=1000')
+  t.same(cookie.serialize('foo', 'bar', { maxAge: 0 }), 'foo=bar; Max-Age=0')
+  t.same(cookie.serialize('foo', 'bar', { maxAge: '0' }), 'foo=bar; Max-Age=0')
+  t.same(cookie.serialize('foo', 'bar', { maxAge: null }), 'foo=bar')
+  t.same(cookie.serialize('foo', 'bar', { maxAge: undefined }), 'foo=bar')
+  t.same(cookie.serialize('foo', 'bar', { maxAge: 3.14 }), 'foo=bar; Max-Age=3')
+  t.end()
+})
+
+test('serializer: expires', (t) => {
+  t.plan(2)
+  t.same(cookie.serialize('foo', 'bar', {
+    expires: new Date(Date.UTC(2000, 11, 24, 10, 30, 59, 900))
+  }), 'foo=bar; Expires=Sun, 24 Dec 2000 10:30:59 GMT')
+
+  t.throws(cookie.serialize.bind(cookie, 'foo', 'bar', {
+    expires: Date.now()
+  }), /option expires is invalid/)
+  t.end()
+})
+
+test('sameSite', (t) => {
+  t.plan(9)
+  t.same(cookie.serialize('foo', 'bar', { sameSite: true }), 'foo=bar; SameSite=Strict')
+  t.same(cookie.serialize('foo', 'bar', { sameSite: 'Strict' }), 'foo=bar; SameSite=Strict')
+  t.same(cookie.serialize('foo', 'bar', { sameSite: 'strict' }), 'foo=bar; SameSite=Strict')
+  t.same(cookie.serialize('foo', 'bar', { sameSite: 'Lax' }), 'foo=bar; SameSite=Lax')
+  t.same(cookie.serialize('foo', 'bar', { sameSite: 'lax' }), 'foo=bar; SameSite=Lax')
+  t.same(cookie.serialize('foo', 'bar', { sameSite: 'None' }), 'foo=bar; SameSite=None')
+  t.same(cookie.serialize('foo', 'bar', { sameSite: 'none' }), 'foo=bar; SameSite=None')
+  t.same(cookie.serialize('foo', 'bar', { sameSite: false }), 'foo=bar')
+
+  t.throws(cookie.serialize.bind(cookie, 'foo', 'bar', {
+    sameSite: 'foo'
+  }), /option sameSite is invalid/)
+  t.end()
+})
+
+test('escaping', (t) => {
+  t.plan(1)
+  t.same(cookie.serialize('cat', '+ '), 'cat=%2B%20')
+  t.end()
+})
+
+test('parse->serialize', (t) => {
+  t.plan(2)
+  t.same(cookie.parse(cookie.serialize('cat', 'foo=123&name=baz five')),
+    { cat: 'foo=123&name=baz five' })
+
+  t.same(cookie.parse(cookie.serialize('cat', ' ";/')),
+    { cat: ' ";/' })
+  t.end()
+})
+
+test('unencoded', (t) => {
+  t.plan(2)
+  t.same(cookie.serialize('cat', '+ ', {
+    encode: function (value) { return value }
+  }), 'cat=+ ')
+
+  t.throws(cookie.serialize.bind(cookie, 'cat', '+ \n', {
+    encode: function (value) { return value }
+  }), /argument val is invalid/)
+  t.end()
 })
