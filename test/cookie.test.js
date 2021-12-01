@@ -202,7 +202,7 @@ test('expires should not be overridden in clearCookie', (t) => {
 })
 
 test('parses incoming cookies', (t) => {
-  t.plan(6 + 3 * 2)
+  t.plan(12)
   const fastify = Fastify()
   fastify.register(plugin)
 
