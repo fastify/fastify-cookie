@@ -147,7 +147,8 @@ appWithRotationSecret.after(() => {
       .send({ hello: 'world' });
   })
 })
-const appWithParserOptions = fastify();
+
+const appWithParseOptions = fastify();
 
 const parseOptions: fastifyCookieStar.CookieSerializeOptions = {
   domain: "example.com",
@@ -162,11 +163,11 @@ const parseOptions: fastifyCookieStar.CookieSerializeOptions = {
 };
 expectType<fastifyCookieStar.CookieSerializeOptions>(parseOptions);
 
-appWithParserOptions.register(cookie, {
+appWithParseOptions.register(cookie, {
   secret: "testsecret",
   parseOptions,
 });
-appWithParserOptions.after(() => {
+appWithParseOptions.after(() => {
   server.get("/", (request, reply) => {
     const { valid, renew, value } = reply.unsignCookie(request.cookies.test);
 
