@@ -81,8 +81,7 @@ function plugin (fastify, options, next) {
   }
 
   function setCookie (name, value, cookieOptions) {
-    const opts = Object.assign({}, options.parseOptions || {})
-    Object.assign(opts, cookieOptions)
+    const opts = Object.assign({}, options.parseOptions, cookieOptions)
     return fastifyCookieSetCookie(this, name, value, opts, signer)
   }
 
