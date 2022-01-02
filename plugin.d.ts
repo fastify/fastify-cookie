@@ -104,6 +104,7 @@ export interface CookieSerializeOptions {
 
 export interface FastifyCookieOptions {
   secret?: string | string[];
+  parseOptions?: CookieSerializeOptions;
 }
 
 declare const fastifyCookie: FastifyPluginCallback<NonNullable<FastifyCookieOptions>>;

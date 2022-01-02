@@ -147,3 +147,32 @@ appWithRotationSecret.after(() => {
       .send({ hello: 'world' });
   })
 })
+
+const appWithParseOptions = fastify();
+
+const parseOptions: fastifyCookieStar.CookieSerializeOptions = {
+  domain: "example.com",
+  encode: (value: string) => value,
+  expires: new Date(),
+  httpOnly: true,
+  maxAge: 3600,
+  path: "/",
+  sameSite: "lax",
+  secure: true,
+  signed: true,
+};
+expectType<fastifyCookieStar.CookieSerializeOptions>(parseOptions);
+
+appWithParseOptions.register(cookie, {
+  secret: "testsecret",
+  parseOptions,
+});
+appWithParseOptions.after(() => {
+  server.get("/", (request, reply) => {
+    const { valid, renew, value } = reply.unsignCookie(request.cookies.test);
+
+    expectType<boolean>(valid);
+    expectType<boolean>(renew);
+    expectType<string | null>(value);
+  });
+});
