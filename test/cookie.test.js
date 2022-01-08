@@ -202,7 +202,7 @@ test('expires should not be overridden in clearCookie', (t) => {
 })
 
 test('parses incoming cookies', (t) => {
-  t.plan(12)
+  t.plan(15)
   const fastify = Fastify()
   fastify.register(plugin)
 
@@ -215,6 +215,13 @@ test('parses incoming cookies', (t) => {
       done()
     })
   }
+
+  fastify.addHook('preParsing', (req, reply, payload, done) => {
+    t.ok(req.cookies)
+    t.ok(req.cookies.bar)
+    t.equal(req.cookies.bar, 'bar')
+    done()
+  })
 
   fastify.get('/test2', (req, reply) => {
     t.ok(req.cookies)
