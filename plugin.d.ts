@@ -60,12 +60,20 @@ declare module 'fastify' {
    * @param value Cookie value
    * @param options Serialize options
    */
-    setCookie: setCookieWrapper;
+    setCookie(
+      name: string,
+      value: string,
+      options?: CookieSerializeOptions
+    ): this;
 
     /**
      * @alias setCookie
      */
-    cookie: setCookieWrapper
+    cookie(
+      name: string,
+      value: string,
+      options?: CookieSerializeOptions
+    ): this;
     /**
      * clear response cookie
      * @param name Cookie name
@@ -74,7 +82,7 @@ declare module 'fastify' {
     clearCookie(
       name: string,
       options?: CookieSerializeOptions
-    ): FastifyReply;
+    ): this;
 
     /**
      * Unsigns the specified cookie using the secret provided.
