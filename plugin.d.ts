@@ -64,6 +64,7 @@ declare module 'fastify' {
      * @alias setCookie
      */
     cookie(name: string, value: string, options?: CookieSerializeOptions): this;
+
     /**
      * clear response cookie
      * @param name Cookie name

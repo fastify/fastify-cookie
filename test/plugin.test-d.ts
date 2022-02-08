@@ -46,10 +46,12 @@ server.after((_err) => {
     expectType<setCookieWrapper>(reply.cookie);
     expectType<setCookieWrapper>(reply.setCookie);
 
-    reply
-      .setCookie('test', test, { domain: 'example.com', path: '/' })
-      .clearCookie('foo')
-      .send({ hello: 'world' });
+    expectType<FastifyReply>(
+      reply
+        .setCookie('test', test, { domain: 'example.com', path: '/' })
+        .clearCookie('foo')
+        .send({ hello: 'world' })
+    );
   });
 });
 
