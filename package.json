@@ -7,8 +7,12 @@
   "scripts": {
     "lint": "standard | snazzy",
     "lint:ci": "standard",
-    "test": "tap test/*.test.js && npm run typescript",
-    "typescript": "tsd"
+    "lint:fix": "standard --fix",
+    "test": "npm run unit && npm run typescript",
+    "typescript": "tsd",
+    "unit": "tap -J \"test/*.test.js\"",
+    "unit:report": "npm run unit -- --coverage-report=html",
+    "unit:verbose": "npm run unit -- -Rspec"
   },
   "precommit": [
     "lint",
