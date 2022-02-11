@@ -1,4 +1,4 @@
-/// <reference types="node" />
+/// <reference types='node' />
 
 import { FastifyPluginCallback } from 'fastify';
 
@@ -8,9 +8,7 @@ declare module 'fastify' {
      * Unsigns the specified cookie using the secret provided.
      * @param value Cookie value
      */
-    unsignCookie(
-      value: string,
-    ): {
+    unsignCookie(value: string): {
       valid: boolean;
       renew: boolean;
       value: string | null;
@@ -20,9 +18,7 @@ declare module 'fastify' {
      * @docs https://github.com/fastify/fastify-cookie#manual-cookie-parsing
      * @param cookieHeader Raw cookie header value
      */
-    parseCookie(
-      cookieHeader: string
-    ): {
+    parseCookie(cookieHeader: string): {
       [key: string]: string;
     };
   }
@@ -37,52 +33,50 @@ declare module 'fastify' {
      * Unsigns the specified cookie using the secret provided.
      * @param value Cookie value
      */
-    unsignCookie(
-      value: string,
-    ): {
+    unsignCookie(value: string): {
       valid: boolean;
       renew: boolean;
       value: string | null;
     };
   }
 
-  type setCookieWrapper = (
+  export type setCookieWrapper = (
     name: string,
     value: string,
     options?: CookieSerializeOptions
-  ) => FastifyReply
+  ) => FastifyReply;
 
   interface FastifyReply {
-  /**
-   * Set response cookie
-   * @name setCookie
-   * @param name Cookie name
-   * @param value Cookie value
-   * @param options Serialize options
-   */
-    setCookie: setCookieWrapper;
+    /**
+     * Set response cookie
+     * @name setCookie
+     * @param name Cookie name
+     * @param value Cookie value
+     * @param options Serialize options
+     */
+    setCookie(
+      name: string,
+      value: string,
+      options?: CookieSerializeOptions
+    ): this;
 
     /**
      * @alias setCookie
      */
-    cookie: setCookieWrapper
+    cookie(name: string, value: string, options?: CookieSerializeOptions): this;
+
     /**
      * clear response cookie
      * @param name Cookie name
      * @param options Serialize options
      */
-    clearCookie(
-      name: string,
-      options?: CookieSerializeOptions
-    ): FastifyReply;
+    clearCookie(name: string, options?: CookieSerializeOptions): this;
 
     /**
      * Unsigns the specified cookie using the secret provided.
      * @param value Cookie value
      */
-    unsignCookie(
-      value: string,
-    ): {
+    unsignCookie(value: string): {
       valid: boolean;
       renew: boolean;
       value: string | null;
@@ -110,4 +104,4 @@ export interface FastifyCookieOptions {
 declare const fastifyCookie: FastifyPluginCallback<NonNullable<FastifyCookieOptions>>;
 
 export default fastifyCookie;
-export { fastifyCookie }
+export { fastifyCookie };
