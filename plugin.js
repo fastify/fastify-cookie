@@ -6,7 +6,7 @@ const cookie = require('./cookie')
 const signerFactory = require('./signer')
 
 function fastifyCookieSetCookie (reply, name, value, options, signer) {
-  const opts = Object.assign({}, options || {})
+  const opts = Object.assign({}, options)
   if (opts.expires && Number.isInteger(opts.expires)) {
     opts.expires = new Date(opts.expires)
   }
@@ -80,8 +80,9 @@ function plugin (fastify, options, next) {
     return signer.unsign(value)
   }
 
-  function setCookie (name, value, options) {
-    return fastifyCookieSetCookie(this, name, value, options, signer)
+  function setCookie (name, value, cookieOptions) {
+    const opts = Object.assign({}, options.parseOptions, cookieOptions)
+    return fastifyCookieSetCookie(this, name, value, opts, signer)
   }
 
   function clearCookie (name, options) {

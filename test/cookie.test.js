@@ -202,7 +202,7 @@ test('expires should not be overridden in clearCookie', (t) => {
 })
 
 test('parses incoming cookies', (t) => {
-  t.plan(12)
+  t.plan(15)
   const fastify = Fastify()
   fastify.register(plugin)
 
@@ -215,6 +215,13 @@ test('parses incoming cookies', (t) => {
       done()
     })
   }
+
+  fastify.addHook('preParsing', (req, reply, payload, done) => {
+    t.ok(req.cookies)
+    t.ok(req.cookies.bar)
+    t.equal(req.cookies.bar, 'bar')
+    done()
+  })
 
   fastify.get('/test2', (req, reply) => {
     t.ok(req.cookies)
@@ -659,4 +666,38 @@ test('parse cookie manually using decorator', (t) => {
     t.same(fastify.parseCookie('foo=bar', {}), { foo: 'bar' })
     t.end()
   })
+})
+
+test('cookies set with plugin options parseOptions field', (t) => {
+  t.plan(8)
+  const fastify = Fastify()
+  fastify.register(plugin, {
+    parseOptions: {
+      path: '/test',
+      domain: 'example.com'
+    }
+  })
+
+  fastify.get('/test', (req, reply) => {
+    reply.setCookie('foo', 'foo').send({ hello: 'world' })
+  })
+
+  fastify.inject(
+    {
+      method: 'GET',
+      url: '/test'
+    },
+    (err, res) => {
+      t.error(err)
+      t.equal(res.statusCode, 200)
+      t.same(JSON.parse(res.body), { hello: 'world' })
+
+      const cookies = res.cookies
+      t.equal(cookies.length, 1)
+      t.equal(cookies[0].name, 'foo')
+      t.equal(cookies[0].value, 'foo')
+      t.equal(cookies[0].path, '/test')
+      t.equal(cookies[0].domain, 'example.com')
+    }
+  )
 })
