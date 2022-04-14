@@ -165,3 +165,27 @@ appWithParseOptions.after(() => {
     expectType<string | null>(value);
   });
 });
+
+const appWithCustomSigner = fastify()
+
+appWithCustomSigner.register(cookie, {
+  secret: {
+    sign: (x) => x + '.signed',
+    unsign: (x) => {
+      if (x.endsWith('.signed')) { return { renew: false, valid: true, value: x.slice(0, -7) } }
+      return { renew: false, valid: false, value: null }
+    }
+  }
+})
+appWithCustomSigner.after(() => {
+  server.get('/', (request, reply) => {
+    reply.unsignCookie(request.cookies.test)
+    const { valid, renew, value } = reply.unsignCookie('test')
+
+    expectType<boolean>(valid)
+    expectType<boolean>(renew)
+    expectType<string | null>(value)
+
+    reply.send({ hello: 'world' })
+  })
+})
