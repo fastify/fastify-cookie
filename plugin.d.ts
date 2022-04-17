@@ -96,8 +96,17 @@ export interface CookieSerializeOptions {
   signed?: boolean;
 }
 
+interface Signer {
+  sign: (input: string) => string;
+  unsign: (input: string) => {
+    valid: boolean;
+    renew: boolean;
+    value: string | null;
+  };
+}
+
 export interface FastifyCookieOptions {
-  secret?: string | string[];
+  secret?: string | string[] | Signer;
   parseOptions?: CookieSerializeOptions;
 }
 
