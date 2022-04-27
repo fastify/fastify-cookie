@@ -1,6 +1,6 @@
 {
-  "name": "fastify-cookie",
-  "version": "5.6.1",
+  "name": "@fastify/cookie",
+  "version": "6.0.0",
   "description": "Plugin for fastify to add support for cookies",
   "main": "plugin.js",
   "types": "plugin.d.ts",
@@ -55,5 +55,8 @@
   },
   "tsd": {
     "directory": "test"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
