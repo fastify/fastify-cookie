@@ -1,7 +1,7 @@
-# fastify-cookie
+# @fastify/cookie
 
 ![CI](https://github.com/fastify/fastify-cookie/workflows/CI/badge.svg)
-[![NPM version](https://img.shields.io/npm/v/fastify-cookie.svg?style=flat)](https://www.npmjs.com/package/fastify-cookie)
+[![NPM version](https://img.shields.io/npm/v/@fastify/cookie.svg?style=flat)](https://www.npmjs.com/package/@fastify/cookie)
 [![Known Vulnerabilities](https://snyk.io/test/github/fastify/fastify-cookie/badge.svg)](https://snyk.io/test/github/fastify/fastify-cookie)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://standardjs.com/)
 
@@ -12,16 +12,16 @@ This plugin's cookie parsing works via Fastify's `onRequest` hook. Therefore,
 you should register it prior to any other `onRequest` hooks that will depend
 upon this plugin's actions.
 
-`fastify-cookie` [v2.x](https://github.com/fastify/fastify-cookie/tree/v2.x)
+`@fastify/cookie` [v2.x](https://github.com/fastify/fastify-cookie/tree/v2.x)
 supports both Fastify@1 and Fastify@2.
-`fastify-cookie` v3 only supports Fastify@2.
+`@fastify/cookie` v3 only supports Fastify@2.
 
 ## Example
 
 ```js
 const fastify = require('fastify')()
 
-fastify.register(require('fastify-cookie'), {
+fastify.register(require('@fastify/cookie'), {
   secret: "my-secret", // for cookies signature
   parseOptions: {}     // options for parsing cookies
 })
@@ -47,8 +47,8 @@ fastify.get('/', (req, reply) => {
 ## TypeScript Example
 
 ```ts
-import { FastifyCookieOptions } from 'fastify-cookie'
-import cookie from 'fastify-cookie'
+import { FastifyCookieOptions } from '@fastify/cookie'
+import cookie from '@fastify/cookie'
 import fastify from 'fastify'
 
 const app = fastify()
@@ -126,7 +126,7 @@ Key rotation is when an encryption key is retired and replaced by generating a n
 
 **Example:**
 ```js
-fastify.register(require('fastify-cookie'), {
+fastify.register(require('@fastify/cookie'), {
   secret: [key1, key2]
 })
 ```
@@ -161,7 +161,7 @@ The `secret` option optionally accepts an object with `sign` and `unsign` functi
 
 **Example:**
 ```js
-fastify.register(require('fastify-cookie'), {
+fastify.register(require('@fastify/cookie'), {
   secret: {
     sign: (value) => {
       // sign using custom logic
@@ -188,7 +188,7 @@ the provided signer's (or the default signer if no custom implementation is prov
 **Example:**
 
 ```js
-fastify.register(require('fastify-cookie'), { secret: 'my-secret' })
+fastify.register(require('@fastify/cookie'), { secret: 'my-secret' })
 
 fastify.get('/', (req, rep) => {
   if (fastify.unsign(req.cookie.foo).valid === false) {
