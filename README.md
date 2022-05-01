@@ -17,13 +17,14 @@ supports both Fastify@1 and Fastify@2.
 `@fastify/cookie` v3 only supports Fastify@2.
 
 ## Installation
+```sh
+npm i @fastify/cookie
+```
+
+or
 
 ```sh
 yarn add @fastify/cookie
-```
-or
-```sh
-npm install @fastify/cookie
 ```
 
 ## Example
