@@ -16,6 +16,17 @@ upon this plugin's actions.
 supports both Fastify@1 and Fastify@2.
 `@fastify/cookie` v3 only supports Fastify@2.
 
+## Installation
+```sh
+npm i @fastify/cookie
+```
+
+or
+
+```sh
+yarn add @fastify/cookie
+```
+
 ## Example
 
 ```js
