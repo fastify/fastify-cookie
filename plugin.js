@@ -91,8 +91,8 @@ function plugin (fastify, options, next) {
 }
 
 const fastifyCookie = fp(plugin, {
-  fastify: '>=3',
-  name: 'fastify-cookie'
+  fastify: '4.x',
+  name: '@fastify/cookie'
 })
 
 /**
