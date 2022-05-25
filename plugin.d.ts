@@ -84,6 +84,8 @@ declare module 'fastify' {
   }
 }
 
+type FastifyCookiePlugin = FastifyPluginCallback<NonNullable<fastifyCookie.FastifyCookieOptions>>
+
 declare namespace fastifyCookie {
   export interface Signer {
     sign: (input: string) => string;
@@ -111,11 +113,11 @@ declare namespace fastifyCookie {
     parseOptions?: fastifyCookie.CookieSerializeOptions;
   }
   
-  export const fastifyCookie: FastifyPluginCallback<NonNullable<FastifyCookieOptions>>;
+  export const fastifyCookie: FastifyCookiePlugin;
 
   export { fastifyCookie as default };
 }
 
-declare function fastifyCookie(...params: Parameters<FastifyPluginCallback<NonNullable<fastifyCookie.FastifyCookieOptions>>>): void
+declare function fastifyCookie(...params: Parameters<FastifyCookiePlugin>): ReturnType<FastifyCookiePlugin>
 
 export = fastifyCookie;
