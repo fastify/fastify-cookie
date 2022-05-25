@@ -43,7 +43,7 @@ declare module 'fastify' {
   export type setCookieWrapper = (
     name: string,
     value: string,
-    options?: CookieSerializeOptions
+    options?: fastifyCookie.CookieSerializeOptions
   ) => FastifyReply;
 
   interface FastifyReply {
@@ -57,20 +57,20 @@ declare module 'fastify' {
     setCookie(
       name: string,
       value: string,
-      options?: CookieSerializeOptions
+      options?: fastifyCookie.CookieSerializeOptions
     ): this;
 
     /**
      * @alias setCookie
      */
-    cookie(name: string, value: string, options?: CookieSerializeOptions): this;
+    cookie(name: string, value: string, options?: fastifyCookie.CookieSerializeOptions): this;
 
     /**
      * clear response cookie
      * @param name Cookie name
      * @param options Serialize options
      */
-    clearCookie(name: string, options?: CookieSerializeOptions): this;
+    clearCookie(name: string, options?: fastifyCookie.CookieSerializeOptions): this;
 
     /**
      * Unsigns the specified cookie using the secret provided.
@@ -84,33 +84,36 @@ declare module 'fastify' {
   }
 }
 
-export interface CookieSerializeOptions {
-  domain?: string;
-  encode?(val: string): string;
-  expires?: Date;
-  httpOnly?: boolean;
-  maxAge?: number;
-  path?: string;
-  sameSite?: boolean | 'lax' | 'strict' | 'none';
-  secure?: boolean;
-  signed?: boolean;
+declare namespace fastifyCookie {
+  interface Signer {
+    sign: (input: string) => string;
+    unsign: (input: string) => {
+      valid: boolean;
+      renew: boolean;
+      value: string | null;
+    };
+  }
+  
+  interface CookieSerializeOptions {
+    domain?: string;
+    encode?(val: string): string;
+    expires?: Date;
+    httpOnly?: boolean;
+    maxAge?: number;
+    path?: string;
+    sameSite?: boolean | 'lax' | 'strict' | 'none';
+    secure?: boolean;
+    signed?: boolean;
+  }
+  
+  interface FastifyCookieOptions {
+    secret?: string | string[] | Signer;
+    parseOptions?: fastifyCookie.CookieSerializeOptions;
+  }
+  
+  const fastifyCookie: FastifyPluginCallback<NonNullable<FastifyCookieOptions>>;
 }
 
-interface Signer {
-  sign: (input: string) => string;
-  unsign: (input: string) => {
-    valid: boolean;
-    renew: boolean;
-    value: string | null;
-  };
-}
+declare function fastifyCookie(): FastifyPluginCallback<NonNullable<fastifyCookie.FastifyCookieOptions>>;
 
-export interface FastifyCookieOptions {
-  secret?: string | string[] | Signer;
-  parseOptions?: CookieSerializeOptions;
-}
-
-declare const fastifyCookie: FastifyPluginCallback<NonNullable<FastifyCookieOptions>>;
-
-export default fastifyCookie;
-export { fastifyCookie };
+export = fastifyCookie;
