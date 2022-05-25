@@ -116,6 +116,6 @@ declare namespace fastifyCookie {
   export { fastifyCookie as default };
 }
 
-declare function fastifyCookie(): FastifyPluginCallback<NonNullable<fastifyCookie.FastifyCookieOptions>>;
+declare function fastifyCookie(...params: Parameters<FastifyPluginCallback<NonNullable<fastifyCookie.FastifyCookieOptions>>>): void
 
 export = fastifyCookie;
