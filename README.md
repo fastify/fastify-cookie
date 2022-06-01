@@ -57,7 +57,7 @@ fastify.get('/', (req, reply) => {
 ## TypeScript Example
 
 ```ts
-import { FastifyCookieOptions } from '@fastify/cookie'
+import type { FastifyCookieOptions } from '@fastify/cookie'
 import cookie from '@fastify/cookie'
 import fastify from 'fastify'
 
