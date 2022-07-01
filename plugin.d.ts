@@ -27,7 +27,7 @@ declare module 'fastify' {
     /**
      * Request cookies
      */
-    cookies: { [cookieName: string]: string };
+    cookies: { [cookieName: string]: string | undefined };
 
     /**
      * Unsigns the specified cookie using the secret provided.
