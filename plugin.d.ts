@@ -1,8 +1,8 @@
 /// <reference types='node' />
 
-import { FastifyPluginCallback } from 'fastify';
+import { FastifyPluginCallback } from "fastify";
 
-declare module 'fastify' {
+declare module "fastify" {
   interface FastifyInstance {
     /**
      * Unsigns the specified cookie using the secret provided.
@@ -91,26 +91,30 @@ export interface CookieSerializeOptions {
   httpOnly?: boolean;
   maxAge?: number;
   path?: string;
-  sameSite?: boolean | 'lax' | 'strict' | 'none';
+  sameSite?: boolean | "lax" | "strict" | "none";
   secure?: boolean;
   signed?: boolean;
 }
 
 interface Signer {
-  sign: (input: string) => string;
-  unsign: (input: string) => {
+  sign: (secret: string) => string;
+  unsign: (secret: string) => {
     valid: boolean;
     renew: boolean;
     value: string | null;
   };
 }
 
+declare const signer: Signer;
+
 export interface FastifyCookieOptions {
   secret?: string | string[] | Signer;
   parseOptions?: CookieSerializeOptions;
 }
 
-declare const fastifyCookie: FastifyPluginCallback<NonNullable<FastifyCookieOptions>>;
+declare const fastifyCookie: FastifyPluginCallback<
+  NonNullable<FastifyCookieOptions>
+>;
 
 export default fastifyCookie;
-export { fastifyCookie };
+export { fastifyCookie, signer };

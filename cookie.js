@@ -26,23 +26,26 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-'use strict'
+"use strict";
+
+const signerFactory = require("./signer");
 
 /**
  * Module exports.
  * @public
  */
 
-exports.parse = parse
-exports.serialize = serialize
+exports.parse = parse;
+exports.serialize = serialize;
+exports.signer = signerFactory;
 
 /**
  * Module variables.
  * @private
  */
 
-const decode = decodeURIComponent
-const encode = encodeURIComponent
+const decode = decodeURIComponent;
+const encode = encodeURIComponent;
 
 /**
  * RegExp to match field-content in RFC 7230 sec 3.2
@@ -52,7 +55,7 @@ const encode = encodeURIComponent
  * obs-text      = %x80-FF
  */
 
-const fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/ // eslint-disable-line
+const fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/; // eslint-disable-line
 
 /**
  * Parse a cookie header.
@@ -66,47 +69,47 @@ const fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/ // eslint-dis
  * @public
  */
 
-function parse (str, options) {
-  if (typeof str !== 'string') {
-    throw new TypeError('argument str must be a string')
+function parse(str, options) {
+  if (typeof str !== "string") {
+    throw new TypeError("argument str must be a string");
   }
 
-  const result = {}
-  const dec = (options && options.decode) || decode
+  const result = {};
+  const dec = (options && options.decode) || decode;
 
-  let pos = 0
-  let terminatorPos = 0
-  let eqIdx = 0
+  let pos = 0;
+  let terminatorPos = 0;
+  let eqIdx = 0;
 
   while (true) {
     if (terminatorPos === str.length) {
-      break
+      break;
     }
-    terminatorPos = str.indexOf(';', pos)
-    terminatorPos = (terminatorPos === -1) ? str.length : terminatorPos
-    eqIdx = str.indexOf('=', pos)
+    terminatorPos = str.indexOf(";", pos);
+    terminatorPos = terminatorPos === -1 ? str.length : terminatorPos;
+    eqIdx = str.indexOf("=", pos);
 
     // skip things that don't look like key=value
     if (eqIdx === -1 || eqIdx > terminatorPos) {
-      pos = terminatorPos + 1
-      continue
+      pos = terminatorPos + 1;
+      continue;
     }
 
-    const key = str.substring(pos, eqIdx++).trim()
+    const key = str.substring(pos, eqIdx++).trim();
 
     // only assign once
     if (undefined === result[key]) {
-      const val = (str.charCodeAt(eqIdx) === 0x22)
-        ? str.substring(eqIdx + 1, terminatorPos - 1).trim()
-        : str.substring(eqIdx, terminatorPos).trim()
+      const val =
+        str.charCodeAt(eqIdx) === 0x22
+          ? str.substring(eqIdx + 1, terminatorPos - 1).trim()
+          : str.substring(eqIdx, terminatorPos).trim();
 
-      result[key] = (dec !== decode || val.indexOf('%') !== -1)
-        ? tryDecode(val, dec)
-        : val
+      result[key] =
+        dec !== decode || val.indexOf("%") !== -1 ? tryDecode(val, dec) : val;
     }
-    pos = terminatorPos + 1
+    pos = terminatorPos + 1;
   }
-  return result
+  return result;
 }
 
 /**
@@ -125,87 +128,88 @@ function parse (str, options) {
  * @public
  */
 
-function serialize (name, val, options) {
-  const opt = options || {}
-  const enc = opt.encode || encode
-  if (typeof enc !== 'function') {
-    throw new TypeError('option encode is invalid')
+function serialize(name, val, options) {
+  const opt = options || {};
+  const enc = opt.encode || encode;
+  if (typeof enc !== "function") {
+    throw new TypeError("option encode is invalid");
   }
 
   if (!fieldContentRegExp.test(name)) {
-    throw new TypeError('argument name is invalid')
+    throw new TypeError("argument name is invalid");
   }
 
-  const value = enc(val)
+  const value = enc(val);
   if (value && !fieldContentRegExp.test(value)) {
-    throw new TypeError('argument val is invalid')
+    throw new TypeError("argument val is invalid");
   }
 
-  let str = name + '=' + value
+  let str = name + "=" + value;
   if (opt.maxAge != null) {
-    const maxAge = opt.maxAge - 0
+    const maxAge = opt.maxAge - 0;
     if (isNaN(maxAge) || !isFinite(maxAge)) {
-      throw new TypeError('option maxAge is invalid')
+      throw new TypeError("option maxAge is invalid");
     }
 
-    str += '; Max-Age=' + Math.floor(maxAge)
+    str += "; Max-Age=" + Math.floor(maxAge);
   }
 
   if (opt.domain) {
     if (!fieldContentRegExp.test(opt.domain)) {
-      throw new TypeError('option domain is invalid')
+      throw new TypeError("option domain is invalid");
     }
 
-    str += '; Domain=' + opt.domain
+    str += "; Domain=" + opt.domain;
   }
 
   if (opt.path) {
     if (!fieldContentRegExp.test(opt.path)) {
-      throw new TypeError('option path is invalid')
+      throw new TypeError("option path is invalid");
     }
 
-    str += '; Path=' + opt.path
+    str += "; Path=" + opt.path;
   }
 
   if (opt.expires) {
-    if (typeof opt.expires.toUTCString !== 'function') {
-      throw new TypeError('option expires is invalid')
+    if (typeof opt.expires.toUTCString !== "function") {
+      throw new TypeError("option expires is invalid");
     }
 
-    str += '; Expires=' + opt.expires.toUTCString()
+    str += "; Expires=" + opt.expires.toUTCString();
   }
 
   if (opt.httpOnly) {
-    str += '; HttpOnly'
+    str += "; HttpOnly";
   }
 
   if (opt.secure) {
-    str += '; Secure'
+    str += "; Secure";
   }
 
   if (opt.sameSite) {
-    const sameSite = typeof opt.sameSite === 'string'
-      ? opt.sameSite.toLowerCase()
-      : opt.sameSite
+    const sameSite =
+      typeof opt.sameSite === "string"
+        ? opt.sameSite.toLowerCase()
+        : opt.sameSite;
     switch (sameSite) {
       case true:
-        str += '; SameSite=Strict'
-        break
-      case 'lax':
-        str += '; SameSite=Lax'
-        break
-      case 'strict':
-        str += '; SameSite=Strict'
-        break
-      case 'none':
-        str += '; SameSite=None'
-        break
+        str += "; SameSite=Strict";
+        break;
+      case "lax":
+        str += "; SameSite=Lax";
+        break;
+      case "strict":
+        str += "; SameSite=Strict";
+        break;
+      case "none":
+        str += "; SameSite=None";
+        break;
       default:
-        throw new TypeError('option sameSite is invalid')
+        throw new TypeError("option sameSite is invalid");
     }
   }
 
-  return str
+  return str;
 }
 
 /**
@@ -216,10 +220,10 @@ function serialize (name, val, options) {
  * @private
  */
 
-function tryDecode (str, decode) {
+function tryDecode(str, decode) {
   try {
-    return decode(str)
+    return decode(str);
   } catch (e) {
-    return str
+    return str;
   }
 }
