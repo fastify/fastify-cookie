@@ -247,7 +247,7 @@ import { sign, unsign } from "@fastify/cookie";
 const sid = "sid-123456";
 const secret = "a secret";
 
-const signedCookie = singn(sid, secret);
+const signedCookie = sign(sid, secret);
 const unsignedCookie = unsign(signedCookie, secret);
 ```
 
