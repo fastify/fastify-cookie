@@ -220,7 +220,7 @@ Sometimes the service under test should only accept requests with signed cookies
 import { signerFactory } from "@fastify/cookie";
 
 const signerFactory = require('@fastify/cookie/signer');
-const secret = 'strong secret :)';
+const secret = 'a secret';
 const signer = signerFactory(secret);
 ...
 
@@ -245,7 +245,7 @@ For cases when it is necessary to use different keys for signing/unsigning
 import { sign, unsign } from "@fastify/cookie";
 
 const sid = "sid-123456";
-const secret = "strong secret :)";
+const secret = "a secret";
 
 const signedCookie = singn(sid, secret);
 const unsignedCookie = unsign(signedCookie, secret);
