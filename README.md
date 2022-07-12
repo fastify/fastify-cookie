@@ -219,7 +219,6 @@ Sometimes the service under test should only accept requests with signed cookies
 ```js
 import { signerFactory } from "@fastify/cookie";
 
-const signerFactory = require('@fastify/cookie/signer');
 const secret = 'a secret';
 const signer = signerFactory(secret);
 ...
