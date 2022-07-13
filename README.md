@@ -201,7 +201,7 @@ the provided signer's (or the default signer if no custom implementation is prov
 fastify.register(require('@fastify/cookie'), { secret: 'my-secret' })
 
 fastify.get('/', (req, rep) => {
-  if (fastify.unsign(req.cookie.foo).valid === false) {
+  if (fastify.unsignCookie(req.cookie.foo).valid === false) {
     rep.send('cookie is invalid')
     return
   }
@@ -210,18 +210,13 @@ fastify.get('/', (req, rep) => {
 })
 ```
 
-### Other cases of manual signing / unsigning cookies
+### Other cases of manual signing
 
 Sometimes the service under test should only accept requests with signed cookies, but it does not generate them itself.
 
 **Example:**
 
 ```js
-import { signerFactory } from "@fastify/cookie";
-
-const secret = 'a secret';
-const signer = signerFactory(secret);
-...
 
 test('Request requires signed cookie', async () => {
     const response = await app.inject({
@@ -229,7 +224,7 @@ test('Request requires signed cookie', async () => {
         url: '/',
         headers: {
           cookies : {
-            'sid': signer.sign(sidValue)
+            'sid': app.signCookie(sidValue)
           }
         },
     });
@@ -238,17 +233,6 @@ test('Request requires signed cookie', async () => {
 });
 ```
 
-For cases when it is necessary to use different keys for signing/unsigning
-
-```js
-import { sign, unsign } from "@fastify/cookie";
-
-const sid = "sid-123456";
-const secret = "a secret";
-
-const signedCookie = sign(sid, secret);
-const unsignedCookie = unsign(signedCookie, secret);
-```
 
 ## License
 

@@ -21,6 +21,12 @@ declare module 'fastify' {
     parseCookie(cookieHeader: string): {
       [key: string]: string;
     };
+    /**
+     * Manual cookie signing method
+     * @docs https://github.com/fastify/fastify-cookie#manual-cookie-parsing
+     * @param value cookie value
+     */
+    signCookie(value: string): string;
   }
 
   interface FastifyRequest {
@@ -105,10 +111,6 @@ interface Signer {
   };
 }
 
-declare const signerFactory: Signer;
-declare const sign: (value: string, secret: string) => string;
-declare const unsign: (input: string, secret: string) => string | false;
-
 export interface FastifyCookieOptions {
   secret?: string | string[] | Signer;
   parseOptions?: CookieSerializeOptions;
@@ -117,4 +119,4 @@ export interface FastifyCookieOptions {
 declare const fastifyCookie: FastifyPluginCallback<NonNullable<FastifyCookieOptions>>;
 
 export default fastifyCookie;
-export { fastifyCookie, signerFactory, sign, unsign };
+export { fastifyCookie };
