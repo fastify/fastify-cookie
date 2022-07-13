@@ -713,13 +713,11 @@ test('create signed cookie manually using signCookie decorator', async (t) => {
     })
   })
 
-  fastify.inject({
+  const res = await fastify.inject({
     method: 'GET',
     url: '/test1',
     headers: { cookie: `foo=${fastify.signCookie('bar')}` }
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { unsigned: { value: 'bar', renew: false, valid: false } })
   })
+  t.equal(res.statusCode, 200)
+  t.same(JSON.parse(res.body), { unsigned: { value: 'bar', renew: false, valid: false } })
 })
