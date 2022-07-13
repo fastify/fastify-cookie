@@ -705,7 +705,7 @@ test('cookies set with plugin options parseOptions field', (t) => {
 test('create signed cookie manually using signCookie decorator', async (t) => {
   const fastify = Fastify()
 
-  fastify.register(plugin, { secret: 'secret' })
+  await fastify.register(plugin, { secret: 'secret' })
 
   fastify.get('/test1', (req, reply) => {
     reply.send({
