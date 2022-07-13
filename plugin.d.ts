@@ -111,6 +111,10 @@ interface Signer {
   };
 }
 
+declare const signerFactory: Signer;
+declare const sign: (value: string, secret: string) => string;
+declare const unsign: (input: string, secret: string) => string | false;
+
 export interface FastifyCookieOptions {
   secret?: string | string[] | Signer;
   parseOptions?: CookieSerializeOptions;
@@ -119,4 +123,4 @@ export interface FastifyCookieOptions {
 declare const fastifyCookie: FastifyPluginCallback<NonNullable<FastifyCookieOptions>>;
 
 export default fastifyCookie;
-export { fastifyCookie };
+export { fastifyCookie, signerFactory, sign, unsign };

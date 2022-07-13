@@ -719,5 +719,5 @@ test('create signed cookie manually using signCookie decorator', async (t) => {
     headers: { cookie: `foo=${fastify.signCookie('bar')}` }
   })
   t.equal(res.statusCode, 200)
-  t.same(JSON.parse(res.body), { unsigned: { value: 'bar', renew: false, valid: false } })
+  t.same(JSON.parse(res.body), { unsigned: { value: 'bar', renew: false, valid: true } })
 })

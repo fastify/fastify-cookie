@@ -28,6 +28,9 @@
 
 'use strict'
 
+const { sign, unsign } = require('cookie-signature')
+const { signerFactory } = require('./signer')
+
 /**
  * Module exports.
  * @public
@@ -35,6 +38,9 @@
 
 exports.parse = parse
 exports.serialize = serialize
+exports.signerFactory = signerFactory
+exports.sign = sign
+exports.unsign = unsign
 
 /**
  * Module variables.

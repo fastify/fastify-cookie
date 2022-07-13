@@ -233,6 +233,27 @@ test('Request requires signed cookie', async () => {
 });
 ```
 
+### Manual signing/unsigning with low level utilities
+
+with signerFactory
+
+```js
+const { signerFactory } = require('@fastify/cookie');
+
+const signer = signerFactory('secret');
+const signedValue = signer.sign('test');
+const {valid, renew, value } = signer.unsign(signedValue);
+```
+
+with sign/unsign utilities
+
+```js
+const { sign, unsign } = require('@fastify/cookie');
+
+const signedValue = sign('test', 'secret');
+const unsignedvalue = unsign(signedValue, 'secret');
+```
+
 
 ## License
 
