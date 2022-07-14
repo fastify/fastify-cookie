@@ -3,7 +3,6 @@ import { Server } from 'http';
 import { expectType } from 'tsd';
 import * as fastifyCookieStar from '..';
 import fastifyCookieDefault, {
-  CookieSerializeOptions,
   fastifyCookie as fastifyCookieNamed
 } from '..';
 import cookie, { FastifyCookieOptions } from '../plugin';
