@@ -19,12 +19,12 @@ app.register(fastifyCookieCjsImport.fastifyCookie);
 app.register(fastifyCookieStar.default);
 app.register(fastifyCookieStar.fastifyCookie);
 
-expectType<FastifyPluginCallback<FastifyCookieOptions, Server>>(fastifyCookieNamed);
-expectType<FastifyPluginCallback<FastifyCookieOptions, Server>>(fastifyCookieDefault);
-expectType<FastifyPluginCallback<FastifyCookieOptions, Server>>(fastifyCookieCjsImport.default);
-expectType<FastifyPluginCallback<FastifyCookieOptions, Server>>(fastifyCookieCjsImport.fastifyCookie);
-expectType<FastifyPluginCallback<FastifyCookieOptions, Server>>(fastifyCookieStar.default);
-expectType<FastifyPluginCallback<FastifyCookieOptions, Server>>(
+expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieNamed);
+expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieDefault);
+expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieCjsImport.default);
+expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieCjsImport.fastifyCookie);
+expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieStar.default);
+expectType<fastifyCookieStar.FastifyCookie>(
   fastifyCookieStar.fastifyCookie
 );
 expectType<any>(fastifyCookieCjs);
