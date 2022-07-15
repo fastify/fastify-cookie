@@ -1,5 +1,6 @@
 'use strict'
 
+const { sign, unsign } = require('cookie-signature')
 const fp = require('fastify-plugin')
 const cookie = require('cookie')
 
@@ -58,6 +59,7 @@ function plugin (fastify, options, next) {
   const signer = typeof secret === 'string' || enableRotation ? signerFactory(secret) : secret
 
   fastify.decorate('parseCookie', parseCookie)
+  fastify.decorate('signCookie', signCookie)
   fastify.decorate('unsignCookie', unsignCookie)
 
   fastify.decorateRequest('cookies', null)
@@ -74,6 +76,10 @@ function plugin (fastify, options, next) {
   // ***************************
   function parseCookie (cookieHeader) {
     return cookie.parse(cookieHeader, options.parseOptions)
+  }
+
+  function signCookie (value) {
+    return signer.sign(value)
   }
 
   function unsignCookie (value) {
@@ -108,3 +114,11 @@ const fastifyCookie = fp(plugin, {
 fastifyCookie.fastifyCookie = fastifyCookie
 fastifyCookie.default = fastifyCookie
 module.exports = fastifyCookie
+
+fastifyCookie.fastifyCookie.signerFactory = signerFactory
+fastifyCookie.fastifyCookie.sign = sign
+fastifyCookie.fastifyCookie.unsign = unsign
+
+module.exports.signerFactory = signerFactory
+module.exports.sign = sign
+module.exports.unsign = unsign
