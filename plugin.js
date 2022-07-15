@@ -1,5 +1,6 @@
 'use strict'
 
+const { sign, unsign } = require('cookie-signature')
 const fp = require('fastify-plugin')
 const cookie = require('./cookie')
 
@@ -113,3 +114,11 @@ const fastifyCookie = fp(plugin, {
 fastifyCookie.fastifyCookie = fastifyCookie
 fastifyCookie.default = fastifyCookie
 module.exports = fastifyCookie
+
+fastifyCookie.signerFactory = signerFactory
+fastifyCookie.sign = sign
+fastifyCookie.unsign = unsign
+
+module.exports.signerFactory = signerFactory
+module.exports.sign = sign
+module.exports.unsign = unsign
