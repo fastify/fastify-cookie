@@ -115,9 +115,9 @@ fastifyCookie.fastifyCookie = fastifyCookie
 fastifyCookie.default = fastifyCookie
 module.exports = fastifyCookie
 
-fastifyCookie.signerFactory = signerFactory
-fastifyCookie.sign = sign
-fastifyCookie.unsign = unsign
+fastifyCookie.fastifyCookie.signerFactory = signerFactory
+fastifyCookie.fastifyCookie.sign = sign
+fastifyCookie.fastifyCookie.unsign = unsign
 
 module.exports.signerFactory = signerFactory
 module.exports.sign = sign
