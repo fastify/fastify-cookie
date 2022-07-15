@@ -41,13 +41,14 @@ server.after((_err) => {
 
   server.get('/', (request, reply) => {
     const test = request.cookies.test;
+    expectType<string | undefined>(test);
 
     expectType<setCookieWrapper>(reply.cookie);
     expectType<setCookieWrapper>(reply.setCookie);
 
     expectType<FastifyReply>(
       reply
-        .setCookie('test', test, { domain: 'example.com', path: '/' })
+        .setCookie('test', test!, { domain: 'example.com', path: '/' })
         .clearCookie('foo')
         .send({ hello: 'world' })
     );
@@ -62,7 +63,7 @@ serverWithHttp2.after(() => {
   serverWithHttp2.get('/', (request, reply) => {
     const test = request.cookies.test;
     reply
-      .setCookie('test', test, { domain: 'example.com', path: '/' })
+      .setCookie('test', test!, { domain: 'example.com', path: '/' })
       .clearCookie('foo')
       .send({ hello: 'world' });
   });
@@ -74,26 +75,26 @@ testSamesiteOptionsApp.register(cookie);
 testSamesiteOptionsApp.after(() => {
   server.get('/test-samesite-option-true', (request, reply) => {
     const test = request.cookies.test;
-    reply.setCookie('test', test, { sameSite: true }).send({ hello: 'world' });
+    reply.setCookie('test', test!, { sameSite: true }).send({ hello: 'world' });
   });
   server.get('/test-samesite-option-false', (request, reply) => {
     const test = request.cookies.test;
-    reply.setCookie('test', test, { sameSite: false }).send({ hello: 'world' });
+    reply.setCookie('test', test!, { sameSite: false }).send({ hello: 'world' });
   });
   server.get('/test-samesite-option-lax', (request, reply) => {
     const test = request.cookies.test;
-    reply.setCookie('test', test, { sameSite: 'lax' }).send({ hello: 'world' });
+    reply.setCookie('test', test!, { sameSite: 'lax' }).send({ hello: 'world' });
   });
   server.get('/test-samesite-option-strict', (request, reply) => {
     const test = request.cookies.test;
     reply
-      .setCookie('test', test, { sameSite: 'strict' })
+      .setCookie('test', test!, { sameSite: 'strict' })
       .send({ hello: 'world' });
   });
   server.get('/test-samesite-option-none', (request, reply) => {
     const test = request.cookies.test;
     reply
-      .setCookie('test', test, { sameSite: 'none' })
+      .setCookie('test', test!, { sameSite: 'none' })
       .send({ hello: 'world' });
   });
 });
@@ -105,13 +106,13 @@ appWithImplicitHttpSigned.register(cookie, {
 });
 appWithImplicitHttpSigned.after(() => {
   server.get('/', (request, reply) => {
-    appWithImplicitHttpSigned.unsignCookie(request.cookies.test);
+    appWithImplicitHttpSigned.unsignCookie(request.cookies.test!);
     appWithImplicitHttpSigned.unsignCookie('test');
 
-    reply.unsignCookie(request.cookies.test);
+    reply.unsignCookie(request.cookies.test!);
     reply.unsignCookie('test');
 
-    request.unsignCookie(request.cookies.anotherTest);
+    request.unsignCookie(request.cookies.anotherTest!);
     request.unsignCookie('anotherTest');
 
     reply.send({ hello: 'world' });
@@ -125,7 +126,7 @@ appWithRotationSecret.register(cookie, {
 });
 appWithRotationSecret.after(() => {
   server.get('/', (request, reply) => {
-    reply.unsignCookie(request.cookies.test);
+    reply.unsignCookie(request.cookies.test!);
     const { valid, renew, value } = reply.unsignCookie('test');
 
     expectType<boolean>(valid);
@@ -157,7 +158,7 @@ appWithParseOptions.register(cookie, {
 });
 appWithParseOptions.after(() => {
   server.get('/', (request, reply) => {
-    const { valid, renew, value } = reply.unsignCookie(request.cookies.test);
+    const { valid, renew, value } = reply.unsignCookie(request.cookies.test!);
 
     expectType<boolean>(valid);
     expectType<boolean>(renew);
@@ -178,7 +179,7 @@ appWithCustomSigner.register(cookie, {
 })
 appWithCustomSigner.after(() => {
   server.get('/', (request, reply) => {
-    reply.unsignCookie(request.cookies.test)
+    reply.unsignCookie(request.cookies.test!)
     const { valid, renew, value } = reply.unsignCookie('test')
 
     expectType<boolean>(valid)
