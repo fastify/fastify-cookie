@@ -26,7 +26,7 @@ expectType<fastifyCookieStar.FastifyCookie>(
 );
 expectType<any>(fastifyCookieCjs);
 
-const { sign, unsign, signerFactory} = fastifyCookieNamed;
+const { sign, unsign, signerFactory } = fastifyCookieNamed;
 
 expectType<fastifyCookieStar.Sign>(sign);
 expectType<fastifyCookieStar.Unsign>(unsign);
