@@ -26,11 +26,13 @@ expectType<fastifyCookieStar.FastifyCookie>(
 );
 expectType<any>(fastifyCookieCjs);
 
-const { sign, unsign, signerFactory } = fastifyCookieNamed;
+expectType<fastifyCookieStar.Sign>(fastifyCookieDefault.sign);
+expectType<fastifyCookieStar.Unsign>(fastifyCookieDefault.unsign);
+expectType<fastifyCookieStar.SignerFactory >(fastifyCookieDefault.signerFactory );
 
-expectType<fastifyCookieStar.Sign>(sign);
-expectType<fastifyCookieStar.Unsign>(unsign);
-expectType<fastifyCookieStar.SignerFactory >(signerFactory );
+expectType<fastifyCookieStar.Sign>(fastifyCookieNamed.sign);
+expectType<fastifyCookieStar.Unsign>(fastifyCookieNamed.unsign);
+expectType<fastifyCookieStar.SignerFactory >(fastifyCookieNamed.signerFactory );
 
 const server = fastify();
 

@@ -128,7 +128,7 @@ export interface Unsign {
 export interface SignerFactory{(secret: string) : Signer}
 
 export interface FastifyCookie extends FastifyPluginCallback<NonNullable<FastifyCookieOptions>>{
-  signerFactory:  (secret: string) => Signer;
+  signerFactory: SignerFactory;
   sign: Sign;
   unsign: Unsign;
 }
