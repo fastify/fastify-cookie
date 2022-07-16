@@ -1,8 +1,8 @@
 /// <reference types='node' />
 
-import { FastifyPluginCallback } from "fastify";
+import { FastifyPluginCallback } from 'fastify';
 
-declare module "fastify" {
+declare module 'fastify' {
   interface FastifyInstance {
     /**
      * Unsigns the specified cookie using the secret provided.
