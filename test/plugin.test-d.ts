@@ -1,13 +1,10 @@
-import fastify, { FastifyInstance, FastifyPluginCallback, FastifyReply, setCookieWrapper } from 'fastify';
-import { Server } from 'http';
+import cookie from '../plugin';
 import { expectType } from 'tsd';
 import * as fastifyCookieStar from '..';
-import fastifyCookieDefault, {
-  fastifyCookie as fastifyCookieNamed
-} from '..';
-import cookie, { FastifyCookieOptions } from '../plugin';
-
 import fastifyCookieCjsImport = require('..');
+import fastifyCookieDefault, { fastifyCookie as fastifyCookieNamed  } from '..';
+import fastify, { FastifyInstance,  FastifyReply, setCookieWrapper } from 'fastify';
+
 const fastifyCookieCjs = require('..');
 
 const app: FastifyInstance = fastify();
@@ -28,6 +25,12 @@ expectType<fastifyCookieStar.FastifyCookie>(
   fastifyCookieStar.fastifyCookie
 );
 expectType<any>(fastifyCookieCjs);
+
+const { sign, unsign, signerFactory} = fastifyCookieNamed;
+
+expectType<fastifyCookieStar.Sign>(sign);
+expectType<fastifyCookieStar.Unsign>(unsign);
+expectType<fastifyCookieStar.SignerFactory >(signerFactory );
 
 const server = fastify();
 
