@@ -243,6 +243,61 @@ test('parses incoming cookies', (t) => {
   })
 })
 
+test('defined and undefined cookies', (t) => {
+  t.plan(23)
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  // check that it parses the cookies in the onRequest hook
+  for (const hook of ['preValidation', 'preHandler']) {
+    fastify.addHook(hook, (req, reply, done) => {
+      t.ok(req.cookies)
+
+      t.ok(req.cookies.bar)
+      t.notOk(req.cookies.baz)
+
+      t.equal(req.cookies.bar, 'bar')
+      t.equal(req.cookies.baz, undefined)
+      done()
+    })
+  }
+
+  fastify.addHook('preParsing', (req, reply, payload, done) => {
+    t.ok(req.cookies)
+
+    t.ok(req.cookies.bar)
+    t.notOk(req.cookies.baz)
+
+    t.equal(req.cookies.bar, 'bar')
+    t.equal(req.cookies.baz, undefined)
+    done()
+  })
+
+  fastify.get('/test2', (req, reply) => {
+    t.ok(req.cookies)
+
+    t.ok(req.cookies.bar)
+    t.notOk(req.cookies.baz)
+
+    t.equal(req.cookies.bar, 'bar')
+    t.equal(req.cookies.baz, undefined)
+
+    reply.send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test2',
+    headers: {
+      cookie: 'bar=bar'
+    }
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+  })
+})
+
 test('does not modify supplied cookie options object', (t) => {
   t.plan(3)
   const expireDate = Date.now() + 1000
@@ -700,4 +755,24 @@ test('cookies set with plugin options parseOptions field', (t) => {
       t.equal(cookies[0].domain, 'example.com')
     }
   )
+})
+
+test('create signed cookie manually using signCookie decorator', async (t) => {
+  const fastify = Fastify()
+
+  await fastify.register(plugin, { secret: 'secret' })
+
+  fastify.get('/test1', (req, reply) => {
+    reply.send({
+      unsigned: req.unsignCookie(req.cookies.foo)
+    })
+  })
+
+  const res = await fastify.inject({
+    method: 'GET',
+    url: '/test1',
+    headers: { cookie: `foo=${fastify.signCookie('bar')}` }
+  })
+  t.equal(res.statusCode, 200)
+  t.same(JSON.parse(res.body), { unsigned: { value: 'bar', renew: false, valid: true } })
 })

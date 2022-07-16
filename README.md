@@ -57,7 +57,7 @@ fastify.get('/', (req, reply) => {
 ## TypeScript Example
 
 ```ts
-import { FastifyCookieOptions } from '@fastify/cookie'
+import type { FastifyCookieOptions } from '@fastify/cookie'
 import cookie from '@fastify/cookie'
 import fastify from 'fastify'
 
@@ -201,13 +201,57 @@ the provided signer's (or the default signer if no custom implementation is prov
 fastify.register(require('@fastify/cookie'), { secret: 'my-secret' })
 
 fastify.get('/', (req, rep) => {
-  if (fastify.unsign(req.cookie.foo).valid === false) {
+  if (fastify.unsignCookie(req.cookie.foo).valid === false) {
     rep.send('cookie is invalid')
     return
   }
 
   rep.send('cookie is valid')
 })
+```
+
+### Other cases of manual signing
+
+Sometimes the service under test should only accept requests with signed cookies, but it does not generate them itself.
+
+**Example:**
+
+```js
+
+test('Request requires signed cookie', async () => {
+    const response = await app.inject({
+        method: 'GET',
+        url: '/',
+        headers: {
+          cookies : {
+            'sid': app.signCookie(sidValue)
+          }
+        },
+    });
+
+    expect(response.statusCode).toBe(200);
+});
+```
+
+### Manual signing/unsigning with low level utilities
+
+with signerFactory
+
+```js
+const { signerFactory } = require('@fastify/cookie');
+
+const signer = signerFactory('secret');
+const signedValue = signer.sign('test');
+const {valid, renew, value } = signer.unsign(signedValue);
+```
+
+with sign/unsign utilities
+
+```js
+const { sign, unsign } = require('@fastify/cookie');
+
+const signedValue = sign('test', 'secret');
+const unsignedvalue = unsign(signedValue, 'secret');
 ```
 
 

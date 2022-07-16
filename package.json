@@ -1,6 +1,6 @@
 {
   "name": "@fastify/cookie",
-  "version": "7.0.0",
+  "version": "7.2.0",
   "description": "Plugin for fastify to add support for cookies",
   "main": "plugin.js",
   "types": "plugin.d.ts",
@@ -39,17 +39,18 @@
   },
   "homepage": "https://github.com/fastify/fastify-cookie#readme",
   "devDependencies": {
-    "@types/node": "^17.0.16",
+    "@types/node": "^18.0.0",
     "fastify": "^4.0.0-rc.2",
     "pre-commit": "^1.2.2",
     "sinon": "^14.0.0",
     "snazzy": "^9.0.0",
     "standard": "^17.0.0",
     "tap": "^16.0.0",
-    "tsd": "^0.20.0",
+    "tsd": "^0.22.0",
     "typescript": "^4.5.5"
   },
   "dependencies": {
+    "cookie": "^0.5.0",
     "cookie-signature": "^1.1.0",
     "fastify-plugin": "^3.0.1"
   },
