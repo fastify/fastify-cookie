@@ -62,8 +62,7 @@ function signerFactory (secret, factoryAlgorithm = 'sha256') {
   }
 }
 
-// create a signer-instance, with dummy secret, as the secret is validated by
-// the sign and unsign functions
+// create a signer-instance, with dummy secret
 const signer = signerFactory(['dummy'])
 
 module.exports = signerFactory
