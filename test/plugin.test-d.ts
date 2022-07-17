@@ -104,6 +104,10 @@ const appWithImplicitHttpSigned = fastify();
 appWithImplicitHttpSigned.register(cookie, {
   secret: 'testsecret',
 });
+appWithImplicitHttpSigned.register(cookie, {
+  secret: 'testsecret',
+  algorithm: 'sha512'
+});
 appWithImplicitHttpSigned.after(() => {
   server.get('/', (request, reply) => {
     appWithImplicitHttpSigned.unsignCookie(request.cookies.test!);

@@ -8,11 +8,7 @@ declare module 'fastify' {
      * Unsigns the specified cookie using the secret provided.
      * @param value Cookie value
      */
-    unsignCookie(value: string): {
-      valid: boolean;
-      renew: boolean;
-      value: string | null;
-    };
+    unsignCookie(value: string): UnsignResult;
     /**
      * Manual cookie parsing method
      * @docs https://github.com/fastify/fastify-cookie#manual-cookie-parsing
@@ -39,11 +35,7 @@ declare module 'fastify' {
      * Unsigns the specified cookie using the secret provided.
      * @param value Cookie value
      */
-    unsignCookie(value: string): {
-      valid: boolean;
-      renew: boolean;
-      value: string | null;
-    };
+    unsignCookie(value: string): UnsignResult;
   }
 
   export type setCookieWrapper = (
@@ -82,11 +74,7 @@ declare module 'fastify' {
      * Unsigns the specified cookie using the secret provided.
      * @param value Cookie value
      */
-    unsignCookie(value: string): {
-      valid: boolean;
-      renew: boolean;
-      value: string | null;
-    };
+    unsignCookie(value: string): UnsignResult;
   }
 }
 
@@ -120,6 +108,7 @@ declare const unsign: (input: string, secret: string, algorithm?: string) => Uns
 
 export interface FastifyCookieOptions {
   secret?: string | string[] | Signer;
+  algorithm?: string;
   parseOptions?: CookieSerializeOptions;
 }
 
