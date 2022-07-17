@@ -5,10 +5,16 @@ const sinon = require('sinon')
 const { signerFactory, sign, unsign } = require('../signer')
 
 test('default', t => {
-  t.plan(4)
+  t.plan(5)
 
   const secret = 'my-secret'
   const signer = signerFactory(secret)
+
+  t.test('signer.sign should throw if there is no value provided', (t) => {
+    t.plan(1)
+
+    t.throws(() => signer.sign(undefined), 'Cookie value must be provided as a string.')
+  })
 
   t.test('signer.sign', (t) => {
     t.plan(2)
@@ -16,8 +22,8 @@ test('default', t => {
     const input = 'some-value'
     const result = signer.sign(input)
 
-    t.equal(result, signer.sign(input, secret))
-    t.throws(() => signer.sign(undefined), 'Cookie value must be provided as a string.')
+    t.equal(result, sign(input, secret))
+    t.throws(() => sign(undefined), 'Cookie value must be provided as a string.')
   })
 
   t.test('sign', (t) => {
@@ -77,7 +83,7 @@ test('key rotation', (t) => {
     const input = 'some-value'
     const result = signer.sign(input)
 
-    t.equal(result, signer.sign(input, secret1))
+    t.equal(result, sign(input, secret1))
   })
 
   t.test('signer.unsign tries to decode using all keys till it finds', (t) => {

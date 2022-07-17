@@ -4,7 +4,7 @@ const tap = require('tap')
 const test = tap.test
 const Fastify = require('fastify')
 const sinon = require('sinon')
-const signer = require('../signer')
+const { sign, unsign } = require('../signer')
 const plugin = require('../')
 
 test('cookies get set correctly', (t) => {
@@ -151,7 +151,7 @@ test('share options for setCookie and clearCookie', (t) => {
     const cookies = res.cookies
     t.equal(cookies.length, 2)
     t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, signer.sign('foo', secret))
+    t.equal(cookies[0].value, sign('foo', secret))
     t.equal(cookies[0].maxAge, 36000)
 
     t.equal(cookies[1].name, 'foo')
@@ -190,7 +190,7 @@ test('expires should not be overridden in clearCookie', (t) => {
     const cookies = res.cookies
     t.equal(cookies.length, 2)
     t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, signer.sign('foo', secret))
+    t.equal(cookies[0].value, sign('foo', secret))
     const expires = new Date(cookies[0].expires)
     t.ok(expires < new Date(Date.now() + 5000))
 
@@ -378,7 +378,7 @@ test('cookies signature', (t) => {
       const cookies = res.cookies
       t.equal(cookies.length, 1)
       t.equal(cookies[0].name, 'foo')
-      t.same(signer.unsign(cookies[0].value, secret), { valid: true, renew: false, value: 'foo' })
+      t.same(unsign(cookies[0].value, secret), { valid: true, renew: false, value: 'foo' })
     })
   })
 
@@ -406,7 +406,7 @@ test('cookies signature', (t) => {
       const cookies = res.cookies
       t.equal(cookies.length, 1)
       t.equal(cookies[0].name, 'foo')
-      t.same(signer.unsign(cookies[0].value, secret1), { valid: true, renew: false, value: 'cookieVal' }) // decode using first key
+      t.same(unsign(cookies[0].value, secret1), { valid: true, renew: false, value: 'cookieVal' }) // decode using first key
     })
   })
 
@@ -427,7 +427,7 @@ test('cookies signature', (t) => {
       method: 'GET',
       url: '/test1',
       headers: {
-        cookie: `foo=${signer.sign('foo', secret)}`
+        cookie: `foo=${sign('foo', secret)}`
       }
     }, (err, res) => {
       t.error(err)
@@ -452,7 +452,7 @@ test('cookies signature', (t) => {
       method: 'GET',
       url: '/test1',
       headers: {
-        cookie: `foo=${signer.sign('foo', secret)}`
+        cookie: `foo=${sign('foo', secret)}`
       }
     }, (err, res) => {
       t.error(err)
@@ -477,7 +477,7 @@ test('cookies signature', (t) => {
       method: 'GET',
       url: '/test1',
       headers: {
-        cookie: `foo=${signer.sign('foo', secret)}`
+        cookie: `foo=${sign('foo', secret)}`
       }
     }, (err, res) => {
       t.error(err)
@@ -503,7 +503,7 @@ test('cookies signature', (t) => {
       method: 'GET',
       url: '/test1',
       headers: {
-        cookie: `foo=${signer.sign('foo', secret2)}`
+        cookie: `foo=${sign('foo', secret2)}`
       }
     }, (err, res) => {
       t.error(err)
@@ -529,7 +529,7 @@ test('cookies signature', (t) => {
       method: 'GET',
       url: '/test1',
       headers: {
-        cookie: `foo=${signer.sign('foo', secret2)}`
+        cookie: `foo=${sign('foo', secret2)}`
       }
     }, (err, res) => {
       t.error(err)
@@ -555,7 +555,7 @@ test('cookies signature', (t) => {
       method: 'GET',
       url: '/test1',
       headers: {
-        cookie: `foo=${signer.sign('foo', 'invalid-secret')}`
+        cookie: `foo=${sign('foo', 'invalid-secret')}`
       }
     }, (err, res) => {
       t.error(err)
@@ -581,7 +581,7 @@ test('cookies signature', (t) => {
       method: 'GET',
       url: '/test1',
       headers: {
-        cookie: `foo=${signer.sign('foo', 'invalid-secret')}`
+        cookie: `foo=${sign('foo', 'invalid-secret')}`
       }
     }, (err, res) => {
       t.error(err)
