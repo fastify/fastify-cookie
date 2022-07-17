@@ -36,7 +36,6 @@ function signerFactory (secret, factoryAlgorithm = 'sha256') {
       if (typeof signedValue !== 'string') {
         throw new TypeError('Signed cookie string must be provided.')
       }
-      (Array.isArray(keys) === false) && (keys = [keys])
       let valid = false
       let renew = false
       let value = null
@@ -87,5 +86,5 @@ module.exports.unsign = function unsign (signedValue, secret, algorithm = 'sha25
     }
   }
 
-  return signer.unsign(signedValue, secret, algorithm)
+  return signer.unsign(signedValue, secrets, algorithm)
 }
