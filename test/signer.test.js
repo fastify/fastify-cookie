@@ -120,7 +120,7 @@ test('signerFactory', t => {
 
   t.test('signerFactory handles algorithm properly', (t) => {
     t.plan(3)
-    t.throws(() => signerFactory('secret', 'invalid'))
+    t.throws(() => signerFactory('secret', 'invalid'), 'Algorithm invalid not supported.')
     t.doesNotThrow(() => signerFactory('secret', 'sha512'))
     t.doesNotThrow(() => signerFactory('secret', 'sha256'))
   })
