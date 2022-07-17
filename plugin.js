@@ -1,10 +1,9 @@
 'use strict'
 
-const { sign, unsign } = require('cookie-signature')
 const fp = require('fastify-plugin')
 const cookie = require('cookie')
 
-const signerFactory = require('./signer')
+const { signerFactory, sign, unsign } = require('./signer')
 
 function fastifyCookieSetCookie (reply, name, value, options, signer) {
   const opts = Object.assign({}, options)

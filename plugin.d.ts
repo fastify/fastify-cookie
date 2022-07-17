@@ -103,18 +103,20 @@ export interface CookieSerializeOptions {
   signed?: boolean;
 }
 
+type UnsignResult = {
+  valid: boolean;
+  renew: boolean;
+  value: string | null;
+};
+
 interface Signer {
   sign: (input: string) => string;
-  unsign: (input: string) => {
-    valid: boolean;
-    renew: boolean;
-    value: string | null;
-  };
+  unsign: (input: string) => UnsignResult;
 }
 
-declare const signerFactory: Signer;
-declare const sign: (value: string, secret: string) => string;
-declare const unsign: (input: string, secret: string) => string | false;
+declare function signerFactory(secret: string, algorithm?: string) : Signer;
+declare const sign: (value: string, secret: string, algorithm?: string) => string;
+declare const unsign: (input: string, secret: string, algorithm?: string) => UnsignResult;
 
 export interface FastifyCookieOptions {
   secret?: string | string[] | Signer;
