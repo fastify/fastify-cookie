@@ -36,26 +36,28 @@ function signerFactory (secret, factoryAlgorithm = 'sha256') {
       if (typeof signedValue !== 'string') {
         throw new TypeError('Signed cookie string must be provided.')
       }
-      let valid = false
-      let renew = false
-      let value = null
-      const tentativeValue = signedValue.slice(0, signedValue.lastIndexOf('.'))
+      const value = signedValue.slice(0, signedValue.lastIndexOf('.'))
       const actual = Buffer.from(signedValue)
 
       for (const key of keys) {
-        const expected = Buffer.from(this.sign(tentativeValue, key, algorithm))
+        const expected = Buffer.from(this.sign(value, key, algorithm))
         if (
           expected.length === actual.length &&
           crypto.timingSafeEqual(expected, actual)
         ) {
-          valid = true
-          renew = key !== keys[0]
-          value = tentativeValue
-          break
+          return {
+            valid: true,
+            renew: key !== keys[0],
+            value
+          }
         }
       }
 
-      return { valid, renew, value }
+      return {
+        valid: false,
+        renew: false,
+        value: null
+      }
     }
   }
 }
