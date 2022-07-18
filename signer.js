@@ -2,12 +2,12 @@
 
 const crypto = require('crypto')
 
-function SignerFactory (secret, algorithm = 'sha256') {
+function SignerFactory (secrets, algorithm = 'sha256') {
   if (!(this instanceof SignerFactory)) {
-    return new SignerFactory(secret, algorithm)
+    return new SignerFactory(secrets, algorithm)
   }
 
-  this.secrets = Array.isArray(secret) ? secret : [secret]
+  this.secrets = Array.isArray(secrets) ? secrets : [secrets]
   this.signingKey = this.secrets[0]
   this.algorithm = algorithm
 

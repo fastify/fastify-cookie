@@ -193,3 +193,9 @@ appWithCustomSigner.after(() => {
     reply.send({ hello: 'world' })
   })
 })
+
+new fastifyCookieStar.SignerFactory('secretString')
+new fastifyCookieStar.SignerFactory(['secretStringInArray'])
+const signer = new fastifyCookieStar.SignerFactory(['secretStringInArray'], 'sha256')
+signer.sign('Lorem Ipsum')
+signer.unsign('Lorem Ipsum')
