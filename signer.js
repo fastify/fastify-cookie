@@ -49,10 +49,15 @@ SignerFactory.prototype.unsign = function (signedValue, secrets = this.secrets, 
     throw new TypeError('Signed cookie string must be provided.')
   }
   const value = signedValue.slice(0, signedValue.lastIndexOf('.'))
-  const actual = Buffer.from(signedValue)
+  const actual = Buffer.from(signedValue.slice(signedValue.lastIndexOf('.') + 1))
 
   for (const secret of secrets) {
-    const expected = Buffer.from(this.sign(value, secret, algorithm))
+    const expected = Buffer.from(crypto
+      .createHmac(algorithm, secret)
+      .update(value)
+      .digest('base64')
+      // remove base64 padding (=) as it has special meaning in cookies
+      .replace(/=+$/, ''))
     if (
       expected.length === actual.length &&
       crypto.timingSafeEqual(expected, actual)

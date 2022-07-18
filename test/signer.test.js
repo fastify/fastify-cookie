@@ -2,6 +2,7 @@
 
 const { test } = require('tap')
 const sinon = require('sinon')
+const crypto = require('crypto')
 const { SignerFactory, sign, unsign } = require('../signer')
 
 test('default', t => {
@@ -71,7 +72,7 @@ test('key rotation', (t) => {
   const secret2 = 'my-secret-2'
   const secret3 = 'my-secret-3'
   const signer = SignerFactory([secret1, secret2, secret3])
-  const signSpy = sinon.spy(signer, 'sign')
+  const signSpy = sinon.spy(crypto, 'createHmac')
 
   t.beforeEach(() => {
     signSpy.resetHistory()
