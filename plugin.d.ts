@@ -117,15 +117,9 @@ export interface FastifyCookieOptions {
   parseOptions?: CookieSerializeOptions;
 }
 
-export interface Sign {
-  (value: string, secret: string): string;
-}
-
-export interface Unsign {
-  (input: string, secret: string): string | false;
-}
-
-export interface SignerFactory{(secret: string) : Signer}
+export type Sign  = (value: string, secret: string) => string;
+export type Unsign  = (input: string, secret: string) => string | false;
+export type SignerFactory = (secret: string) => Signer;
 
 export interface FastifyCookie extends FastifyPluginCallback<NonNullable<FastifyCookieOptions>>{
   signerFactory: SignerFactory;
