@@ -3,7 +3,7 @@
 const fp = require('fastify-plugin')
 const cookie = require('cookie')
 
-const { signerFactory, sign, unsign } = require('./signer')
+const { SignerFactory, sign, unsign } = require('./signer')
 
 function fastifyCookieSetCookie (reply, name, value, options, signer) {
   const opts = Object.assign({}, options)
@@ -56,7 +56,7 @@ function plugin (fastify, options, next) {
   const secret = options.secret || ''
   const enableRotation = Array.isArray(secret)
   const algorithm = options.algorithm || 'sha256'
-  const signer = typeof secret === 'string' || enableRotation ? signerFactory(secret, algorithm) : secret
+  const signer = typeof secret === 'string' || enableRotation ? new SignerFactory(secret, algorithm) : secret
 
   fastify.decorate('parseCookie', parseCookie)
   fastify.decorate('signCookie', signCookie)
@@ -115,10 +115,10 @@ fastifyCookie.fastifyCookie = fastifyCookie
 fastifyCookie.default = fastifyCookie
 module.exports = fastifyCookie
 
-fastifyCookie.fastifyCookie.signerFactory = signerFactory
+fastifyCookie.fastifyCookie.SignerFactory = SignerFactory
 fastifyCookie.fastifyCookie.sign = sign
 fastifyCookie.fastifyCookie.unsign = unsign
 
-module.exports.signerFactory = signerFactory
+module.exports.SignerFactory = SignerFactory
 module.exports.sign = sign
 module.exports.unsign = unsign

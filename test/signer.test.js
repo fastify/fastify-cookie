@@ -2,13 +2,13 @@
 
 const { test } = require('tap')
 const sinon = require('sinon')
-const { signerFactory, sign, unsign } = require('../signer')
+const { SignerFactory, sign, unsign } = require('../signer')
 
 test('default', t => {
   t.plan(5)
 
   const secret = 'my-secret'
-  const signer = signerFactory(secret)
+  const signer = SignerFactory(secret)
 
   t.test('signer.sign should throw if there is no value provided', (t) => {
     t.plan(1)
@@ -70,7 +70,7 @@ test('key rotation', (t) => {
   const secret1 = 'my-secret-1'
   const secret2 = 'my-secret-2'
   const secret3 = 'my-secret-3'
-  const signer = signerFactory([secret1, secret2, secret3])
+  const signer = SignerFactory([secret1, secret2, secret3])
   const signSpy = sinon.spy(signer, 'sign')
 
   t.beforeEach(() => {
@@ -118,16 +118,16 @@ test('signerFactory', t => {
 
   t.test('signerFactory needs a string as secret', (t) => {
     t.plan(4)
-    t.throws(() => signerFactory(1), 'Secret key must be a string.')
-    t.throws(() => signerFactory(undefined), 'Secret key must be a string.')
-    t.doesNotThrow(() => signerFactory('secret'))
-    t.doesNotThrow(() => signerFactory(['secret']))
+    t.throws(() => SignerFactory(1), 'Secret key must be a string.')
+    t.throws(() => SignerFactory(undefined), 'Secret key must be a string.')
+    t.doesNotThrow(() => SignerFactory('secret'))
+    t.doesNotThrow(() => SignerFactory(['secret']))
   })
 
   t.test('signerFactory handles algorithm properly', (t) => {
     t.plan(3)
-    t.throws(() => signerFactory('secret', 'invalid'), 'Algorithm invalid not supported.')
-    t.doesNotThrow(() => signerFactory('secret', 'sha512'))
-    t.doesNotThrow(() => signerFactory('secret', 'sha256'))
+    t.throws(() => SignerFactory('secret', 'invalid'), 'Algorithm invalid not supported.')
+    t.doesNotThrow(() => SignerFactory('secret', 'sha512'))
+    t.doesNotThrow(() => SignerFactory('secret', 'sha256'))
   })
 })
