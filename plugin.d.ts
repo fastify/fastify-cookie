@@ -102,7 +102,7 @@ interface Signer {
   unsign: (input: string) => UnsignResult;
 }
 
-declare class SignerFactory {
+declare class Signer {
   constructor (secrets: string | Array<string>, algorithm?: string)
   sign: (value: string) => string;
   unsign: (input: string) => UnsignResult;
@@ -120,4 +120,4 @@ export interface FastifyCookieOptions {
 declare const fastifyCookie: FastifyPluginCallback<NonNullable<FastifyCookieOptions>>;
 
 export default fastifyCookie;
-export { fastifyCookie, SignerFactory, sign, unsign };
+export { fastifyCookie, Signer, sign, unsign };

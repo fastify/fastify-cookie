@@ -3,13 +3,13 @@
 const { test } = require('tap')
 const sinon = require('sinon')
 const crypto = require('crypto')
-const { SignerFactory, sign, unsign } = require('../signer')
+const { Signer, sign, unsign } = require('../signer')
 
 test('default', t => {
   t.plan(5)
 
   const secret = 'my-secret'
-  const signer = SignerFactory(secret)
+  const signer = Signer(secret)
 
   t.test('signer.sign should throw if there is no value provided', (t) => {
     t.plan(1)
@@ -71,7 +71,7 @@ test('key rotation', (t) => {
   const secret1 = 'my-secret-1'
   const secret2 = 'my-secret-2'
   const secret3 = 'my-secret-3'
-  const signer = SignerFactory([secret1, secret2, secret3])
+  const signer = Signer([secret1, secret2, secret3])
   const signSpy = sinon.spy(crypto, 'createHmac')
 
   t.beforeEach(() => {
@@ -114,21 +114,21 @@ test('key rotation', (t) => {
   })
 })
 
-test('signerFactory', t => {
+test('Signer', t => {
   t.plan(2)
 
-  t.test('signerFactory needs a string as secret', (t) => {
+  t.test('Signer needs a string as secret', (t) => {
     t.plan(4)
-    t.throws(() => SignerFactory(1), 'Secret key must be a string.')
-    t.throws(() => SignerFactory(undefined), 'Secret key must be a string.')
-    t.doesNotThrow(() => SignerFactory('secret'))
-    t.doesNotThrow(() => SignerFactory(['secret']))
+    t.throws(() => Signer(1), 'Secret key must be a string.')
+    t.throws(() => Signer(undefined), 'Secret key must be a string.')
+    t.doesNotThrow(() => Signer('secret'))
+    t.doesNotThrow(() => Signer(['secret']))
   })
 
-  t.test('signerFactory handles algorithm properly', (t) => {
+  t.test('Signer handles algorithm properly', (t) => {
     t.plan(3)
-    t.throws(() => SignerFactory('secret', 'invalid'), 'Algorithm invalid not supported.')
-    t.doesNotThrow(() => SignerFactory('secret', 'sha512'))
-    t.doesNotThrow(() => SignerFactory('secret', 'sha256'))
+    t.throws(() => Signer('secret', 'invalid'), 'Algorithm invalid not supported.')
+    t.doesNotThrow(() => Signer('secret', 'sha512'))
+    t.doesNotThrow(() => Signer('secret', 'sha256'))
   })
 })

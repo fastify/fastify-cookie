@@ -2,9 +2,9 @@
 
 const crypto = require('crypto')
 
-function SignerFactory (secrets, algorithm = 'sha256') {
-  if (!(this instanceof SignerFactory)) {
-    return new SignerFactory(secrets, algorithm)
+function Signer (secrets, algorithm = 'sha256') {
+  if (!(this instanceof Signer)) {
+    return new Signer(secrets, algorithm)
   }
 
   this.secrets = Array.isArray(secrets) ? secrets : [secrets]
@@ -32,7 +32,7 @@ function validateAlgorithm (algorithm) {
   }
 }
 
-SignerFactory.prototype.sign = function (value, secret = this.signingKey, algorithm = this.algorithm) {
+Signer.prototype.sign = function (value, secret = this.signingKey, algorithm = this.algorithm) {
   if (typeof value !== 'string') {
     throw new TypeError('Cookie value must be provided as a string.')
   }
@@ -44,7 +44,7 @@ SignerFactory.prototype.sign = function (value, secret = this.signingKey, algori
     .replace(/=+$/, '')
 }
 
-SignerFactory.prototype.unsign = function (signedValue, secrets = this.secrets, algorithm = this.algorithm) {
+Signer.prototype.unsign = function (signedValue, secrets = this.secrets, algorithm = this.algorithm) {
   if (typeof signedValue !== 'string') {
     throw new TypeError('Signed cookie string must be provided.')
   }
@@ -78,7 +78,7 @@ SignerFactory.prototype.unsign = function (signedValue, secrets = this.secrets, 
 }
 
 // create a signer-instance, with dummy secret
-const signer = new SignerFactory(['dummy'])
+const signer = new Signer(['dummy'])
 
 function sign (value, secret, algorithm = 'sha256') {
   const secrets = Array.isArray(secret) ? secret : [secret]
@@ -95,7 +95,7 @@ function unsign (signedValue, secret, algorithm = 'sha256') {
 
   return signer.unsign(signedValue, secrets, algorithm)
 }
-module.exports = SignerFactory
-module.exports.SignerFactory = SignerFactory
+module.exports = Signer
+module.exports.Signer = Signer
 module.exports.sign = sign
 module.exports.unsign = unsign

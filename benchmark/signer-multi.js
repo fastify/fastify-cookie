@@ -1,8 +1,8 @@
 const Benchmark = require('benchmark')
-const SignerFactory = require('../signer')
+const Signer = require('../signer')
 const suite = new Benchmark.Suite()
 
-const signer = SignerFactory(['abcd', 'asdf', 'vadfa'])
+const signer = Signer(['abcd', 'asdf', 'vadfa'])
 const signedValue = signer.sign('test', 'vadfa')
 
 suite
