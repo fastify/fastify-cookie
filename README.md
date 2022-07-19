@@ -248,10 +248,10 @@ const {valid, renew, value } = signer.unsign(signedValue);
 with sign/unsign utilities
 
 ```js
-const { sign, unsign } = require('@fastify/cookie');
+const { fastifyCookie } = require('@fastify/cookie');
 
-const signedValue = sign('test', 'secret');
-const unsignedvalue = unsign(signedValue, 'secret');
+const signedValue = fastifyCookie.sign('test', 'secret');
+const unsignedvalue = fastifyCookie.unsign(signedValue, 'secret');
 ```
 
 
