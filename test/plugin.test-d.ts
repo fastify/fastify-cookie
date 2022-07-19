@@ -1,13 +1,10 @@
-import fastify, { FastifyInstance, FastifyPluginCallback, FastifyReply, setCookieWrapper } from 'fastify';
-import { Server } from 'http';
+import cookie from '../plugin';
 import { expectType } from 'tsd';
 import * as fastifyCookieStar from '..';
-import fastifyCookieDefault, {
-  fastifyCookie as fastifyCookieNamed
-} from '..';
-import cookie, { FastifyCookieOptions } from '../plugin';
-
 import fastifyCookieCjsImport = require('..');
+import fastifyCookieDefault, { fastifyCookie as fastifyCookieNamed  } from '..';
+import fastify, { FastifyInstance,  FastifyReply, setCookieWrapper } from 'fastify';
+
 const fastifyCookieCjs = require('..');
 
 const app: FastifyInstance = fastify();
@@ -19,15 +16,23 @@ app.register(fastifyCookieCjsImport.fastifyCookie);
 app.register(fastifyCookieStar.default);
 app.register(fastifyCookieStar.fastifyCookie);
 
-expectType<FastifyPluginCallback<FastifyCookieOptions, Server>>(fastifyCookieNamed);
-expectType<FastifyPluginCallback<FastifyCookieOptions, Server>>(fastifyCookieDefault);
-expectType<FastifyPluginCallback<FastifyCookieOptions, Server>>(fastifyCookieCjsImport.default);
-expectType<FastifyPluginCallback<FastifyCookieOptions, Server>>(fastifyCookieCjsImport.fastifyCookie);
-expectType<FastifyPluginCallback<FastifyCookieOptions, Server>>(fastifyCookieStar.default);
-expectType<FastifyPluginCallback<FastifyCookieOptions, Server>>(
+expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieNamed);
+expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieDefault);
+expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieCjsImport.default);
+expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieCjsImport.fastifyCookie);
+expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieStar.default);
+expectType<fastifyCookieStar.FastifyCookie>(
   fastifyCookieStar.fastifyCookie
 );
 expectType<any>(fastifyCookieCjs);
+
+expectType<fastifyCookieStar.Sign>(fastifyCookieDefault.sign);
+expectType<fastifyCookieStar.Unsign>(fastifyCookieDefault.unsign);
+expectType<fastifyCookieStar.SignerFactory >(fastifyCookieDefault.signerFactory );
+
+expectType<fastifyCookieStar.Sign>(fastifyCookieNamed.sign);
+expectType<fastifyCookieStar.Unsign>(fastifyCookieNamed.unsign);
+expectType<fastifyCookieStar.SignerFactory >(fastifyCookieNamed.signerFactory );
 
 const server = fastify();
 
