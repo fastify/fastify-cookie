@@ -1,5 +1,11 @@
 'use strict'
 
+// Inspired by node-cookie-signature
+// https://github.com/tj/node-cookie-signature
+//
+// The MIT License
+// Copyright (c) 2012–2022 LearnBoost <tj@learnboost.com> and other contributors;
+
 const crypto = require('crypto')
 
 function Signer (secrets, algorithm = 'sha256') {
