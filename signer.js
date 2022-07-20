@@ -95,7 +95,9 @@ function unsign (signedValue, secret, algorithm = 'sha256') {
 
   return signer.unsign(signedValue, secrets, algorithm)
 }
+
 module.exports = Signer
+module.exports.signerFactory = Signer
 module.exports.Signer = Signer
 module.exports.sign = sign
 module.exports.unsign = unsign
