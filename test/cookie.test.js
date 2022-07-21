@@ -776,3 +776,41 @@ test('create signed cookie manually using signCookie decorator', async (t) => {
   t.equal(res.statusCode, 200)
   t.same(JSON.parse(res.body), { unsigned: { value: 'bar', renew: false, valid: true } })
 })
+
+test('handle secure:auto of cookieOptions', async (t) => {
+  const fastify = Fastify()
+
+  await fastify.register(plugin)
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .setCookie('foo', 'foo', { path: '/', secure: 'auto' })
+      .send()
+  })
+
+  const res = await fastify.inject({
+    method: 'GET',
+    url: '/test1',
+    headers: { 'x-forwarded-proto': 'https' }
+  })
+
+  const cookies = res.cookies
+  t.equal(cookies.length, 1)
+  t.equal(cookies[0].name, 'foo')
+  t.equal(cookies[0].value, 'foo')
+  t.equal(cookies[0].secure, true)
+  t.equal(cookies[0].path, '/')
+
+  const res2 = await fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  })
+
+  const cookies2 = res2.cookies
+  t.equal(cookies2.length, 1)
+  t.equal(cookies2[0].name, 'foo')
+  t.equal(cookies2[0].value, 'foo')
+  t.equal(cookies2[0].sameSite, 'Lax')
+  t.same(cookies2[0].secure, null)
+  t.equal(cookies2[0].path, '/')
+})

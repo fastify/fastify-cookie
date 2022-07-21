@@ -87,7 +87,7 @@ export interface CookieSerializeOptions {
   path?: string;
   priority?: 'low' | 'medium' | 'high';
   sameSite?: boolean | 'lax' | 'strict' | 'none';
-  secure?: boolean;
+  secure?: boolean | 'auto';
   signed?: boolean;
 }
 
