@@ -137,8 +137,7 @@ declare namespace fastifyCookie {
   export const sign: Sign;
   export const unsign: Unsign;
 
-  export interface FastifyCookie
-    extends FastifyPluginCallback<NonNullable<FastifyCookieOptions>> {
+  export interface FastifyCookie extends FastifyCookiePlugin {
     signerFactory: SignerFactory;
     sign: Sign;
     unsign: Unsign;
