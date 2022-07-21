@@ -20,7 +20,7 @@ function fastifyCookieSetCookie (reply, name, value, options, signer) {
     if (isConnectionSecure(reply.request)) {
       opts.secure = true
     } else {
-      opts.sameSite = 'Lax'
+      opts.sameSite = 'lax'
       opts.secure = false
     }
   }
