@@ -16,6 +16,15 @@ function fastifyCookieSetCookie (reply, name, value, options, signer) {
     value = signer.sign(value)
   }
 
+  if (opts.secure === 'auto') {
+    if (isConnectionSecure(reply.request)) {
+      opts.secure = true
+    } else {
+      opts.sameSite = 'Lax'
+      opts.secure = false
+    }
+  }
+
   const serialized = cookie.serialize(name, value, opts)
   let setCookie = reply.getHeader('Set-Cookie')
   if (!setCookie) {
@@ -94,6 +103,13 @@ function plugin (fastify, options, next) {
   function clearCookie (name, options) {
     return fastifyCookieClearCookie(this, name, options)
   }
+}
+
+function isConnectionSecure (request) {
+  return (
+    request.raw.socket?.encrypted === true ||
+    request.headers['x-forwarded-proto'] === 'https'
+  )
 }
 
 const fastifyCookie = fp(plugin, {
