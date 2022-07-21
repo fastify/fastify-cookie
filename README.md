@@ -99,7 +99,8 @@ with a value of `'foo'` on the cookie path `/`.
 + `name`: a string name for the cookie to be set
 + `value`: a string value for the cookie
 + `options`: an options object as described in the [cookie serialize][cs] documentation
-  with a extra param "signed" for signed cookie
++ `options.signed`: the cookie should be signed
++ `options.secure`: if set to `true` it will set the Secure-flag. If it is set to `"auto"` Secure-flag is set when the connection is using tls.
 
 #### Securing the cookie
 
@@ -238,9 +239,9 @@ test('Request requires signed cookie', async () => {
 with signerFactory
 
 ```js
-const { signerFactory } = require('@fastify/cookie');
+const { fastifyCookie } = require('@fastify/cookie');
 
-const signer = signerFactory('secret');
+const signer = fastifyCookie.signerFactory('secret');
 const signedValue = signer.sign('test');
 const {valid, renew, value } = signer.unsign(signedValue);
 ```
@@ -248,10 +249,10 @@ const {valid, renew, value } = signer.unsign(signedValue);
 with sign/unsign utilities
 
 ```js
-const { sign, unsign } = require('@fastify/cookie');
+const { fastifyCookie } = require('@fastify/cookie');
 
-const signedValue = sign('test', 'secret');
-const unsignedvalue = unsign(signedValue, 'secret');
+const signedValue = fastifyCookie.sign('test', 'secret');
+const unsignedvalue = fastifyCookie.unsign(signedValue, 'secret');
 ```
 
 

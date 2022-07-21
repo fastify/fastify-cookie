@@ -1,23 +1,15 @@
-import fastify, { FastifyInstance, FastifyPluginCallback, FastifyReply, setCookieWrapper } from 'fastify';
-import { Server } from 'http';
-import { expectType } from 'tsd';
-import * as fastifyCookieStar from '..';
-import fastifyCookieDefault, {
-  fastifyCookie as fastifyCookieNamed,
-  signerFactory,
-  sign,
-  unsign
-} from '..';
-import cookie, { FastifyCookieOptions } from '../plugin';
+import cookie from "../plugin";
+import { expectType } from "tsd";
+import * as fastifyCookieStar from "..";
+import fastifyCookieCjsImport = require("..");
+import fastifyCookieDefault, { fastifyCookie as fastifyCookieNamed } from "..";
+import fastify, {
+  FastifyInstance,
+  FastifyReply,
+  setCookieWrapper,
+} from "fastify";
 
-interface FastifyCookieAdditionalProperties {
-  signerFactory: typeof signerFactory;
-  sign: typeof sign;
-  unsign: typeof unsign;
-}
-
-import fastifyCookieCjsImport = require('..');
-const fastifyCookieCjs = require('..');
+const fastifyCookieCjs = require("..");
 
 const app: FastifyInstance = fastify();
 app.register(fastifyCookieNamed);
@@ -28,15 +20,23 @@ app.register(fastifyCookieCjsImport.fastifyCookie);
 app.register(fastifyCookieStar.default);
 app.register(fastifyCookieStar.fastifyCookie);
 
-expectType<FastifyPluginCallback<FastifyCookieOptions, Server> & FastifyCookieAdditionalProperties>(fastifyCookieNamed);
-expectType<FastifyPluginCallback<FastifyCookieOptions, Server> & FastifyCookieAdditionalProperties>(fastifyCookieDefault);
-expectType<FastifyPluginCallback<FastifyCookieOptions, Server> & FastifyCookieAdditionalProperties>(fastifyCookieCjsImport.default);
-expectType<FastifyPluginCallback<FastifyCookieOptions, Server> & FastifyCookieAdditionalProperties>(fastifyCookieCjsImport.fastifyCookie);
-expectType<FastifyPluginCallback<FastifyCookieOptions, Server> & FastifyCookieAdditionalProperties>(fastifyCookieStar.default);
-expectType<FastifyPluginCallback<FastifyCookieOptions, Server> & FastifyCookieAdditionalProperties>(
-  fastifyCookieStar.fastifyCookie
+expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieNamed);
+expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieDefault);
+expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieCjsImport.default);
+expectType<fastifyCookieStar.FastifyCookie>(
+  fastifyCookieCjsImport.fastifyCookie
 );
+expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieStar.default);
+expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieStar.fastifyCookie);
 expectType<any>(fastifyCookieCjs);
+
+expectType<fastifyCookieStar.Sign>(fastifyCookieDefault.sign);
+expectType<fastifyCookieStar.Unsign>(fastifyCookieDefault.unsign);
+expectType<fastifyCookieStar.SignerFactory>(fastifyCookieDefault.signerFactory);
+
+expectType<fastifyCookieStar.Sign>(fastifyCookieNamed.sign);
+expectType<fastifyCookieStar.Unsign>(fastifyCookieNamed.unsign);
+expectType<fastifyCookieStar.SignerFactory>(fastifyCookieNamed.signerFactory);
 
 const server = fastify();
 
@@ -45,10 +45,10 @@ server.register(cookie);
 server.after((_err) => {
   expectType<{ [key: string]: string }>(
     // See https://github.com/fastify/fastify-cookie#manual-cookie-parsing
-    server.parseCookie('sessionId=aYb4uTIhdBXC')
+    server.parseCookie("sessionId=aYb4uTIhdBXC")
   );
 
-  server.get('/', (request, reply) => {
+  server.get("/", (request, reply) => {
     const test = request.cookies.test;
     expectType<string | undefined>(test);
 
@@ -57,9 +57,9 @@ server.after((_err) => {
 
     expectType<FastifyReply>(
       reply
-        .setCookie('test', test!, { domain: 'example.com', path: '/' })
-        .clearCookie('foo')
-        .send({ hello: 'world' })
+        .setCookie("test", test!, { domain: "example.com", path: "/" })
+        .clearCookie("foo")
+        .send({ hello: "world" })
     );
   });
 });
@@ -69,12 +69,12 @@ const serverWithHttp2 = fastify({ http2: true });
 serverWithHttp2.register(cookie);
 
 serverWithHttp2.after(() => {
-  serverWithHttp2.get('/', (request, reply) => {
+  serverWithHttp2.get("/", (request, reply) => {
     const test = request.cookies.test;
     reply
-      .setCookie('test', test!, { domain: 'example.com', path: '/' })
-      .clearCookie('foo')
-      .send({ hello: 'world' });
+      .setCookie("test", test!, { domain: "example.com", path: "/" })
+      .clearCookie("foo")
+      .send({ hello: "world" });
   });
 });
 
@@ -82,91 +82,95 @@ const testSamesiteOptionsApp = fastify();
 
 testSamesiteOptionsApp.register(cookie);
 testSamesiteOptionsApp.after(() => {
-  server.get('/test-samesite-option-true', (request, reply) => {
+  server.get("/test-samesite-option-true", (request, reply) => {
     const test = request.cookies.test;
-    reply.setCookie('test', test!, { sameSite: true }).send({ hello: 'world' });
+    reply.setCookie("test", test!, { sameSite: true }).send({ hello: "world" });
   });
-  server.get('/test-samesite-option-false', (request, reply) => {
-    const test = request.cookies.test;
-    reply.setCookie('test', test!, { sameSite: false }).send({ hello: 'world' });
-  });
-  server.get('/test-samesite-option-lax', (request, reply) => {
-    const test = request.cookies.test;
-    reply.setCookie('test', test!, { sameSite: 'lax' }).send({ hello: 'world' });
-  });
-  server.get('/test-samesite-option-strict', (request, reply) => {
+  server.get("/test-samesite-option-false", (request, reply) => {
     const test = request.cookies.test;
     reply
-      .setCookie('test', test!, { sameSite: 'strict' })
-      .send({ hello: 'world' });
+      .setCookie("test", test!, { sameSite: false })
+      .send({ hello: "world" });
   });
-  server.get('/test-samesite-option-none', (request, reply) => {
+  server.get("/test-samesite-option-lax", (request, reply) => {
     const test = request.cookies.test;
     reply
-      .setCookie('test', test!, { sameSite: 'none' })
-      .send({ hello: 'world' });
+      .setCookie("test", test!, { sameSite: "lax" })
+      .send({ hello: "world" });
+  });
+  server.get("/test-samesite-option-strict", (request, reply) => {
+    const test = request.cookies.test;
+    reply
+      .setCookie("test", test!, { sameSite: "strict" })
+      .send({ hello: "world" });
+  });
+  server.get("/test-samesite-option-none", (request, reply) => {
+    const test = request.cookies.test;
+    reply
+      .setCookie("test", test!, { sameSite: "none" })
+      .send({ hello: "world" });
   });
 });
 
 const appWithImplicitHttpSigned = fastify();
 
 appWithImplicitHttpSigned.register(cookie, {
-  secret: 'testsecret',
+  secret: "testsecret",
 });
 appWithImplicitHttpSigned.after(() => {
-  server.get('/', (request, reply) => {
+  server.get("/", (request, reply) => {
     appWithImplicitHttpSigned.unsignCookie(request.cookies.test!);
-    appWithImplicitHttpSigned.unsignCookie('test');
+    appWithImplicitHttpSigned.unsignCookie("test");
 
     reply.unsignCookie(request.cookies.test!);
-    reply.unsignCookie('test');
+    reply.unsignCookie("test");
 
     request.unsignCookie(request.cookies.anotherTest!);
-    request.unsignCookie('anotherTest');
+    request.unsignCookie("anotherTest");
 
-    reply.send({ hello: 'world' });
+    reply.send({ hello: "world" });
   });
 });
 
 const appWithRotationSecret = fastify();
 
 appWithRotationSecret.register(cookie, {
-  secret: ['testsecret'],
+  secret: ["testsecret"],
 });
 appWithRotationSecret.after(() => {
-  server.get('/', (request, reply) => {
+  server.get("/", (request, reply) => {
     reply.unsignCookie(request.cookies.test!);
-    const { valid, renew, value } = reply.unsignCookie('test');
+    const { valid, renew, value } = reply.unsignCookie("test");
 
     expectType<boolean>(valid);
     expectType<boolean>(renew);
     expectType<string | null>(value);
 
-    reply.send({ hello: 'world' });
+    reply.send({ hello: "world" });
   });
 });
 
 const appWithParseOptions = fastify();
 
 const parseOptions: fastifyCookieStar.CookieSerializeOptions = {
-  domain: 'example.com',
+  domain: "example.com",
   encode: (value: string) => value,
   expires: new Date(),
   httpOnly: true,
   maxAge: 3600,
-  path: '/',
-  sameSite: 'lax',
+  path: "/",
+  sameSite: "lax",
   secure: true,
   signed: true,
 };
 expectType<fastifyCookieStar.CookieSerializeOptions>(parseOptions);
 
 appWithParseOptions.register(cookie, {
-  secret: 'testsecret',
+  secret: "testsecret",
   parseOptions,
 });
 appWithParseOptions.after(() => {
-  server.get('/', (request, reply) => {
+  server.get("/", (request, reply) => {
     const { valid, renew, value } = reply.unsignCookie(request.cookies.test!);
 
     expectType<boolean>(valid);
@@ -175,26 +179,28 @@ appWithParseOptions.after(() => {
   });
 });
 
-const appWithCustomSigner = fastify()
+const appWithCustomSigner = fastify();
 
 appWithCustomSigner.register(cookie, {
   secret: {
-    sign: (x) => x + '.signed',
+    sign: (x) => x + ".signed",
     unsign: (x) => {
-      if (x.endsWith('.signed')) { return { renew: false, valid: true, value: x.slice(0, -7) } }
-      return { renew: false, valid: false, value: null }
-    }
-  }
-})
+      if (x.endsWith(".signed")) {
+        return { renew: false, valid: true, value: x.slice(0, -7) };
+      }
+      return { renew: false, valid: false, value: null };
+    },
+  },
+});
 appWithCustomSigner.after(() => {
-  server.get('/', (request, reply) => {
-    reply.unsignCookie(request.cookies.test!)
-    const { valid, renew, value } = reply.unsignCookie('test')
+  server.get("/", (request, reply) => {
+    reply.unsignCookie(request.cookies.test!);
+    const { valid, renew, value } = reply.unsignCookie("test");
 
-    expectType<boolean>(valid)
-    expectType<boolean>(renew)
-    expectType<string | null>(value)
+    expectType<boolean>(valid);
+    expectType<boolean>(renew);
+    expectType<string | null>(value);
 
-    reply.send({ hello: 'world' })
-  })
-})
+    reply.send({ hello: "world" });
+  });
+});
