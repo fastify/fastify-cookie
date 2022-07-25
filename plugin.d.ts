@@ -90,7 +90,12 @@ type FastifyCookiePlugin = FastifyPluginCallback<
 >;
 
 declare namespace fastifyCookie {
-  export class Signer {
+  interface SignerBase {
+    sign: (value: string) => string;
+    unsign: (input: string) => UnsignResult;
+  }
+
+  export class Signer implements SignerBase {
     constructor (secrets: string | Array<string>, algorithm?: string)
     sign: (value: string) => string;
     unsign: (input: string) => UnsignResult;
@@ -114,9 +119,9 @@ declare namespace fastifyCookie {
     parseOptions?: fastifyCookie.CookieSerializeOptions;
   }
 
-  export type Sign = (value: string, secret: string) => string;
-  export type Unsign = (input: string, secret: string) => UnsignResult;
-  export type SignerFactory = (secret: string) => Signer;
+  export type Sign = (value: string, secret: string, algorithm?: string) => string;
+  export type Unsign = (input: string, secret: string, algorithm?: string) => UnsignResult;
+  export type SignerFactory = (secrets: string | Array<string>, algorithm?: string) => SignerBase;
 
   export interface UnsignResult {
     valid: boolean;
@@ -138,7 +143,7 @@ declare namespace fastifyCookie {
   export const fastifyCookie: FastifyCookie;
 
   export interface FastifyCookieOptions {
-    secret?: string | string[] | Signer;
+    secret?: string | string[] | SignerBase;
     algorithm?: string;
     parseOptions?: CookieSerializeOptions;
   }
