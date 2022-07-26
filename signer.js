@@ -8,6 +8,8 @@
 
 const crypto = require('crypto')
 
+const base64PaddingRE = /=/g
+
 function Signer (secrets, algorithm = 'sha256') {
   if (!(this instanceof Signer)) {
     return new Signer(secrets, algorithm)
@@ -47,7 +49,7 @@ function _sign (value, secret, algorithm) {
     .update(value)
     .digest('base64')
     // remove base64 padding (=) as it has special meaning in cookies
-    .replace(/=+$/, '')
+    .replace(base64PaddingRE, '')
 }
 
 function _unsign (signedValue, secrets, algorithm) {
@@ -63,7 +65,7 @@ function _unsign (signedValue, secrets, algorithm) {
       .update(value)
       .digest('base64')
       // remove base64 padding (=) as it has special meaning in cookies
-      .replace(/=+$/, ''))
+      .replace(base64PaddingRE, ''))
     if (
       expected.length === actual.length &&
       crypto.timingSafeEqual(expected, actual)
