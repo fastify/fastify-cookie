@@ -38,7 +38,7 @@ function validateAlgorithm (algorithm) {
   }
 }
 
-Signer.prototype.sign = function (value, secret = this.signingKey, algorithm = this.algorithm) {
+function _sign (value, secret, algorithm) {
   if (typeof value !== 'string') {
     throw new TypeError('Cookie value must be provided as a string.')
   }
@@ -50,7 +50,7 @@ Signer.prototype.sign = function (value, secret = this.signingKey, algorithm = t
     .replace(/=+$/, '')
 }
 
-Signer.prototype.unsign = function (signedValue, secrets = this.secrets, algorithm = this.algorithm) {
+function _unsign (signedValue, secrets, algorithm) {
   if (typeof signedValue !== 'string') {
     throw new TypeError('Signed cookie string must be provided.')
   }
@@ -83,15 +83,20 @@ Signer.prototype.unsign = function (signedValue, secrets = this.secrets, algorit
   }
 }
 
-// create a signer-instance, with dummy secret
-const signer = new Signer(['dummy'])
+Signer.prototype.sign = function (value) {
+  return _sign(value, this.signingKey, this.algorithm)
+}
+
+Signer.prototype.unsign = function (signedValue) {
+  return _unsign(signedValue, this.secrets, this.algorithm)
+}
 
 function sign (value, secret, algorithm = 'sha256') {
   const secrets = Array.isArray(secret) ? secret : [secret]
 
   validateSecrets(secrets)
 
-  return signer.sign(value, secrets[0], algorithm)
+  return _sign(value, secrets[0], algorithm)
 }
 
 function unsign (signedValue, secret, algorithm = 'sha256') {
@@ -99,7 +104,7 @@ function unsign (signedValue, secret, algorithm = 'sha256') {
 
   validateSecrets(secrets)
 
-  return signer.unsign(signedValue, secrets, algorithm)
+  return _unsign(signedValue, secrets, algorithm)
 }
 
 module.exports = Signer

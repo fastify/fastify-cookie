@@ -90,7 +90,7 @@ test('key rotation', (t) => {
   t.test('signer.unsign tries to decode using all keys till it finds', (t) => {
     t.plan(4)
 
-    const input = signer.sign('some-value', secret2)
+    const input = sign('some-value', secret2)
     signSpy.resetHistory()
     const result = signer.unsign(input)
 
@@ -103,7 +103,7 @@ test('key rotation', (t) => {
   t.test('signer.unsign failure response', (t) => {
     t.plan(4)
 
-    const input = signer.sign('some-value', 'invalid-secret')
+    const input = sign('some-value', 'invalid-secret')
     signSpy.resetHistory()
     const result = signer.unsign(input)
 
