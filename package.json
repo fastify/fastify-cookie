@@ -39,9 +39,9 @@
   },
   "homepage": "https://github.com/fastify/fastify-cookie#readme",
   "devDependencies": {
+    "@fastify/pre-commit": "^2.0.2",
     "@types/node": "^18.0.0",
     "fastify": "^4.0.0-rc.2",
-    "pre-commit": "^1.2.2",
     "sinon": "^14.0.0",
     "snazzy": "^9.0.0",
     "standard": "^17.0.0",
