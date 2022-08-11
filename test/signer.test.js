@@ -2,33 +2,67 @@
 
 const { test } = require('tap')
 const sinon = require('sinon')
-const cookieSignature = require('cookie-signature')
-const signerFactory = require('../signer')
+const crypto = require('crypto')
+const { Signer, sign, unsign } = require('../signer')
 
-test('default', (t) => {
-  t.plan(2)
+test('default', t => {
+  t.plan(5)
 
   const secret = 'my-secret'
-  const signer = signerFactory(secret)
+  const signer = Signer(secret)
+
+  t.test('signer.sign should throw if there is no value provided', (t) => {
+    t.plan(1)
+
+    t.throws(() => signer.sign(undefined), 'Cookie value must be provided as a string.')
+  })
 
   t.test('signer.sign', (t) => {
-    t.plan(1)
+    t.plan(2)
 
     const input = 'some-value'
     const result = signer.sign(input)
 
-    t.equal(result, cookieSignature.sign(input, secret))
+    t.equal(result, sign(input, secret))
+    t.throws(() => sign(undefined), 'Cookie value must be provided as a string.')
+  })
+
+  t.test('sign', (t) => {
+    t.plan(3)
+
+    const input = 'some-value'
+    const result = signer.sign(input)
+
+    t.equal(result, sign(input, secret))
+    t.equal(result, sign(input, [secret]))
+
+    t.throws(() => sign(undefined), 'Cookie value must be provided as a string.')
   })
 
   t.test('signer.unsign', (t) => {
-    t.plan(3)
+    t.plan(4)
 
-    const input = cookieSignature.sign('some-value', secret)
+    const input = signer.sign('some-value', secret)
     const result = signer.unsign(input)
 
     t.equal(result.valid, true)
     t.equal(result.renew, false)
     t.equal(result.value, 'some-value')
+    t.throws(() => signer.unsign(undefined), 'Signed cookie string must be provided.')
+  })
+
+  t.test('unsign', (t) => {
+    t.plan(6)
+
+    const input = sign('some-value', secret)
+    const result = unsign(input, secret)
+
+    t.equal(result.valid, true)
+    t.equal(result.renew, false)
+    t.equal(result.value, 'some-value')
+    t.same(result, unsign(input, [secret]))
+    t.throws(() => unsign(undefined), 'Secret key must be a string.')
+    t.throws(() => unsign(undefined, secret), 'Signed cookie string must be provided.')
   })
 })
 
@@ -37,11 +71,11 @@ test('key rotation', (t) => {
   const secret1 = 'my-secret-1'
   const secret2 = 'my-secret-2'
   const secret3 = 'my-secret-3'
-  const signer = signerFactory([secret1, secret2, secret3])
-  const unsignSpy = sinon.spy(cookieSignature, 'unsign')
+  const signer = Signer([secret1, secret2, secret3])
+  const signSpy = sinon.spy(crypto, 'createHmac')
 
   t.beforeEach(() => {
-    unsignSpy.resetHistory()
+    signSpy.resetHistory()
   })
 
   t.test('signer.sign always signs using first key', (t) => {
@@ -50,30 +84,51 @@ test('key rotation', (t) => {
     const input = 'some-value'
     const result = signer.sign(input)
 
-    t.equal(result, cookieSignature.sign(input, secret1))
+    t.equal(result, sign(input, secret1))
   })
 
   t.test('signer.unsign tries to decode using all keys till it finds', (t) => {
     t.plan(4)
 
-    const input = cookieSignature.sign('some-value', secret2)
+    const input = sign('some-value', secret2)
+    signSpy.resetHistory()
     const result = signer.unsign(input)
 
     t.equal(result.valid, true)
     t.equal(result.renew, true)
     t.equal(result.value, 'some-value')
-    t.equal(unsignSpy.callCount, 2) // should have returned early when the right key was found
+    t.equal(signSpy.callCount, 2) // should have returned early when the right key was found
   })
 
   t.test('signer.unsign failure response', (t) => {
     t.plan(4)
 
-    const input = cookieSignature.sign('some-value', 'invalid-secret')
+    const input = sign('some-value', 'invalid-secret')
+    signSpy.resetHistory()
     const result = signer.unsign(input)
 
     t.equal(result.valid, false)
     t.equal(result.renew, false)
     t.equal(result.value, null)
-    t.equal(unsignSpy.callCount, 3) // should have tried all 3
+    t.equal(signSpy.callCount, 3) // should have tried all 3
+  })
+})
+
+test('Signer', t => {
+  t.plan(2)
+
+  t.test('Signer needs a string as secret', (t) => {
+    t.plan(4)
+    t.throws(() => Signer(1), 'Secret key must be a string.')
+    t.throws(() => Signer(undefined), 'Secret key must be a string.')
+    t.doesNotThrow(() => Signer('secret'))
+    t.doesNotThrow(() => Signer(['secret']))
+  })
+
+  t.test('Signer handles algorithm properly', (t) => {
+    t.plan(3)
+    t.throws(() => Signer('secret', 'invalid'), 'Algorithm invalid not supported.')
+    t.doesNotThrow(() => Signer('secret', 'sha512'))
+    t.doesNotThrow(() => Signer('secret', 'sha256'))
   })
 })

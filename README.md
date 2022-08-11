@@ -236,12 +236,12 @@ test('Request requires signed cookie', async () => {
 
 ### Manual signing/unsigning with low level utilities
 
-with signerFactory
+with Signer
 
 ```js
-const { fastifyCookie } = require('@fastify/cookie');
+const { Signer } = require('@fastify/cookie');
 
-const signer = fastifyCookie.signerFactory('secret');
+const signer = new Signer('secret');
 const signedValue = signer.sign('test');
 const {valid, renew, value } = signer.unsign(signedValue);
 ```

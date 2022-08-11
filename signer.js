@@ -1,32 +1,116 @@
 'use strict'
 
-const cookieSignature = require('cookie-signature')
+// Inspired by node-cookie-signature
+// https://github.com/tj/node-cookie-signature
+//
+// The MIT License
+// Copyright (c) 2012–2022 LearnBoost <tj@learnboost.com> and other contributors;
 
-module.exports = function (secret) {
-  const secrets = Array.isArray(secret) ? secret : [secret]
-  const [signingKey] = secrets
+const crypto = require('crypto')
 
-  return {
-    sign (value) {
-      return cookieSignature.sign(value, signingKey)
-    },
-    unsign (signedValue) {
-      let valid = false
-      let renew = false
-      let value = null
+const base64PaddingRE = /=/g
 
-      for (const key of secrets) {
-        const result = cookieSignature.unsign(signedValue, key)
+function Signer (secrets, algorithm = 'sha256') {
+  if (!(this instanceof Signer)) {
+    return new Signer(secrets, algorithm)
+  }
 
-        if (result !== false) {
-          valid = true
-          renew = key !== signingKey
-          value = result
-          break
-        }
-      }
+  this.secrets = Array.isArray(secrets) ? secrets : [secrets]
+  this.signingKey = this.secrets[0]
+  this.algorithm = algorithm
 
-      return { valid, renew, value }
+  validateSecrets(this.secrets)
+  validateAlgorithm(this.algorithm)
+}
+
+function validateSecrets (secrets) {
+  for (const secret of secrets) {
+    if (typeof secret !== 'string') {
+      throw new TypeError('Secret key must be a string.')
     }
   }
 }
+
+function validateAlgorithm (algorithm) {
+  // validate that the algorithm is supported by the node runtime
+  try {
+    crypto.createHmac(algorithm, 'dummyHmac')
+  } catch (e) {
+    throw new TypeError(`Algorithm ${algorithm} not supported.`)
+  }
+}
+
+function _sign (value, secret, algorithm) {
+  if (typeof value !== 'string') {
+    throw new TypeError('Cookie value must be provided as a string.')
+  }
+  return value + '.' + crypto
+    .createHmac(algorithm, secret)
+    .update(value)
+    .digest('base64')
+    // remove base64 padding (=) as it has special meaning in cookies
+    .replace(base64PaddingRE, '')
+}
+
+function _unsign (signedValue, secrets, algorithm) {
+  if (typeof signedValue !== 'string') {
+    throw new TypeError('Signed cookie string must be provided.')
+  }
+  const value = signedValue.slice(0, signedValue.lastIndexOf('.'))
+  const actual = Buffer.from(signedValue.slice(signedValue.lastIndexOf('.') + 1))
+
+  for (const secret of secrets) {
+    const expected = Buffer.from(crypto
+      .createHmac(algorithm, secret)
+      .update(value)
+      .digest('base64')
+      // remove base64 padding (=) as it has special meaning in cookies
+      .replace(base64PaddingRE, ''))
+    if (
+      expected.length === actual.length &&
+      crypto.timingSafeEqual(expected, actual)
+    ) {
+      return {
+        valid: true,
+        renew: secret !== secrets[0],
+        value
+      }
+    }
+  }
+
+  return {
+    valid: false,
+    renew: false,
+    value: null
+  }
+}
+
+Signer.prototype.sign = function (value) {
+  return _sign(value, this.signingKey, this.algorithm)
+}
+
+Signer.prototype.unsign = function (signedValue) {
+  return _unsign(signedValue, this.secrets, this.algorithm)
+}
+
+function sign (value, secret, algorithm = 'sha256') {
+  const secrets = Array.isArray(secret) ? secret : [secret]
+
+  validateSecrets(secrets)
+
+  return _sign(value, secrets[0], algorithm)
+}
+
+function unsign (signedValue, secret, algorithm = 'sha256') {
+  const secrets = Array.isArray(secret) ? secret : [secret]
+
+  validateSecrets(secrets)
+
+  return _unsign(signedValue, secrets, algorithm)
+}
+
+module.exports = Signer
+module.exports.signerFactory = Signer
+module.exports.Signer = Signer
+module.exports.sign = sign
+module.exports.unsign = unsign

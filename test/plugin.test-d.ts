@@ -109,6 +109,10 @@ const appWithImplicitHttpSigned = fastify();
 appWithImplicitHttpSigned.register(cookie, {
   secret: 'testsecret',
 });
+appWithImplicitHttpSigned.register(cookie, {
+  secret: 'testsecret',
+  algorithm: 'sha512'
+});
 appWithImplicitHttpSigned.after(() => {
   server.get('/', (request, reply) => {
     appWithImplicitHttpSigned.unsignCookie(request.cookies.test!);
@@ -194,3 +198,9 @@ appWithCustomSigner.after(() => {
     reply.send({ hello: 'world' })
   })
 })
+
+new fastifyCookieStar.Signer('secretString')
+new fastifyCookieStar.Signer(['secretStringInArray'])
+const signer = new fastifyCookieStar.Signer(['secretStringInArray'], 'sha256')
+signer.sign('Lorem Ipsum')
+signer.unsign('Lorem Ipsum')

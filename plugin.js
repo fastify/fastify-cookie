@@ -1,10 +1,9 @@
 'use strict'
 
-const { sign, unsign } = require('cookie-signature')
 const fp = require('fastify-plugin')
 const cookie = require('cookie')
 
-const signerFactory = require('./signer')
+const { Signer, sign, unsign } = require('./signer')
 
 function fastifyCookieSetCookie (reply, name, value, options, signer) {
   const opts = Object.assign({}, options)
@@ -65,7 +64,8 @@ function onReqHandlerWrapper (fastify) {
 function plugin (fastify, options, next) {
   const secret = options.secret || ''
   const enableRotation = Array.isArray(secret)
-  const signer = typeof secret === 'string' || enableRotation ? signerFactory(secret) : secret
+  const algorithm = options.algorithm || 'sha256'
+  const signer = typeof secret === 'string' || enableRotation ? new Signer(secret, algorithm) : secret
 
   fastify.decorate('parseCookie', parseCookie)
   fastify.decorate('signCookie', signCookie)
@@ -127,14 +127,17 @@ const fastifyCookie = fp(plugin, {
  * - `import { fastifyCookie } from 'fastify-cookie'`
  * - `import fastifyCookie from 'fastify-cookie'`
  */
+fastifyCookie.signerFactory = Signer
 fastifyCookie.fastifyCookie = fastifyCookie
 fastifyCookie.default = fastifyCookie
 module.exports = fastifyCookie
 
-fastifyCookie.fastifyCookie.signerFactory = signerFactory
+fastifyCookie.fastifyCookie.signerFactory = Signer
+fastifyCookie.fastifyCookie.Signer = Signer
 fastifyCookie.fastifyCookie.sign = sign
 fastifyCookie.fastifyCookie.unsign = unsign
 
-module.exports.signerFactory = signerFactory
+module.exports.signerFactory = Signer
+module.exports.Signer = Signer
 module.exports.sign = sign
 module.exports.unsign = unsign
