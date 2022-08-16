@@ -1,4 +1,4 @@
-import cookie from '../plugin';
+import cookie from '..';
 import { expectType } from 'tsd';
 import * as fastifyCookieStar from '..';
 import fastifyCookieCjsImport = require('..');
@@ -57,6 +57,16 @@ server.after((_err) => {
         .clearCookie('foo')
         .send({ hello: 'world' })
     );
+  });
+
+  expectType<(value: string) => string>(server.signCookie)
+  expectType<(value: string) => fastifyCookieStar.UnsignResult>(server.unsignCookie)
+
+  server.get('/', (request, reply) => {
+    expectType<(value: string) => string>(request.signCookie)
+    expectType<(value: string) => string>(reply.signCookie)
+    expectType<(value: string) => fastifyCookieStar.UnsignResult>(request.unsignCookie)
+    expectType<(value: string) => fastifyCookieStar.UnsignResult>(reply.unsignCookie)
   });
 });
 

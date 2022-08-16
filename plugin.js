@@ -68,15 +68,23 @@ function plugin (fastify, options, next) {
   const signer = typeof secret === 'string' || enableRotation ? new Signer(secret, algorithm) : secret
 
   fastify.decorate('parseCookie', parseCookie)
-  fastify.decorate('signCookie', signCookie)
-  fastify.decorate('unsignCookie', unsignCookie)
+
+  if (secret !== '') {
+    fastify.decorate('signCookie', signCookie)
+    fastify.decorate('unsignCookie', unsignCookie)
+
+    fastify.decorateRequest('signCookie', signCookie)
+    fastify.decorateRequest('unsignCookie', unsignCookie)
+
+    fastify.decorateReply('signCookie', signCookie)
+    fastify.decorateReply('unsignCookie', unsignCookie)
+  }
 
   fastify.decorateRequest('cookies', null)
-  fastify.decorateRequest('unsignCookie', unsignCookie)
-  fastify.decorateReply('setCookie', setCookie)
   fastify.decorateReply('cookie', setCookie)
+
+  fastify.decorateReply('setCookie', setCookie)
   fastify.decorateReply('clearCookie', clearCookie)
-  fastify.decorateReply('unsignCookie', unsignCookie)
 
   fastify.addHook('onRequest', onReqHandlerWrapper(fastify))
 
