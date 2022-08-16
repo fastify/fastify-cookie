@@ -62,14 +62,14 @@ function onReqHandlerWrapper (fastify) {
 }
 
 function plugin (fastify, options, next) {
-  const secret = options.secret || ''
+  const secret = options.secret
   const enableRotation = Array.isArray(secret)
   const algorithm = options.algorithm || 'sha256'
   const signer = typeof secret === 'string' || enableRotation ? new Signer(secret, algorithm) : secret
 
   fastify.decorate('parseCookie', parseCookie)
 
-  if (secret !== '') {
+  if (typeof secret !== 'undefined') {
     fastify.decorate('signCookie', signCookie)
     fastify.decorate('unsignCookie', unsignCookie)
 
