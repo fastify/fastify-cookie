@@ -814,3 +814,36 @@ test('handle secure:auto of cookieOptions', async (t) => {
   t.same(cookies2[0].secure, null)
   t.equal(cookies2[0].path, '/')
 })
+
+test('should not decorate fastify, request and reply if no secret was provided', async (t) => {
+  t.plan(8)
+  const fastify = Fastify()
+
+  await fastify.register(plugin)
+
+  t.notOk(fastify.signCookie)
+  t.notOk(fastify.unsignCookie)
+
+  fastify.get('/testDecorators', (req, reply) => {
+    t.notOk(req.signCookie)
+    t.notOk(reply.signCookie)
+    t.notOk(req.unsignCookie)
+    t.notOk(reply.unsignCookie)
+
+    reply.send({
+      unsigned: req.unsignCookie(req.cookies.foo)
+    })
+  })
+
+  const res = await fastify.inject({
+    method: 'GET',
+    url: '/testDecorators'
+  })
+
+  t.equal(res.statusCode, 500)
+  t.same(JSON.parse(res.body), {
+    statusCode: 500,
+    error: 'Internal Server Error',
+    message: 'req.unsignCookie is not a function'
+  })
+})
