@@ -63,6 +63,7 @@ function onReqHandlerWrapper (fastify) {
 
 function plugin (fastify, options, next) {
   const secret = options.secret
+  const addHookOnRequest = options.addHookOnRequest ?? true
   const enableRotation = Array.isArray(secret)
   const algorithm = options.algorithm || 'sha256'
   const signer = typeof secret === 'string' || enableRotation ? new Signer(secret, algorithm) : secret
@@ -86,7 +87,9 @@ function plugin (fastify, options, next) {
   fastify.decorateReply('setCookie', setCookie)
   fastify.decorateReply('clearCookie', clearCookie)
 
-  fastify.addHook('onRequest', onReqHandlerWrapper(fastify))
+  if (addHookOnRequest) {
+    fastify.addHook('onRequest', onReqHandlerWrapper(fastify))
+  }
 
   next()
 

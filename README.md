@@ -33,6 +33,7 @@ const fastify = require('fastify')()
 
 fastify.register(require('@fastify/cookie'), {
   secret: "my-secret", // for cookies signature
+  addHookOnRequest: false, // disable cookie parsing on the onRequest phase
   parseOptions: {}     // options for parsing cookies
 })
 

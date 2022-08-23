@@ -847,3 +847,39 @@ test('should not decorate fastify, request and reply if no secret was provided',
     message: 'req.unsignCookie is not a function'
   })
 })
+
+// addHookOnRequest: false
+test('disable parses incoming cookies', (t) => {
+  t.plan(7)
+  const fastify = Fastify()
+  fastify.register(plugin, { addHookOnRequest: false })
+
+  for (const hook of ['preValidation', 'preHandler']) {
+    fastify.addHook(hook, (req, reply, done) => {
+      t.notOk(req.cookies)
+      done()
+    })
+  }
+
+  fastify.addHook('preParsing', (req, reply, payload, done) => {
+    t.notOk(req.cookies, null)
+    done()
+  })
+
+  fastify.get('/disable', (req, reply) => {
+    t.notOk(req.cookies, null)
+    reply.send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/disable',
+    headers: {
+      cookie: 'bar=bar'
+    }
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+  })
+})
