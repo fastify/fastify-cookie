@@ -125,9 +125,11 @@ declare namespace fastifyCookie {
     signed?: boolean;
   }
 
+  type HookType = 'onRequest' | 'preParsing' | 'preValidation' | 'preHandler'  | 'preSerialization';
+
   export interface FastifyCookieOptions {
     secret?: string | string[] | Signer;
-    addHookOnRequest?: boolean;
+    hook?: HookType| false;
     parseOptions?: fastifyCookie.CookieSerializeOptions;
   }
 

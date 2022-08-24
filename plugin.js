@@ -51,7 +51,9 @@ function fastifyCookieClearCookie (reply, name, options) {
 }
 
 function onReqHandlerWrapper (fastify) {
-  return function fastifyCookieOnReqHandler (fastifyReq, fastifyRes, done) {
+  return function fastifyCookieHandler (...argv) {
+    const fastifyReq = argv[0]
+    const done = argv.pop()
     fastifyReq.cookies = {} // New container per request. Issue #53
     const cookieHeader = fastifyReq.raw.headers.cookie
     if (cookieHeader) {
@@ -61,9 +63,21 @@ function onReqHandlerWrapper (fastify) {
   }
 }
 
+function getHook (hook, next) {
+  const hooks = {
+    onRequest: 'onRequest',
+    preParsing: 'preParsing',
+    preValidation: 'preValidation',
+    preHandler: 'preHandler',
+    [false]: false
+  }
+
+  return hooks[hook] ?? next(new Error('You can set false or use only \'onRequest\' , \'preParsing\' , \'preValidation\' , \'preHandler\' hooks'))
+}
+
 function plugin (fastify, options, next) {
   const secret = options.secret
-  const addHookOnRequest = options.addHookOnRequest ?? true
+  const hook = getHook(options.hook ?? 'onRequest', next)
   const enableRotation = Array.isArray(secret)
   const algorithm = options.algorithm || 'sha256'
   const signer = typeof secret === 'string' || enableRotation ? new Signer(secret, algorithm) : secret
@@ -87,8 +101,8 @@ function plugin (fastify, options, next) {
   fastify.decorateReply('setCookie', setCookie)
   fastify.decorateReply('clearCookie', clearCookie)
 
-  if (addHookOnRequest) {
-    fastify.addHook('onRequest', onReqHandlerWrapper(fastify))
+  if (hook) {
+    fastify.addHook(hook, onReqHandlerWrapper(fastify))
   }
 
   next()

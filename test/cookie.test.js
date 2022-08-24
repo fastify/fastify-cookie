@@ -848,11 +848,10 @@ test('should not decorate fastify, request and reply if no secret was provided',
   })
 })
 
-// addHookOnRequest: false
 test('disable parses incoming cookies', (t) => {
   t.plan(6)
   const fastify = Fastify()
-  fastify.register(plugin, { addHookOnRequest: false })
+  fastify.register(plugin, { hook: false })
 
   for (const hook of ['preValidation', 'preHandler']) {
     fastify.addHook(hook, (req, reply, done) => {
@@ -880,5 +879,27 @@ test('disable parses incoming cookies', (t) => {
   }, (err, res) => {
     t.error(err)
     t.equal(res.statusCode, 200)
+  })
+})
+
+test('error if option is invalid', (t) => {
+  t.plan(1)
+  const fastify = Fastify()
+
+  fastify.register(plugin, { hook: true })
+
+  fastify.get('/error', (req, reply) => {
+    console.log('/error')
+    reply.send()
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/error',
+    headers: {
+      cookie: 'bar=bar'
+    }
+  }, (err, res) => {
+    t.equal(err.name, 'Error')
   })
 })
