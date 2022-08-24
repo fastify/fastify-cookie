@@ -129,7 +129,7 @@ declare namespace fastifyCookie {
 
   export interface FastifyCookieOptions {
     secret?: string | string[] | Signer;
-    hook?: HookType| false;
+    hook?: HookType | false;
     parseOptions?: fastifyCookie.CookieSerializeOptions;
   }
 
