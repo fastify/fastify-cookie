@@ -53,7 +53,7 @@ function fastifyCookieClearCookie (reply, name, options) {
 function onReqHandlerWrapper (fastify) {
   return function fastifyCookieHandler (...argv) {
     const fastifyReq = argv[0]
-    const done = argv.pop()
+    const done = argv[argv.length - 1]
     fastifyReq.cookies = {} // New container per request. Issue #53
     const cookieHeader = fastifyReq.raw.headers.cookie
     if (cookieHeader) {
@@ -63,7 +63,7 @@ function onReqHandlerWrapper (fastify) {
   }
 }
 
-function getHook (hook, next) {
+function getHook (hook = 'onRequest', next) {
   const hooks = {
     onRequest: 'onRequest',
     preParsing: 'preParsing',
@@ -72,12 +72,15 @@ function getHook (hook, next) {
     [false]: false
   }
 
-  return hooks[hook] ?? next(new Error('@fastify/cookie: Invalid value provided for the hook-option. You can set the hook-option only to false, \'onRequest\' , \'preParsing\' , \'preValidation\' or \'preHandler\''))
+  return hooks[hook]
 }
 
 function plugin (fastify, options, next) {
   const secret = options.secret
-  const hook = getHook(options.hook ?? 'onRequest', next)
+  const hook = getHook(options.hook, next)
+  if (hook === undefined) {
+    return next(new Error('@fastify/cookie: Invalid value provided for the hook-option. You can set the hook-option only to false, \'onRequest\' , \'preParsing\' , \'preValidation\' or \'preHandler\''))
+  }
   const enableRotation = Array.isArray(secret)
   const algorithm = options.algorithm || 'sha256'
   const signer = typeof secret === 'string' || enableRotation ? new Signer(secret, algorithm) : secret

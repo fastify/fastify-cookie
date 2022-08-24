@@ -859,11 +859,6 @@ test('dont add default @fastify/cookie hook-function to fastify if hook-option t
     })
   }
 
-  fastify.addHook('preParsing', (req, reply, payload, done) => {
-    t.equal(req.cookies, null)
-    done()
-  })
-
   fastify.get('/disable', (req, reply) => {
     t.equal(req.cookies, null)
     reply.send()
