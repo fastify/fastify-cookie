@@ -50,17 +50,24 @@ function fastifyCookieClearCookie (reply, name, options) {
   return fastifyCookieSetCookie(reply, name, '', opts)
 }
 
-function onReqHandlerWrapper (fastify) {
-  return function fastifyCookieHandler (...argv) {
-    const fastifyReq = argv[0]
-    const done = argv[argv.length - 1]
-    fastifyReq.cookies = {} // New container per request. Issue #53
-    const cookieHeader = fastifyReq.raw.headers.cookie
-    if (cookieHeader) {
-      fastifyReq.cookies = fastify.parseCookie(cookieHeader)
+function onReqHandlerWrapper (fastify, hook) {
+  return hook === 'preParsing'
+    ? function fastifyCookieHandler (fastifyReq, fastifyRes, payload, done) {
+      fastifyReq.cookies = {} // New container per request. Issue #53
+      const cookieHeader = fastifyReq.raw.headers.cookie
+      if (cookieHeader) {
+        fastifyReq.cookies = fastify.parseCookie(cookieHeader)
+      }
+      done()
     }
-    done()
-  }
+    : function fastifyCookieHandler (fastifyReq, fastifyRes, done) {
+      fastifyReq.cookies = {} // New container per request. Issue #53
+      const cookieHeader = fastifyReq.raw.headers.cookie
+      if (cookieHeader) {
+        fastifyReq.cookies = fastify.parseCookie(cookieHeader)
+      }
+      done()
+    }
 }
 
 function getHook (hook = 'onRequest', next) {
@@ -105,7 +112,7 @@ function plugin (fastify, options, next) {
   fastify.decorateReply('clearCookie', clearCookie)
 
   if (hook) {
-    fastify.addHook(hook, onReqHandlerWrapper(fastify))
+    fastify.addHook(hook, onReqHandlerWrapper(fastify, hook))
   }
 
   next()
