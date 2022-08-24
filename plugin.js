@@ -72,7 +72,7 @@ function getHook (hook, next) {
     [false]: false
   }
 
-  return hooks[hook] ?? next(new Error('You can set false or use only \'onRequest\' , \'preParsing\' , \'preValidation\' , \'preHandler\' hooks'))
+  return hooks[hook] ?? next(new Error('@fastify/cookie: Invalid value provided for the hook-option. You can set the hook-option only to false, \'onRequest\' , \'preParsing\' , \'preValidation\' or \'preHandler\''))
 }
 
 function plugin (fastify, options, next) {
