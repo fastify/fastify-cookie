@@ -848,7 +848,7 @@ test('should not decorate fastify, request and reply if no secret was provided',
   })
 })
 
-test('disable parses incoming cookies', (t) => {
+test('dont add default @fastify/cookie hook-function to fastify if hook-option to false  ', (t) => {
   t.plan(6)
   const fastify = Fastify()
   fastify.register(plugin, { hook: false })
