@@ -882,7 +882,7 @@ test('dont add default @fastify/cookie hook-function to fastify if hook-option t
   })
 })
 
-test('error if option is invalid', (t) => {
+test('result in an error if hook-option is set to an invaid value', (t) => {
   t.plan(1)
   const fastify = Fastify()
 
