@@ -889,7 +889,6 @@ test('result in an error if hook-option is set to an invaid value', (t) => {
   fastify.register(plugin, { hook: true })
 
   fastify.get('/error', (req, reply) => {
-    console.log('/error')
     reply.send()
   })
 
