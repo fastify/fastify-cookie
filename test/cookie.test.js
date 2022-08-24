@@ -853,10 +853,9 @@ test('dont add default @fastify/cookie hook-function to fastify if hook-option t
   const fastify = Fastify()
   fastify.register(plugin, { hook: false })
 
-  for (const hook of ['preValidation', 'preHandler']) {
-    fastify.addHook(hook, (req, reply, done) => {
+  for (const hook of ['preValidation', 'preHandler', 'preParsing']) {
+    fastify.addHook(hook, async (req) => {
       t.equal(req.cookies, null)
-      done()
     })
   }
 
