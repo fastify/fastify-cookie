@@ -882,23 +882,14 @@ test('dont add default @fastify/cookie hook-function to fastify if hook-option t
   })
 })
 
-test('result in an error if hook-option is set to an invaid value', (t) => {
+test('result in an error if hook-option is set to an invalid value', (t) => {
   t.plan(1)
   const fastify = Fastify()
 
-  fastify.register(plugin, { hook: true })
-
-  fastify.get('/error', (req, reply) => {
-    reply.send()
-  })
-
-  fastify.inject({
-    method: 'GET',
-    url: '/error',
-    headers: {
-      cookie: 'bar=bar'
-    }
-  }, (err, res) => {
-    t.equal(err.name, 'Error')
-  })
+  t.rejects(
+    () => fastify.register(plugin, { hook: true }),
+    {},
+    { skip: true },
+    new Error("@fastify/cookie: Invalid value provided for the hook-option. You can set the hook-option only to false, 'onRequest' , 'preParsing' , 'preValidation' or 'preHandler'")
+  )
 })
