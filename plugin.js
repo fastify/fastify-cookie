@@ -70,7 +70,7 @@ function onReqHandlerWrapper (fastify, hook) {
     }
 }
 
-function getHook (hook = 'onRequest', next) {
+function getHook (hook = 'onRequest') {
   const hooks = {
     onRequest: 'onRequest',
     preParsing: 'preParsing',
