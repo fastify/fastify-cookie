@@ -84,7 +84,7 @@ function getHook (hook = 'onRequest', next) {
 
 function plugin (fastify, options, next) {
   const secret = options.secret
-  const hook = getHook(options.hook, next)
+  const hook = getHook(options.hook)
   if (hook === undefined) {
     return next(new Error('@fastify/cookie: Invalid value provided for the hook-option. You can set the hook-option only to false, \'onRequest\' , \'preParsing\' , \'preValidation\' or \'preHandler\''))
   }
