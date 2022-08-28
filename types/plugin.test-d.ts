@@ -1,9 +1,10 @@
 import cookie from '..';
-import { expectType } from 'tsd';
+import { expectError, expectType } from 'tsd';
 import * as fastifyCookieStar from '..';
 import fastifyCookieCjsImport = require('..');
 import fastifyCookieDefault, { fastifyCookie as fastifyCookieNamed  } from '..';
-import fastify, { FastifyInstance,  FastifyReply, setCookieWrapper } from 'fastify';
+import fastify, { FastifyInstance,  FastifyPluginCallback,  FastifyReply, setCookieWrapper } from 'fastify';
+import { Server } from 'http';
 
 const fastifyCookieCjs = require('..');
 
@@ -214,3 +215,14 @@ new fastifyCookieStar.Signer(['secretStringInArray'])
 const signer = new fastifyCookieStar.Signer(['secretStringInArray'], 'sha256')
 signer.sign('Lorem Ipsum')
 signer.unsign('Lorem Ipsum')
+
+const appWithHook: FastifyInstance = fastify();
+
+appWithHook.register(cookie, { hook: false });
+appWithHook.register(cookie, { hook: 'onRequest' });
+appWithHook.register(cookie, { hook: 'preHandler' });
+appWithHook.register(cookie, { hook: 'preParsing' });
+appWithHook.register(cookie, { hook: 'preSerialization' });
+appWithHook.register(cookie, { hook: 'preValidation' });
+expectError(appWithHook.register(cookie, { hook: true }));
+expectError(appWithHook.register(cookie, { hook: 'false' }));
