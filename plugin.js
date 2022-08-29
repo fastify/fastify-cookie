@@ -50,19 +50,44 @@ function fastifyCookieClearCookie (reply, name, options) {
   return fastifyCookieSetCookie(reply, name, '', opts)
 }
 
-function onReqHandlerWrapper (fastify) {
-  return function fastifyCookieOnReqHandler (fastifyReq, fastifyRes, done) {
-    fastifyReq.cookies = {} // New container per request. Issue #53
-    const cookieHeader = fastifyReq.raw.headers.cookie
-    if (cookieHeader) {
-      fastifyReq.cookies = fastify.parseCookie(cookieHeader)
+function onReqHandlerWrapper (fastify, hook) {
+  return hook === 'preParsing'
+    ? function fastifyCookieHandler (fastifyReq, fastifyRes, payload, done) {
+      fastifyReq.cookies = {} // New container per request. Issue #53
+      const cookieHeader = fastifyReq.raw.headers.cookie
+      if (cookieHeader) {
+        fastifyReq.cookies = fastify.parseCookie(cookieHeader)
+      }
+      done()
     }
-    done()
+    : function fastifyCookieHandler (fastifyReq, fastifyRes, done) {
+      fastifyReq.cookies = {} // New container per request. Issue #53
+      const cookieHeader = fastifyReq.raw.headers.cookie
+      if (cookieHeader) {
+        fastifyReq.cookies = fastify.parseCookie(cookieHeader)
+      }
+      done()
+    }
+}
+
+function getHook (hook = 'onRequest') {
+  const hooks = {
+    onRequest: 'onRequest',
+    preParsing: 'preParsing',
+    preValidation: 'preValidation',
+    preHandler: 'preHandler',
+    [false]: false
   }
+
+  return hooks[hook]
 }
 
 function plugin (fastify, options, next) {
   const secret = options.secret
+  const hook = getHook(options.hook)
+  if (hook === undefined) {
+    return next(new Error('@fastify/cookie: Invalid value provided for the hook-option. You can set the hook-option only to false, \'onRequest\' , \'preParsing\' , \'preValidation\' or \'preHandler\''))
+  }
   const enableRotation = Array.isArray(secret)
   const algorithm = options.algorithm || 'sha256'
   const signer = typeof secret === 'string' || enableRotation ? new Signer(secret, algorithm) : secret
@@ -86,7 +111,9 @@ function plugin (fastify, options, next) {
   fastify.decorateReply('setCookie', setCookie)
   fastify.decorateReply('clearCookie', clearCookie)
 
-  fastify.addHook('onRequest', onReqHandlerWrapper(fastify))
+  if (hook) {
+    fastify.addHook(hook, onReqHandlerWrapper(fastify, hook))
+  }
 
   next()
 

@@ -847,3 +847,98 @@ test('should not decorate fastify, request and reply if no secret was provided',
     message: 'req.unsignCookie is not a function'
   })
 })
+
+test('dont add auto cookie parsing to onRequest-hook if hook-option is set to false', (t) => {
+  t.plan(6)
+  const fastify = Fastify()
+  fastify.register(plugin, { hook: false })
+
+  for (const hook of ['preValidation', 'preHandler', 'preParsing']) {
+    fastify.addHook(hook, async (req) => {
+      t.equal(req.cookies, null)
+    })
+  }
+
+  fastify.get('/disable', (req, reply) => {
+    t.equal(req.cookies, null)
+    reply.send()
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/disable',
+    headers: {
+      cookie: 'bar=bar'
+    }
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+  })
+})
+
+test('result in an error if hook-option is set to an invalid value', (t) => {
+  t.plan(1)
+  const fastify = Fastify()
+
+  t.rejects(
+    () => fastify.register(plugin, { hook: true }),
+    new Error("@fastify/cookie: Invalid value provided for the hook-option. You can set the hook-option only to false, 'onRequest' , 'preParsing' , 'preValidation' or 'preHandler'")
+  )
+})
+
+test('correct working plugin if hook-option to preParsing', (t) => {
+  t.plan(5)
+  const fastify = Fastify()
+  fastify.register(plugin, { hook: 'preParsing' })
+
+  fastify.addHook('onRequest', async (req) => {
+    t.equal(req.cookies, null)
+  })
+
+  fastify.addHook('preValidation', async (req) => {
+    t.equal(req.cookies.bar, 'bar')
+  })
+
+  fastify.get('/preparsing', (req, reply) => {
+    t.equal(req.cookies.bar, 'bar')
+    reply.send()
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/preparsing',
+    headers: {
+      cookie: 'bar=bar'
+    }
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+  })
+})
+
+test('if cookies are not set, then the handler creates an empty req.cookies object', (t) => {
+  t.plan(5)
+  const fastify = Fastify()
+  fastify.register(plugin, { hook: 'preParsing' })
+
+  fastify.addHook('onRequest', async (req) => {
+    t.equal(req.cookies, null)
+  })
+
+  fastify.addHook('preValidation', async (req) => {
+    t.ok(req.cookies)
+  })
+
+  fastify.get('/preparsing', (req, reply) => {
+    t.ok(req.cookies)
+    reply.send()
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/preparsing'
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+  })
+})

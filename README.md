@@ -33,7 +33,8 @@ const fastify = require('fastify')()
 
 fastify.register(require('@fastify/cookie'), {
   secret: "my-secret", // for cookies signature
-  parseOptions: {}     // options for parsing cookies
+  hook: 'onRequest', // set to false to disable cookie autoparsing or set autoparsing on any of the following hooks: 'onRequest', 'preParsing', 'preHandler', 'preValidation'. default: 'onRequest'
+  parseOptions: {}  // options for parsing cookies
 })
 
 fastify.get('/', (req, reply) => {
