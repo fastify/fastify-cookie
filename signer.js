@@ -34,7 +34,7 @@ function validateSecrets (secrets) {
 function validateAlgorithm (algorithm) {
   // validate that the algorithm is supported by the node runtime
   try {
-    crypto.createHmac(algorithm, 'dummyHmac')
+    crypto.createHmac(algorithm, crypto.randomBytes(16))
   } catch (e) {
     throw new TypeError(`Algorithm ${algorithm} not supported.`)
   }
