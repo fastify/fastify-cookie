@@ -34,13 +34,18 @@ function fastifyCookieSetCookie (reply, name, value, options, signer) {
 
   const serialized = cookie.serialize(name, value, opts)
 
-  const bytes = calculateCookieSize(serialized)
+  if (opts.enableWarnOnSafeLimit !== false) {
+    const limit = opts.warnOnSafeLimit || 4096
 
-  if (bytes >= 4096) {
-    const reachedOrExceeded = bytes > 4096 ? 'exceeded' : 'reached'
-    reply.server.log.warn(`Cookie[${name}] has ${reachedOrExceeded} safe size limit of 4096 bytes with current size of ${bytes} bytes`)
-  } else {
-    reply.server.log.debug(`Cookie[${name}] is now ${bytes} bytes of allowed 4096 bytes for safe limit`)
+    const bytes = calculateCookieSize(serialized)
+
+    if (bytes > limit) {
+      reply.server.log.warn({ name, bytes }, 'Cookie[%s] has exceeded safe size limit of 4096 bytes with current size of %d bytes', name, bytes)
+    } else if (bytes === limit) {
+      reply.server.log.warn({ name, bytes }, 'Cookie[%s] has reached safe size limit of 4096 bytes with current size of %d bytes', name, bytes)
+    } else {
+      reply.server.log.debug({ name, bytes }, 'Cookie[%s] is below safe size limit of 4096 bytes with current size of %d bytes', name, bytes)
+    }
   }
 
   let setCookie = reply.getHeader('Set-Cookie')

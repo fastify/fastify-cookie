@@ -943,8 +943,9 @@ test('if cookies are not set, then the handler creates an empty req.cookies obje
   })
 })
 
-test('issue 208 - below', (t) => {
+test('issue 208 - logging enabled - below', (t) => {
   t.plan(10)
+
   const fastify = Fastify()
   fastify.register(plugin)
 
@@ -989,10 +990,12 @@ test('issue 208 - below', (t) => {
     t.equal(cookies[0].name, 'my-awesome-cookie-name')
     t.equal(cookies[0].value, text)
     t.equal(cookies[0].path, '/')
+
+    // TODO: Actually check if logs are written
   })
 })
 
-test('issue 208 - reached', (t) => {
+test('issue 208 - logging enabled - reached', (t) => {
   t.plan(10)
   const fastify = Fastify()
   fastify.register(plugin)
@@ -1038,10 +1041,12 @@ test('issue 208 - reached', (t) => {
     t.equal(cookies[0].name, 'my-awesome-cookie-name')
     t.equal(cookies[0].value, text)
     t.equal(cookies[0].path, '/')
+
+    // TODO: Actually check if logs are written
   })
 })
 
-test('issue 208 - exceeded', (t) => {
+test('issue 208 - logging enabled - exceeded', (t) => {
   t.plan(10)
   const fastify = Fastify()
   fastify.register(plugin)
@@ -1087,5 +1092,161 @@ test('issue 208 - exceeded', (t) => {
     t.equal(cookies[0].name, 'my-awesome-cookie-name')
     t.equal(cookies[0].value, text)
     t.equal(cookies[0].path, '/')
+
+    // TODO: Actually check if logs are written
+  })
+})
+
+test('issue 208 - logging disabled - below', (t) => {
+  t.plan(10)
+
+  const fastify = Fastify()
+  fastify.register(plugin, { parseOptions: { enableWarnOnSafeLimit: false } })
+
+  let text = ''
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+
+  const cookieName = 'my-awesome-cookie-name'
+
+  const target = 4095
+
+  const calculatedNameSize = Buffer.byteLength(cookieName)
+
+  const maxValueSize = (target - calculatedNameSize)
+
+  for (let i = 0; i < maxValueSize; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length))
+  }
+
+  const calculatedValueSize = Buffer.byteLength(text)
+  const calculatedSize = calculatedNameSize + calculatedValueSize
+
+  t.equal(calculatedNameSize, calculatedSize - maxValueSize)
+  t.equal(calculatedValueSize, maxValueSize)
+  t.equal(calculatedSize, target)
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .setCookie('my-awesome-cookie-name', text, { path: '/' })
+      .send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.equal(cookies.length, 1)
+    t.equal(cookies[0].name, 'my-awesome-cookie-name')
+    t.equal(cookies[0].value, text)
+    t.equal(cookies[0].path, '/')
+
+    // TODO: Actually check if logs are not written
+  })
+})
+
+test('issue 208 - logging disabled - reached', (t) => {
+  t.plan(10)
+  const fastify = Fastify()
+  fastify.register(plugin, { parseOptions: { enableWarnOnSafeLimit: false } })
+
+  let text = ''
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+
+  const cookieName = 'my-awesome-cookie-name'
+
+  const target = 4096
+
+  const calculatedNameSize = Buffer.byteLength(cookieName)
+
+  const maxValueSize = (target - calculatedNameSize)
+
+  for (let i = 0; i < maxValueSize; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length))
+  }
+
+  const calculatedValueSize = Buffer.byteLength(text)
+  const calculatedSize = calculatedNameSize + calculatedValueSize
+
+  t.equal(calculatedNameSize, calculatedSize - maxValueSize)
+  t.equal(calculatedValueSize, maxValueSize)
+  t.equal(calculatedSize, target)
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .setCookie('my-awesome-cookie-name', text, { path: '/' })
+      .send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.equal(cookies.length, 1)
+    t.equal(cookies[0].name, 'my-awesome-cookie-name')
+    t.equal(cookies[0].value, text)
+    t.equal(cookies[0].path, '/')
+
+    // TODO: Actually check if logs are not written
+  })
+})
+
+test('issue 208 - logging disabled - exceeded', (t) => {
+  t.plan(10)
+  const fastify = Fastify()
+  fastify.register(plugin, { parseOptions: { enableWarnOnSafeLimit: false } })
+
+  let text = ''
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+
+  const cookieName = 'my-awesome-cookie-name'
+
+  const target = 4097
+
+  const calculatedNameSize = Buffer.byteLength(cookieName)
+
+  const maxValueSize = (target - calculatedNameSize)
+
+  for (let i = 0; i < maxValueSize; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length))
+  }
+
+  const calculatedValueSize = Buffer.byteLength(text)
+  const calculatedSize = calculatedNameSize + calculatedValueSize
+
+  t.equal(calculatedNameSize, calculatedSize - maxValueSize)
+  t.equal(calculatedValueSize, maxValueSize)
+  t.equal(calculatedSize, target)
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .setCookie('my-awesome-cookie-name', text, { path: '/' })
+      .send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.equal(cookies.length, 1)
+    t.equal(cookies[0].name, 'my-awesome-cookie-name')
+    t.equal(cookies[0].value, text)
+    t.equal(cookies[0].path, '/')
+
+    // TODO: Actually check if logs are not written
   })
 })

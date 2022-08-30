@@ -119,10 +119,14 @@ declare namespace fastifyCookie {
     path?: string;
     priority?: "low" | "medium" | "high";
     /** A `boolean` or one of the `SameSite` string attributes. E.g.: `lax`, `node` or `strict`.  */
-    sameSite?: 'lax' | 'none' | 'strict' | boolean;
+    sameSite?: "lax" | "none" | "strict" | boolean;
     /**  The `boolean` value of the `Secure` attribute. Set this option to false when communicating over an unencrypted (HTTP) connection. Value can be set to `auto`; in this case the `Secure` attribute will be set to false for HTTP request, in case of HTTPS it will be set to true.  Defaults to true. */
-    secure?: boolean | 'auto';
+    secure?: boolean | "auto";
     signed?: boolean;
+    /** Warn when cookie safe size limit is reached. Defaults to true. */
+    enableWarnOnSafeLimit?: boolean;
+    /** Limit set to determine when safe size is reached. Defaults to 4096. */
+    warnOnSafeLimit?: number;
   }
 
   type HookType = 'onRequest' | 'preParsing' | 'preValidation' | 'preHandler'  | 'preSerialization';
