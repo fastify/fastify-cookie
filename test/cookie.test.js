@@ -943,7 +943,7 @@ test('if cookies are not set, then the handler creates an empty req.cookies obje
   })
 })
 
-test('issue 208 - logging enabled - below', (t) => {
+test('enableWarnOnSafeLimit - logging enabled - serialized cookie is smaller than the safe limit', (t) => {
   t.plan(10)
 
   const fastify = Fastify()
