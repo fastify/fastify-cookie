@@ -5,6 +5,18 @@ const cookie = require('cookie')
 
 const { Signer, sign, unsign } = require('./signer')
 
+function calculateCookieSize(serialized) {
+  const pieces = serialized.split(';').map(piece => piece.trim())
+
+  if (pieces.length > 0) {
+    const nameValuePiece = pieces.shift()
+    const [pieceName, pieceValue] = nameValuePiece.split('=')
+    return Buffer.byteLength(pieceName) + Buffer.byteLength(pieceValue)
+  }
+
+  return 0
+}
+
 function fastifyCookieSetCookie (reply, name, value, options, signer) {
   const opts = Object.assign({}, options)
   if (opts.expires && Number.isInteger(opts.expires)) {
@@ -25,6 +37,16 @@ function fastifyCookieSetCookie (reply, name, value, options, signer) {
   }
 
   const serialized = cookie.serialize(name, value, opts)
+
+  const bytes = calculateCookieSize(serialized)
+
+  if (bytes >= 4096) {
+    const reachedOrExceeded = bytes > 4096 ? 'exceeded' : 'reached'
+    reply.server.log.warn(`Cookie[${name}] has ${reachedOrExceeded} safe size limit of 4096 bytes with current size of ${bytes} bytes`)
+  } else {
+    reply.server.log.debug(`Cookie[${name}] is now ${bytes} bytes of allowed 4096 bytes for safe limit`)
+  }
+
   let setCookie = reply.getHeader('Set-Cookie')
   if (!setCookie) {
     reply.header('Set-Cookie', serialized)
