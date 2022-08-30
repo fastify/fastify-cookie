@@ -995,7 +995,7 @@ test('enableWarnOnSafeLimit - logging enabled - serialized cookie is smaller tha
   })
 })
 
-test('issue 208 - logging enabled - reached', (t) => {
+test('enableWarnOnSafeLimit - logging enabled - serialized cookie reached the safe limit', (t) => {
   t.plan(10)
   const fastify = Fastify()
   fastify.register(plugin)
