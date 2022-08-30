@@ -3,8 +3,7 @@ import { expectError, expectType } from 'tsd';
 import * as fastifyCookieStar from '..';
 import fastifyCookieCjsImport = require('..');
 import fastifyCookieDefault, { fastifyCookie as fastifyCookieNamed  } from '..';
-import fastify, { FastifyInstance,  FastifyPluginCallback,  FastifyReply, setCookieWrapper } from 'fastify';
-import { Server } from 'http';
+import fastify, { FastifyInstance, FastifyReply, setCookieWrapper } from 'fastify';
 
 const fastifyCookieCjs = require('..');
 
