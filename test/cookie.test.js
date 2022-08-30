@@ -942,3 +942,150 @@ test('if cookies are not set, then the handler creates an empty req.cookies obje
     t.equal(res.statusCode, 200)
   })
 })
+
+test('issue 208 - below', (t) => {
+  t.plan(10)
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  let text = ''
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+
+  const cookieName = 'my-awesome-cookie-name'
+
+  const target = 4095
+
+  const calculatedNameSize = Buffer.byteLength(cookieName)
+
+  const maxValueSize = (target - calculatedNameSize)
+
+  for (let i = 0; i < maxValueSize; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length))
+  }
+
+  const calculatedValueSize = Buffer.byteLength(text)
+  const calculatedSize = calculatedNameSize + calculatedValueSize
+
+  t.equal(calculatedNameSize, calculatedSize - maxValueSize)
+  t.equal(calculatedValueSize, maxValueSize)
+  t.equal(calculatedSize, target)
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .setCookie('my-awesome-cookie-name', text, { path: '/' })
+      .send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.equal(cookies.length, 1)
+    t.equal(cookies[0].name, 'my-awesome-cookie-name')
+    t.equal(cookies[0].value, text)
+    t.equal(cookies[0].path, '/')
+  })
+})
+
+test('issue 208 - reached', (t) => {
+  t.plan(10)
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  let text = ''
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+
+  const cookieName = 'my-awesome-cookie-name'
+
+  const target = 4096
+
+  const calculatedNameSize = Buffer.byteLength(cookieName)
+
+  const maxValueSize = (target - calculatedNameSize)
+
+  for (let i = 0; i < maxValueSize; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length))
+  }
+
+  const calculatedValueSize = Buffer.byteLength(text)
+  const calculatedSize = calculatedNameSize + calculatedValueSize
+
+  t.equal(calculatedNameSize, calculatedSize - maxValueSize)
+  t.equal(calculatedValueSize, maxValueSize)
+  t.equal(calculatedSize, target)
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .setCookie('my-awesome-cookie-name', text, { path: '/' })
+      .send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.equal(cookies.length, 1)
+    t.equal(cookies[0].name, 'my-awesome-cookie-name')
+    t.equal(cookies[0].value, text)
+    t.equal(cookies[0].path, '/')
+  })
+})
+
+test('issue 208 - exceeded', (t) => {
+  t.plan(10)
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  let text = ''
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+
+  const cookieName = 'my-awesome-cookie-name'
+
+  const target = 4097
+
+  const calculatedNameSize = Buffer.byteLength(cookieName)
+
+  const maxValueSize = (target - calculatedNameSize)
+
+  for (let i = 0; i < maxValueSize; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length))
+  }
+
+  const calculatedValueSize = Buffer.byteLength(text)
+  const calculatedSize = calculatedNameSize + calculatedValueSize
+
+  t.equal(calculatedNameSize, calculatedSize - maxValueSize)
+  t.equal(calculatedValueSize, maxValueSize)
+  t.equal(calculatedSize, target)
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .setCookie('my-awesome-cookie-name', text, { path: '/' })
+      .send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.equal(cookies.length, 1)
+    t.equal(cookies[0].name, 'my-awesome-cookie-name')
+    t.equal(cookies[0].value, text)
+    t.equal(cookies[0].path, '/')
+  })
+})

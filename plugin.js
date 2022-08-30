@@ -5,16 +5,12 @@ const cookie = require('cookie')
 
 const { Signer, sign, unsign } = require('./signer')
 
-function calculateCookieSize(serialized) {
+function calculateCookieSize (serialized) {
   const pieces = serialized.split(';').map(piece => piece.trim())
 
-  if (pieces.length > 0) {
-    const nameValuePiece = pieces.shift()
-    const [pieceName, pieceValue] = nameValuePiece.split('=')
-    return Buffer.byteLength(pieceName) + Buffer.byteLength(pieceValue)
-  }
-
-  return 0
+  const nameValuePiece = pieces.shift()
+  const [pieceName, pieceValue] = nameValuePiece.split('=')
+  return Buffer.byteLength(pieceName) + Buffer.byteLength(pieceValue)
 }
 
 function fastifyCookieSetCookie (reply, name, value, options, signer) {
