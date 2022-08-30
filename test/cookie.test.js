@@ -1046,7 +1046,7 @@ test('issue 208 - logging enabled - reached', (t) => {
   })
 })
 
-test('issue 208 - logging enabled - exceeded', (t) => {
+test('enableWarnOnSafeLimit - logging enabled - serialized cookie exceeds the safe limit', (t) => {
   t.plan(10)
   const fastify = Fastify()
   fastify.register(plugin)
