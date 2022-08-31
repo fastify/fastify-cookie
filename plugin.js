@@ -32,9 +32,9 @@ function fastifyCookieSetCookie (reply, name, value, options, signer) {
     const bytes = Buffer.byteLength(name) + Buffer.byteLength(encodeURIComponent(value))
 
     if (bytes >= limit) {
-      reply.server.log.warn({ name, bytes }, 'Cookie[%s] has exceeded safe size limit of 4096 bytes with current size of %d bytes', name, bytes)
+      reply.server.log.warn({ name, bytes }, 'Cookie[%s] has exceeded safe size limit of %d bytes with current size of %d bytes', name, limit, bytes)
     } else {
-      reply.server.log.debug({ name, bytes }, 'Cookie[%s] is below safe size limit of 4096 bytes with current size of %d bytes', name, bytes)
+      reply.server.log.debug({ name, bytes }, 'Cookie[%s] is below safe size limit of %d bytes with current size of %d bytes', name, limit, bytes)
     }
   }
 

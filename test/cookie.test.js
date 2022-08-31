@@ -943,10 +943,37 @@ test('if cookies are not set, then the handler creates an empty req.cookies obje
   })
 })
 
-test('enableWarnOnSafeLimit - logging enabled - serialized cookie is smaller than the safe limit', (t) => {
-  t.plan(10)
+function createTracedLoggerInstance () {
+  const logs = {}
 
-  const fastify = Fastify()
+  function createLevelLogger (level) {
+    logs[level] = []
+    return (o, ...n) => logs[level].push([o, ...n])
+  }
+
+  return {
+    logs,
+    instance: {
+      info: createLevelLogger('info'),
+      warn: createLevelLogger('warn'),
+      error: createLevelLogger('error'),
+      fatal: createLevelLogger('fatal'),
+      trace: createLevelLogger('trace'),
+      debug: createLevelLogger('debug'),
+      child: function () {
+        const child = Object.create(this)
+        return child
+      }
+    }
+  }
+}
+
+test('enableWarnOnSafeLimit - logging enabled - serialized cookie is smaller than the safe limit', (t) => {
+  t.plan(17)
+
+  const { logs, instance } = createTracedLoggerInstance()
+
+  const fastify = Fastify({ logger: instance, disableRequestLogging: true })
   fastify.register(plugin, { parseOptions: { enableWarnOnSafeLimit: true } })
 
   let text = ''
@@ -964,7 +991,7 @@ test('enableWarnOnSafeLimit - logging enabled - serialized cookie is smaller tha
     text += possible.charAt(Math.floor(Math.random() * possible.length))
   }
 
-  const calculatedValueSize = Buffer.byteLength(text)
+  const calculatedValueSize = Buffer.byteLength(encodeURIComponent(text))
   const calculatedSize = calculatedNameSize + calculatedValueSize
 
   t.equal(calculatedNameSize, calculatedSize - maxValueSize)
@@ -973,7 +1000,7 @@ test('enableWarnOnSafeLimit - logging enabled - serialized cookie is smaller tha
 
   fastify.get('/test1', (req, reply) => {
     reply
-      .setCookie('my-awesome-cookie-name', text, { path: '/' })
+      .setCookie(cookieName, text, { path: '/' })
       .send({ hello: 'world' })
   })
 
@@ -987,21 +1014,47 @@ test('enableWarnOnSafeLimit - logging enabled - serialized cookie is smaller tha
 
     const cookies = res.cookies
     t.equal(cookies.length, 1)
-    t.equal(cookies[0].name, 'my-awesome-cookie-name')
+    t.equal(cookies[0].name, cookieName)
     t.equal(cookies[0].value, text)
     t.equal(cookies[0].path, '/')
 
-    // TODO: Actually check if logs are written
+    const {
+      info,
+      warn,
+      error,
+      fatal,
+      trace,
+      debug
+    } = logs
+    t.equal(info.length, 0)
+    t.equal(warn.length, 0)
+    t.equal(error.length, 0)
+    t.equal(fatal.length, 0)
+    t.equal(trace.length, 0)
+    t.equal(debug.length, 1)
+    t.same(
+      debug[0],
+      [
+        { name: cookieName, bytes: calculatedSize },
+        'Cookie[%s] is below safe size limit of %d bytes with current size of %d bytes',
+        cookieName,
+        4096,
+        calculatedSize
+      ]
+    )
   })
 })
 
 test('enableWarnOnSafeLimit - logging enabled - serialized cookie exceeds the safe limit', (t) => {
-  t.plan(10)
-  const fastify = Fastify()
+  t.plan(17)
+
+  const { logs, instance } = createTracedLoggerInstance()
+
+  const fastify = Fastify({ logger: instance, disableRequestLogging: true })
   fastify.register(plugin, { parseOptions: { enableWarnOnSafeLimit: true } })
 
   let text = ''
-  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789, { parserOptions: { enableWarnOnSafeLimit: true } }'
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
   const cookieName = 'my-awesome-cookie-name'
 
@@ -1015,7 +1068,7 @@ test('enableWarnOnSafeLimit - logging enabled - serialized cookie exceeds the sa
     text += possible.charAt(Math.floor(Math.random() * possible.length))
   }
 
-  const calculatedValueSize = Buffer.byteLength(text)
+  const calculatedValueSize = Buffer.byteLength(encodeURIComponent(text))
   const calculatedSize = calculatedNameSize + calculatedValueSize
 
   t.equal(calculatedNameSize, calculatedSize - maxValueSize)
@@ -1042,14 +1095,193 @@ test('enableWarnOnSafeLimit - logging enabled - serialized cookie exceeds the sa
     t.equal(cookies[0].value, text)
     t.equal(cookies[0].path, '/')
 
-    // TODO: Actually check if logs are written
+    const {
+      info,
+      warn,
+      error,
+      fatal,
+      trace,
+      debug
+    } = logs
+    t.equal(info.length, 0)
+    t.equal(warn.length, 1)
+    t.equal(error.length, 0)
+    t.equal(fatal.length, 0)
+    t.equal(trace.length, 0)
+    t.equal(debug.length, 0)
+    t.same(
+      warn[0],
+      [
+        { name: cookieName, bytes: calculatedSize },
+        'Cookie[%s] has exceeded safe size limit of %d bytes with current size of %d bytes',
+        cookieName,
+        4096,
+        calculatedSize
+      ]
+    )
+  })
+})
+
+test('warnOnSafeLimit:2048 - logging enabled - serialized cookie is smaller than the safe limit', (t) => {
+  t.plan(17)
+
+  const { logs, instance } = createTracedLoggerInstance()
+
+  const fastify = Fastify({ logger: instance, disableRequestLogging: true })
+  fastify.register(plugin, { parseOptions: { enableWarnOnSafeLimit: true, warnOnSafeLimit: 2048 } })
+
+  let text = ''
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+
+  const cookieName = 'my-awesome-cookie-name'
+
+  const target = 2047
+
+  const calculatedNameSize = Buffer.byteLength(cookieName)
+
+  const maxValueSize = (target - calculatedNameSize)
+
+  for (let i = 0; i < maxValueSize; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length))
+  }
+
+  const calculatedValueSize = Buffer.byteLength(encodeURIComponent(text))
+  const calculatedSize = calculatedNameSize + calculatedValueSize
+
+  t.equal(calculatedNameSize, calculatedSize - maxValueSize)
+  t.equal(calculatedValueSize, maxValueSize)
+  t.equal(calculatedSize, target)
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .setCookie(cookieName, text, { path: '/' })
+      .send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.equal(cookies.length, 1)
+    t.equal(cookies[0].name, cookieName)
+    t.equal(cookies[0].value, text)
+    t.equal(cookies[0].path, '/')
+
+    const {
+      info,
+      warn,
+      error,
+      fatal,
+      trace,
+      debug
+    } = logs
+    t.equal(info.length, 0)
+    t.equal(warn.length, 0)
+    t.equal(error.length, 0)
+    t.equal(fatal.length, 0)
+    t.equal(trace.length, 0)
+    t.equal(debug.length, 1)
+    t.same(
+      debug[0],
+      [
+        { name: cookieName, bytes: calculatedSize },
+        'Cookie[%s] is below safe size limit of %d bytes with current size of %d bytes',
+        cookieName,
+        2048,
+        calculatedSize
+      ]
+    )
+  })
+})
+
+test('warnOnSafeLimit:2048 - logging enabled - serialized cookie exceeds the safe limit', (t) => {
+  t.plan(17)
+
+  const { logs, instance } = createTracedLoggerInstance()
+
+  const fastify = Fastify({ logger: instance, disableRequestLogging: true })
+  fastify.register(plugin, { parseOptions: { enableWarnOnSafeLimit: true, warnOnSafeLimit: 2048 } })
+
+  let text = ''
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+
+  const cookieName = 'my-awesome-cookie-name'
+
+  const target = 2049
+
+  const calculatedNameSize = Buffer.byteLength(cookieName)
+
+  const maxValueSize = (target - calculatedNameSize)
+
+  for (let i = 0; i < maxValueSize; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length))
+  }
+
+  const calculatedValueSize = Buffer.byteLength(encodeURIComponent(text))
+  const calculatedSize = calculatedNameSize + calculatedValueSize
+
+  t.equal(calculatedNameSize, calculatedSize - maxValueSize)
+  t.equal(calculatedValueSize, maxValueSize)
+  t.equal(calculatedSize, target)
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .setCookie('my-awesome-cookie-name', text, { path: '/' })
+      .send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.equal(cookies.length, 1)
+    t.equal(cookies[0].name, 'my-awesome-cookie-name')
+    t.equal(cookies[0].value, text)
+    t.equal(cookies[0].path, '/')
+
+    const {
+      info,
+      warn,
+      error,
+      fatal,
+      trace,
+      debug
+    } = logs
+    t.equal(info.length, 0)
+    t.equal(warn.length, 1)
+    t.equal(error.length, 0)
+    t.equal(fatal.length, 0)
+    t.equal(trace.length, 0)
+    t.equal(debug.length, 0)
+    t.same(
+      warn[0],
+      [
+        { name: cookieName, bytes: calculatedSize },
+        'Cookie[%s] has exceeded safe size limit of %d bytes with current size of %d bytes',
+        cookieName,
+        2048,
+        calculatedSize
+      ]
+    )
   })
 })
 
 test('enableWarnOnSafeLimit - logging disabled - serialized cookie is below the safe limit', (t) => {
-  t.plan(10)
+  t.plan(16)
 
-  const fastify = Fastify()
+  const { logs, instance } = createTracedLoggerInstance()
+
+  const fastify = Fastify({ logger: instance, disableRequestLogging: true })
   fastify.register(plugin, { parseOptions: { enableWarnOnSafeLimit: false } })
 
   let text = ''
@@ -1067,7 +1299,7 @@ test('enableWarnOnSafeLimit - logging disabled - serialized cookie is below the 
     text += possible.charAt(Math.floor(Math.random() * possible.length))
   }
 
-  const calculatedValueSize = Buffer.byteLength(text)
+  const calculatedValueSize = Buffer.byteLength(encodeURIComponent(text))
   const calculatedSize = calculatedNameSize + calculatedValueSize
 
   t.equal(calculatedNameSize, calculatedSize - maxValueSize)
@@ -1094,17 +1326,33 @@ test('enableWarnOnSafeLimit - logging disabled - serialized cookie is below the 
     t.equal(cookies[0].value, text)
     t.equal(cookies[0].path, '/')
 
-    // TODO: Actually check if logs are not written
+    const {
+      info,
+      warn,
+      error,
+      fatal,
+      trace,
+      debug
+    } = logs
+    t.equal(info.length, 0)
+    t.equal(warn.length, 0)
+    t.equal(error.length, 0)
+    t.equal(fatal.length, 0)
+    t.equal(trace.length, 0)
+    t.equal(debug.length, 0)
   })
 })
 
 test('enableWarnOnSafeLimit - logging disabled - serialized cookie exceeds the safe limit', (t) => {
-  t.plan(10)
-  const fastify = Fastify()
+  t.plan(16)
+
+  const { logs, instance } = createTracedLoggerInstance()
+
+  const fastify = Fastify({ logger: instance, disableRequestLogging: true })
   fastify.register(plugin, { parseOptions: { enableWarnOnSafeLimit: false } })
 
   let text = ''
-  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789, { parserOptions: { enableWarnOnSafeLimit: true } }'
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
   const cookieName = 'my-awesome-cookie-name'
 
@@ -1118,7 +1366,7 @@ test('enableWarnOnSafeLimit - logging disabled - serialized cookie exceeds the s
     text += possible.charAt(Math.floor(Math.random() * possible.length))
   }
 
-  const calculatedValueSize = Buffer.byteLength(text)
+  const calculatedValueSize = Buffer.byteLength(encodeURIComponent(text))
   const calculatedSize = calculatedNameSize + calculatedValueSize
 
   t.equal(calculatedNameSize, calculatedSize - maxValueSize)
@@ -1145,6 +1393,19 @@ test('enableWarnOnSafeLimit - logging disabled - serialized cookie exceeds the s
     t.equal(cookies[0].value, text)
     t.equal(cookies[0].path, '/')
 
-    // TODO: Actually check if logs are not written
+    const {
+      info,
+      warn,
+      error,
+      fatal,
+      trace,
+      debug
+    } = logs
+    t.equal(info.length, 0)
+    t.equal(warn.length, 0)
+    t.equal(error.length, 0)
+    t.equal(fatal.length, 0)
+    t.equal(trace.length, 0)
+    t.equal(debug.length, 0)
   })
 })
