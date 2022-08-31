@@ -5,14 +5,6 @@ const cookie = require('cookie')
 
 const { Signer, sign, unsign } = require('./signer')
 
-function calculateCookieSize (serialized) {
-  const pieces = serialized.split(';').map(piece => piece.trim())
-
-  const nameValuePiece = pieces.shift()
-  const [pieceName, pieceValue] = nameValuePiece.split('=')
-  return Buffer.byteLength(pieceName) + Buffer.byteLength(pieceValue)
-}
-
 function fastifyCookieSetCookie (reply, name, value, options, signer) {
   const opts = Object.assign({}, options)
   if (opts.expires && Number.isInteger(opts.expires)) {
@@ -34,15 +26,13 @@ function fastifyCookieSetCookie (reply, name, value, options, signer) {
 
   const serialized = cookie.serialize(name, value, opts)
 
-  if (opts.enableWarnOnSafeLimit !== false) {
+  if (opts.enableWarnOnSafeLimit === true) {
     const limit = opts.warnOnSafeLimit || 4096
 
-    const bytes = calculateCookieSize(serialized)
+    const bytes = Buffer.byteLength(name) + Buffer.byteLength(encodeURIComponent(value))
 
-    if (bytes > limit) {
+    if (bytes >= limit) {
       reply.server.log.warn({ name, bytes }, 'Cookie[%s] has exceeded safe size limit of 4096 bytes with current size of %d bytes', name, bytes)
-    } else if (bytes === limit) {
-      reply.server.log.warn({ name, bytes }, 'Cookie[%s] has reached safe size limit of 4096 bytes with current size of %d bytes', name, bytes)
     } else {
       reply.server.log.debug({ name, bytes }, 'Cookie[%s] is below safe size limit of 4096 bytes with current size of %d bytes', name, bytes)
     }
