@@ -943,7 +943,7 @@ test('if cookies are not set, then the handler creates an empty req.cookies obje
   })
 })
 
-test('aaae', (t) => {
+test('clearCookie should include parseOptions', (t) => {
   t.plan(14)
   const fastify = Fastify()
   fastify.register(plugin, {
