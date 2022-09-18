@@ -726,7 +726,6 @@ test('parse cookie manually using decorator', (t) => {
 test('cookies set with plugin options parseOptions field', (t) => {
   t.plan(8)
   const fastify = Fastify()
-  //
   fastify.register(plugin, {
     parseOptions: {
       path: '/test',
@@ -982,6 +981,8 @@ test('aaae', (t) => {
     t.equal(cookies[0].maxAge, 36000)
     t.equal(cookies[0].path, '/test')
     t.equal(cookies[0].domain, 'example.com')
+
+    console.log(cookies[1])
 
     t.equal(cookies[1].name, 'foo')
     t.equal(cookies[1].value, '')
