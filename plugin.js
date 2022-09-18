@@ -42,7 +42,7 @@ function fastifyCookieSetCookie (reply, name, value, options, signer) {
 }
 
 function fastifyCookieClearCookie (reply, name, options) {
-  const opts = Object.assign({ path: '/' }, options || { }, {
+  const opts = Object.assign({ path: '/' }, options, {
     expires: new Date(1),
     signed: undefined,
     maxAge: undefined
@@ -135,8 +135,9 @@ function plugin (fastify, options, next) {
     return fastifyCookieSetCookie(this, name, value, opts, signer)
   }
 
-  function clearCookie (name, options) {
-    return fastifyCookieClearCookie(this, name, options)
+  function clearCookie (name, cookieOptions) {
+    const opts = Object.assign({}, options.parseOptions, cookieOptions)
+    return fastifyCookieClearCookie(this, name, opts)
   }
 }
 
