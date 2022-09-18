@@ -982,8 +982,6 @@ test('clearCookie should include parseOptions', (t) => {
     t.equal(cookies[0].path, '/test')
     t.equal(cookies[0].domain, 'example.com')
 
-    console.log(cookies[1])
-
     t.equal(cookies[1].name, 'foo')
     t.equal(cookies[1].value, '')
     t.equal(cookies[1].path, '/test')
