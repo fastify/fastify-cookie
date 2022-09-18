@@ -726,6 +726,7 @@ test('parse cookie manually using decorator', (t) => {
 test('cookies set with plugin options parseOptions field', (t) => {
   t.plan(8)
   const fastify = Fastify()
+  //
   fastify.register(plugin, {
     parseOptions: {
       path: '/test',
@@ -940,5 +941,53 @@ test('if cookies are not set, then the handler creates an empty req.cookies obje
   }, (err, res) => {
     t.error(err)
     t.equal(res.statusCode, 200)
+  })
+})
+
+test('aaae', (t) => {
+  t.plan(14)
+  const fastify = Fastify()
+  fastify.register(plugin, {
+    parseOptions: {
+      path: '/test',
+      domain: 'example.com'
+    }
+  })
+
+  const cookieOptions = {
+    path: '/test',
+    maxAge: 36000
+  }
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .setCookie('foo', 'foo', cookieOptions)
+      .clearCookie('foo', cookieOptions)
+      .send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+
+    t.equal(cookies.length, 2)
+    t.equal(cookies[0].name, 'foo')
+    t.equal(cookies[0].value, 'foo')
+    t.equal(cookies[0].maxAge, 36000)
+    t.equal(cookies[0].path, '/test')
+    t.equal(cookies[0].domain, 'example.com')
+
+    t.equal(cookies[1].name, 'foo')
+    t.equal(cookies[1].value, '')
+    t.equal(cookies[1].path, '/test')
+    t.equal(cookies[1].domain, 'example.com')
+
+    t.ok(new Date(cookies[1].expires) < new Date())
   })
 })
