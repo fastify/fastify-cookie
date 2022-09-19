@@ -25,8 +25,8 @@ function Signer (secrets, algorithm = 'sha256') {
 
 function validateSecrets (secrets) {
   for (const secret of secrets) {
-    if (typeof secret !== 'string') {
-      throw new TypeError('Secret key must be a string.')
+    if (typeof secret !== 'string' && !Buffer.isBuffer(secret)) {
+      throw new TypeError('Secret key must be a string or Buffer.')
     }
   }
 }
