@@ -88,9 +88,9 @@ function plugin (fastify, options, next) {
   if (hook === undefined) {
     return next(new Error('@fastify/cookie: Invalid value provided for the hook-option. You can set the hook-option only to false, \'onRequest\' , \'preParsing\' , \'preValidation\' or \'preHandler\''))
   }
-  const enableRotation = Array.isArray(secret)
+  const isSigner = Boolean(secret) && typeof secret === 'object' && typeof secret.sign === 'function' && typeof secret.unsign === 'function'
   const algorithm = options.algorithm || 'sha256'
-  const signer = typeof secret === 'string' || enableRotation ? new Signer(secret, algorithm) : secret
+  const signer = isSigner ? secret : new Signer(secret, algorithm)
 
   fastify.decorate('parseCookie', parseCookie)
 
