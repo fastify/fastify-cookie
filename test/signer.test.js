@@ -28,13 +28,15 @@ test('default', t => {
   })
 
   t.test('sign', (t) => {
-    t.plan(3)
+    t.plan(5)
 
     const input = 'some-value'
     const result = signer.sign(input)
 
     t.equal(result, sign(input, secret))
     t.equal(result, sign(input, [secret]))
+    t.equal(result, sign(input, Buffer.from(secret)))
+    t.equal(result, sign(input, [Buffer.from(secret)]))
 
     t.throws(() => sign(undefined), 'Cookie value must be provided as a string.')
   })

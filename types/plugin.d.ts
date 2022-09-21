@@ -135,7 +135,7 @@ declare namespace fastifyCookie {
 
   export type Sign = (value: string, secret: string | Buffer, algorithm?: string) => string;
   export type Unsign = (input: string, secret: string | Buffer, algorithm?: string) => UnsignResult;
-  export type SignerFactory = (secrets: string | Array<string> | Buffer | Array<Buffer>, algorithm?: string) => SignerBase;
+  export type SignerFactory = (secrets: string | string[] | Buffer | Buffer[], algorithm?: string) => SignerBase;
 
   export interface UnsignResult {
     valid: boolean;
