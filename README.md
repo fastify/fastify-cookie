@@ -72,8 +72,8 @@ app.register(cookie, {
 
 ## Options
 
-- `secret` (`String` | `Array` | `Object`):
-  - A `String` can be passed to use as secret to sign the cookie using [`cookie-signature`](http://npm.im/cookie-signature).
+- `secret` (`String` | `Array` | `Buffer` | `Object`):
+  - A `String` or `Buffer` can be passed to use as secret to sign the cookie using [`cookie-signature`](http://npm.im/cookie-signature).
   - An `Array` can be passed if key rotation is desired. Read more about it in [Rotating signing secret](#rotating-secret).
   - More sophisticated cookie signing mechanisms can be implemented by supplying an `Object`. Read more about it in [Custom cookie signer](#custom-cookie-signer).
 

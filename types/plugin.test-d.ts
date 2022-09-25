@@ -211,6 +211,8 @@ appWithCustomSigner.after(() => {
 
 new fastifyCookieStar.Signer('secretString')
 new fastifyCookieStar.Signer(['secretStringInArray'])
+new fastifyCookieStar.Signer(Buffer.from('secretString'))
+new fastifyCookieStar.Signer([Buffer.from('secretStringInArray')])
 const signer = new fastifyCookieStar.Signer(['secretStringInArray'], 'sha256')
 signer.sign('Lorem Ipsum')
 signer.unsign('Lorem Ipsum')

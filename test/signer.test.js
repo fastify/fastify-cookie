@@ -28,13 +28,15 @@ test('default', t => {
   })
 
   t.test('sign', (t) => {
-    t.plan(3)
+    t.plan(5)
 
     const input = 'some-value'
     const result = signer.sign(input)
 
     t.equal(result, sign(input, secret))
     t.equal(result, sign(input, [secret]))
+    t.equal(result, sign(input, Buffer.from(secret)))
+    t.equal(result, sign(input, [Buffer.from(secret)]))
 
     t.throws(() => sign(undefined), 'Cookie value must be provided as a string.')
   })
@@ -61,7 +63,7 @@ test('default', t => {
     t.equal(result.renew, false)
     t.equal(result.value, 'some-value')
     t.same(result, unsign(input, [secret]))
-    t.throws(() => unsign(undefined), 'Secret key must be a string.')
+    t.throws(() => unsign(undefined), 'Secret key must be a string or Buffer.')
     t.throws(() => unsign(undefined, secret), 'Signed cookie string must be provided.')
   })
 })
@@ -117,12 +119,14 @@ test('key rotation', (t) => {
 test('Signer', t => {
   t.plan(2)
 
-  t.test('Signer needs a string as secret', (t) => {
-    t.plan(4)
-    t.throws(() => Signer(1), 'Secret key must be a string.')
-    t.throws(() => Signer(undefined), 'Secret key must be a string.')
+  t.test('Signer needs a string or Buffer as secret', (t) => {
+    t.plan(6)
+    t.throws(() => Signer(1), 'Secret key must be a string or Buffer.')
+    t.throws(() => Signer(undefined), 'Secret key must be a string or Buffer.')
     t.doesNotThrow(() => Signer('secret'))
     t.doesNotThrow(() => Signer(['secret']))
+    t.doesNotThrow(() => Signer(Buffer.from('deadbeef76543210', 'hex')))
+    t.doesNotThrow(() => Signer([Buffer.from('deadbeef76543210', 'hex')]))
   })
 
   t.test('Signer handles algorithm properly', (t) => {
