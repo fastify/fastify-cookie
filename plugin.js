@@ -12,7 +12,7 @@ function fastifyCookieSetCookie (reply, name, value, options, signer, encrypter)
     opts.expires = new Date(opts.expires)
   }
 
-  if (encrypter && value) {
+  if (opts.encrypted && encrypter && value) {
     try {
       value = encrypter.encrypt(value.toString())
     } catch (error) {
@@ -54,6 +54,7 @@ function fastifyCookieSetCookie (reply, name, value, options, signer, encrypter)
 function fastifyCookieClearCookie (reply, name, options) {
   const opts = Object.assign({ path: '/' }, options, {
     expires: new Date(1),
+    encrypted: undefined,
     signed: undefined,
     maxAge: undefined
   })
@@ -68,16 +69,6 @@ function onReqHandlerWrapper (fastify, hook) {
       if (cookieHeader) {
         fastifyReq.cookies = fastify.parseCookie(cookieHeader)
       }
-      if (fastify.decryptCookie) {
-        Object.keys(fastifyReq.cookies).forEach(key => {
-          try {
-            fastifyReq.cookies[key] = fastify.decryptCookie(fastifyReq.cookies[key])
-          } catch (error) {
-            // decryption failed
-            delete fastifyReq.cookies[key]
-          }
-        })
-      }
       done()
     }
     : function fastifyCookieHandler (fastifyReq, fastifyRes, done) {
@@ -85,16 +76,6 @@ function onReqHandlerWrapper (fastify, hook) {
       const cookieHeader = fastifyReq.raw.headers.cookie
       if (cookieHeader) {
         fastifyReq.cookies = fastify.parseCookie(cookieHeader)
-      }
-      if (fastify.decryptCookie) {
-        Object.keys(fastifyReq.cookies).forEach(key => {
-          try {
-            fastifyReq.cookies[key] = fastify.decryptCookie(fastifyReq.cookies[key])
-          } catch (error) {
-            // decryption failed
-            delete fastifyReq.cookies[key]
-          }
-        })
       }
       done()
     }
@@ -127,14 +108,8 @@ function plugin (fastify, options, next) {
   fastify.decorate('parseCookie', parseCookie)
 
   if (typeof key !== 'undefined') {
-    fastify.decorate('encryptCookie', encryptCookie)
-    fastify.decorate('decryptCookie', decryptCookie)
-
-    fastify.decorateRequest('encryptCookie', encryptCookie)
     fastify.decorateRequest('decryptCookie', decryptCookie)
-
     fastify.decorateReply('encryptCookie', encryptCookie)
-    fastify.decorateReply('decryptCookie', decryptCookie)
   }
 
   if (typeof secret !== 'undefined') {
