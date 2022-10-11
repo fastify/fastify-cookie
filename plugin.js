@@ -4,7 +4,7 @@ const fp = require('fastify-plugin')
 const cookie = require('cookie')
 
 const { Signer, sign, unsign } = require('./signer')
-const { Encrypter } = require('./encrypter')
+const Encrypter = require('./encrypter')
 
 function fastifyCookieSetCookie (reply, name, value, options, signer, encrypter) {
   const opts = Object.assign({}, options)

@@ -52,4 +52,4 @@ function checkProps (key, algorithm) {
   }
 }
 
-module.exports = { Encrypter, encrypt, decrypt }
+module.exports = Encrypter
