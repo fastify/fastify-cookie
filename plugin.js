@@ -67,7 +67,10 @@ function onReqHandlerWrapper (fastify, hook) {
         Object.keys(fastifyReq.cookies).forEach(key => {
           try {
             fastifyReq.cookies[key] = fastify.decryptCookie(fastifyReq.cookies[key])
-          } catch (error) {}
+          } catch (error) {
+            // decryption failed
+            delete fastifyReq.cookies[key]
+          }
         })
       }
       done()
@@ -82,7 +85,10 @@ function onReqHandlerWrapper (fastify, hook) {
         Object.keys(fastifyReq.cookies).forEach(key => {
           try {
             fastifyReq.cookies[key] = fastify.decryptCookie(fastifyReq.cookies[key])
-          } catch (error) {}
+          } catch (error) {
+            // decryption failed
+            delete fastifyReq.cookies[key]
+          }
         })
       }
       done()
