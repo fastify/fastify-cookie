@@ -12,13 +12,9 @@ function fastifyCookieSetCookie (reply, name, value, options, signer, encrypter)
     opts.expires = new Date(opts.expires)
   }
 
-  if (encrypter) {
+  if (value && encrypter) {
     try {
-      if (typeof value !== 'string') {
-        throw new Error('Cookie value must be of type string.')
-      }
-
-      value = encrypter.encrypt(value)
+      value = encrypter.encrypt(value.toString())
     } catch (error) {
       // encryption failed
       throw new Error(`Encryption failed: ${error}`)
