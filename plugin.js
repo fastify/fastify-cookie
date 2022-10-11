@@ -13,7 +13,16 @@ function fastifyCookieSetCookie (reply, name, value, options, signer, encryptor)
   }
 
   if (encryptor) {
-    value = encryptor.encrypt(value)
+    try {
+      if (typeof value !== 'string') {
+        throw new Error('Cookie value must be of type string.')
+      }
+
+      value = encryptor.encrypt(value)
+    } catch (error) {
+      // encryption failed
+      throw new Error('Encryption failed!', error)
+    }
   }
 
   if (opts.signed) {
