@@ -4,21 +4,21 @@ const fp = require('fastify-plugin')
 const cookie = require('cookie')
 
 const { Signer, sign, unsign } = require('./signer')
-const { Encryptor } = require('./encryptor')
+const { Encrypter } = require('./encrypter')
 
-function fastifyCookieSetCookie (reply, name, value, options, signer, encryptor) {
+function fastifyCookieSetCookie (reply, name, value, options, signer, encrypter) {
   const opts = Object.assign({}, options)
   if (opts.expires && Number.isInteger(opts.expires)) {
     opts.expires = new Date(opts.expires)
   }
 
-  if (encryptor) {
+  if (encrypter) {
     try {
       if (typeof value !== 'string') {
         throw new Error('Cookie value must be of type string.')
       }
 
-      value = encryptor.encrypt(value)
+      value = encrypter.encrypt(value)
     } catch (error) {
       // encryption failed
       throw new Error(`Encryption failed: ${error}`)
@@ -126,7 +126,7 @@ function plugin (fastify, options, next) {
   const isSigner = !secret || (typeof secret.sign === 'function' && typeof secret.unsign === 'function')
   const signingAlgorithm = options.algorithm || 'sha256'
   const signer = isSigner ? secret : new Signer(secret, signingAlgorithm)
-  const encryptor = key ? new Encryptor(key) : undefined
+  const encrypter = key ? new Encrypter(key) : undefined
 
   fastify.decorate('parseCookie', parseCookie)
 
@@ -170,11 +170,11 @@ function plugin (fastify, options, next) {
   }
 
   function encryptCookie (value) {
-    return encryptor.encrypt(value)
+    return encrypter.encrypt(value)
   }
 
   function decryptCookie (value) {
-    return encryptor.decrypt(value)
+    return encrypter.decrypt(value)
   }
 
   function signCookie (value) {
@@ -187,7 +187,7 @@ function plugin (fastify, options, next) {
 
   function setCookie (name, value, cookieOptions) {
     const opts = Object.assign({}, options.parseOptions, cookieOptions)
-    return fastifyCookieSetCookie(this, name, value, opts, signer, encryptor)
+    return fastifyCookieSetCookie(this, name, value, opts, signer, encrypter)
   }
 
   function clearCookie (name, cookieOptions) {

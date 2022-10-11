@@ -4,7 +4,7 @@ const crypto = require('crypto')
 const defaultAlgorithm = 'aes256'
 const defaultEncoding = 'base64'
 
-function Encryptor (key, algorithm, encoding) {
+function Encrypter (key, algorithm, encoding) {
   this.key = key
   this.algorithm = algorithm || defaultAlgorithm
   this.encoding = encoding || defaultEncoding
@@ -12,11 +12,11 @@ function Encryptor (key, algorithm, encoding) {
   checkProps(this.key, this.algorithm)
 }
 
-Encryptor.prototype.encrypt = function (value) {
+Encrypter.prototype.encrypt = function (value) {
   return encrypt(value, this.key, this.algorithm, this.encoding)
 }
 
-Encryptor.prototype.decrypt = function (value) {
+Encrypter.prototype.decrypt = function (value) {
   return decrypt(value, this.key, this.algorithm, this.encoding)
 }
 
@@ -52,4 +52,4 @@ function checkProps (key, algorithm) {
   }
 }
 
-module.exports = { Encryptor, encrypt, decrypt }
+module.exports = { Encrypter, encrypt, decrypt }
