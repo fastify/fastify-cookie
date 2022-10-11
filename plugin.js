@@ -21,7 +21,7 @@ function fastifyCookieSetCookie (reply, name, value, options, signer, encryptor)
       value = encryptor.encrypt(value)
     } catch (error) {
       // encryption failed
-      throw new Error('Encryption failed!', error)
+      throw new Error(`Encryption failed: ${error}`)
     }
   }
 
