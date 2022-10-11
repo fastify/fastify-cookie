@@ -4,7 +4,7 @@ const crypto = require('crypto')
 const defaultAlgorithm = 'aes256'
 const defaultEncoding = 'base64'
 
-function Encryptor (key = undefined) {
+function Encryptor (key) {
   this.key = key || crypto.randomBytes(32)
 }
 
