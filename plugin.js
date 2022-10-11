@@ -4,11 +4,16 @@ const fp = require('fastify-plugin')
 const cookie = require('cookie')
 
 const { Signer, sign, unsign } = require('./signer')
+const { Encryptor } = require('./encryptor')
 
-function fastifyCookieSetCookie (reply, name, value, options, signer) {
+function fastifyCookieSetCookie (reply, name, value, options, signer, encryptor) {
   const opts = Object.assign({}, options)
   if (opts.expires && Number.isInteger(opts.expires)) {
     opts.expires = new Date(opts.expires)
+  }
+
+  if (encryptor) {
+    value = encryptor.encrypt(value)
   }
 
   if (opts.signed) {
@@ -58,6 +63,11 @@ function onReqHandlerWrapper (fastify, hook) {
       if (cookieHeader) {
         fastifyReq.cookies = fastify.parseCookie(cookieHeader)
       }
+      if (fastify.decryptCookie) {
+        Object.keys(fastifyReq.cookies).forEach(key => {
+          fastifyReq.cookies[key] = fastify.decryptCookie(fastifyReq.cookies[key])
+        })
+      }
       done()
     }
     : function fastifyCookieHandler (fastifyReq, fastifyRes, done) {
@@ -65,6 +75,11 @@ function onReqHandlerWrapper (fastify, hook) {
       const cookieHeader = fastifyReq.raw.headers.cookie
       if (cookieHeader) {
         fastifyReq.cookies = fastify.parseCookie(cookieHeader)
+      }
+      if (fastify.decryptCookie) {
+        Object.keys(fastifyReq.cookies).forEach(key => {
+          fastifyReq.cookies[key] = fastify.decryptCookie(fastifyReq.cookies[key])
+        })
       }
       done()
     }
@@ -83,16 +98,29 @@ function getHook (hook = 'onRequest') {
 }
 
 function plugin (fastify, options, next) {
+  const key = options.key
   const secret = options.secret
   const hook = getHook(options.hook)
   if (hook === undefined) {
     return next(new Error('@fastify/cookie: Invalid value provided for the hook-option. You can set the hook-option only to false, \'onRequest\' , \'preParsing\' , \'preValidation\' or \'preHandler\''))
   }
   const isSigner = !secret || (typeof secret.sign === 'function' && typeof secret.unsign === 'function')
-  const algorithm = options.algorithm || 'sha256'
-  const signer = isSigner ? secret : new Signer(secret, algorithm)
+  const signingAlgorithm = options.algorithm || 'sha256'
+  const signer = isSigner ? secret : new Signer(secret, signingAlgorithm)
+  const encryptor = key ? new Encryptor(key) : undefined
 
   fastify.decorate('parseCookie', parseCookie)
+
+  if (typeof key !== 'undefined') {
+    fastify.decorate('encryptCookie', encryptCookie)
+    fastify.decorate('decryptCookie', decryptCookie)
+
+    fastify.decorateRequest('encryptCookie', encryptCookie)
+    fastify.decorateRequest('decryptCookie', decryptCookie)
+
+    fastify.decorateReply('encryptCookie', encryptCookie)
+    fastify.decorateReply('decryptCookie', decryptCookie)
+  }
 
   if (typeof secret !== 'undefined') {
     fastify.decorate('signCookie', signCookie)
@@ -122,6 +150,14 @@ function plugin (fastify, options, next) {
     return cookie.parse(cookieHeader, options.parseOptions)
   }
 
+  function encryptCookie (value) {
+    return encryptor.encrypt(value)
+  }
+
+  function decryptCookie (value) {
+    return encryptor.decrypt(value)
+  }
+
   function signCookie (value) {
     return signer.sign(value)
   }
@@ -132,7 +168,7 @@ function plugin (fastify, options, next) {
 
   function setCookie (name, value, cookieOptions) {
     const opts = Object.assign({}, options.parseOptions, cookieOptions)
-    return fastifyCookieSetCookie(this, name, value, opts, signer)
+    return fastifyCookieSetCookie(this, name, value, opts, signer, encryptor)
   }
 
   function clearCookie (name, cookieOptions) {
