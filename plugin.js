@@ -12,7 +12,7 @@ function fastifyCookieSetCookie (reply, name, value, options, signer, encrypter)
     opts.expires = new Date(opts.expires)
   }
 
-  if (value && encrypter) {
+  if (encrypter && value) {
     try {
       value = encrypter.encrypt(value.toString())
     } catch (error) {
