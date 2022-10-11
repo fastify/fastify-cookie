@@ -65,7 +65,9 @@ function onReqHandlerWrapper (fastify, hook) {
       }
       if (fastify.decryptCookie) {
         Object.keys(fastifyReq.cookies).forEach(key => {
-          fastifyReq.cookies[key] = fastify.decryptCookie(fastifyReq.cookies[key])
+          try {
+            fastifyReq.cookies[key] = fastify.decryptCookie(fastifyReq.cookies[key])
+          } catch (error) {}
         })
       }
       done()
@@ -78,7 +80,9 @@ function onReqHandlerWrapper (fastify, hook) {
       }
       if (fastify.decryptCookie) {
         Object.keys(fastifyReq.cookies).forEach(key => {
-          fastifyReq.cookies[key] = fastify.decryptCookie(fastifyReq.cookies[key])
+          try {
+            fastifyReq.cookies[key] = fastify.decryptCookie(fastifyReq.cookies[key])
+          } catch (error) {}
         })
       }
       done()
