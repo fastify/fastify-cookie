@@ -108,8 +108,8 @@ function plugin (fastify, options, next) {
   fastify.decorate('parseCookie', parseCookie)
 
   if (typeof key !== 'undefined') {
-    fastify.decorateRequest('decryptCookie', decryptCookie)
-    fastify.decorateReply('encryptCookie', encryptCookie)
+    fastify.decorate('encryptCookie', encryptCookie)
+    fastify.decorate('decryptCookie', decryptCookie)
   }
 
   if (typeof secret !== 'undefined') {
