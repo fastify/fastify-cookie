@@ -113,7 +113,7 @@ declare namespace fastifyCookie {
     expires?: Date;
     /**  The `boolean` value of the `HttpOnly` attribute. Defaults to true. */
     httpOnly?: boolean;
-    /**  A `number` in milliseconds that specifies the `Expires` attribute by adding the specified milliseconds to the current date. If both `expires` and `maxAge` are set, then `expires` is used. */
+    /**  A `number` in seconds that specifies the `Expires` attribute by adding the specified seconds to the current date. If both `expires` and `maxAge` are set, then `expires` is used. */
     maxAge?: number;
     /**  The `Path` attribute. Defaults to `/` (the root path).  */
     path?: string;
