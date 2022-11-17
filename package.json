@@ -38,6 +38,7 @@
     "url": "https://github.com/fastify/fastify-cookie/issues"
   },
   "homepage": "https://github.com/fastify/fastify-cookie#readme",
+  "files": ["*.js", "types/*.ts"],
   "devDependencies": {
     "@fastify/pre-commit": "^2.0.2",
     "@types/node": "^18.0.0",
