@@ -132,6 +132,9 @@ dist
 # Vim swap files
 *.swp
 
+# Clinic
+.clinic
+
 # macOS files
 .DS_Store
 
