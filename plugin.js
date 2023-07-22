@@ -31,11 +31,29 @@ function fastifyCookieSetCookie (reply, name, value, options, signer) {
     return reply
   }
 
+  const cookieNameWithEqual = name + '='
   if (typeof setCookie === 'string') {
-    setCookie = [setCookie]
+    if (setCookie.startsWith(cookieNameWithEqual)) {
+      setCookie = serialized
+    } else {
+      reply.setCookieSet.add(setCookie.slice(0, setCookie.indexOf('=')))
+      reply.setCookieSet.add(name)
+      setCookie = [setCookie, serialized]
+    }
+  } else {
+    if (reply.setCookieSet.has(name)) {
+      for (let i = 0; i < setCookie.length; ++i) {
+        if (setCookie[i].startsWith(cookieNameWithEqual)) {
+          setCookie[i] = serialized
+          break
+        }
+      }
+    } else {
+      reply.setCookieSet.add(name)
+      setCookie.push(serialized)
+    }
   }
 
-  setCookie.push(serialized)
   reply.removeHeader('Set-Cookie')
   reply.header('Set-Cookie', setCookie)
   return reply
@@ -58,6 +76,7 @@ function onReqHandlerWrapper (fastify, hook) {
       if (cookieHeader) {
         fastifyReq.cookies = fastify.parseCookie(cookieHeader)
       }
+      fastifyRes.setCookieSet = new Set()
       done()
     }
     : function fastifyCookieHandler (fastifyReq, fastifyRes, done) {
@@ -66,6 +85,7 @@ function onReqHandlerWrapper (fastify, hook) {
       if (cookieHeader) {
         fastifyReq.cookies = fastify.parseCookie(cookieHeader)
       }
+      fastifyRes.setCookieSet = new Set()
       done()
     }
 }
@@ -106,8 +126,9 @@ function plugin (fastify, options, next) {
   }
 
   fastify.decorateRequest('cookies', null)
-  fastify.decorateReply('cookie', setCookie)
+  fastify.decorateReply('setCookieSet', null)
 
+  fastify.decorateReply('cookie', setCookie)
   fastify.decorateReply('setCookie', setCookie)
   fastify.decorateReply('clearCookie', clearCookie)
 
