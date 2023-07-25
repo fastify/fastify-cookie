@@ -936,7 +936,7 @@ test('if cookies are not set, then the handler creates an empty req.cookies obje
 })
 
 test('clearCookie should include parseOptions', (t) => {
-  t.plan(9)
+  t.plan(10)
   const fastify = Fastify()
   fastify.register(plugin, {
     parseOptions: {
@@ -970,6 +970,7 @@ test('clearCookie should include parseOptions', (t) => {
     t.equal(cookies.length, 1)
     t.equal(cookies[0].name, 'foo')
     t.equal(cookies[0].value, '')
+    t.equal(cookies[0].maxAge, undefined)
     t.equal(cookies[0].path, '/test')
     t.equal(cookies[0].domain, 'example.com')
 
