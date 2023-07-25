@@ -5,6 +5,8 @@ const cookie = require('cookie')
 
 const { Signer, sign, unsign } = require('./signer')
 
+const kReplySetCookies = Symbol('fastify.reply.setCookies')
+
 function fastifyCookieSetCookie (reply, name, value, options, signer) {
   const opts = Object.assign({}, options)
   if (opts.expires && Number.isInteger(opts.expires)) {
@@ -36,12 +38,12 @@ function fastifyCookieSetCookie (reply, name, value, options, signer) {
     if (setCookie.startsWith(cookieNameWithEqual)) {
       setCookie = serialized
     } else {
-      reply.setCookieSet.add(setCookie.slice(0, setCookie.indexOf('=')))
-      reply.setCookieSet.add(name)
+      reply[kReplySetCookies].add(setCookie.slice(0, setCookie.indexOf('=')))
+      reply[kReplySetCookies].add(name)
       setCookie = [setCookie, serialized]
     }
   } else {
-    if (reply.setCookieSet.has(name)) {
+    if (reply[kReplySetCookies].has(name)) {
       for (let i = 0; i < setCookie.length; ++i) {
         if (setCookie[i].startsWith(cookieNameWithEqual)) {
           setCookie[i] = serialized
@@ -49,7 +51,7 @@ function fastifyCookieSetCookie (reply, name, value, options, signer) {
         }
       }
     } else {
-      reply.setCookieSet.add(name)
+      reply[kReplySetCookies].add(name)
       setCookie.push(serialized)
     }
   }
@@ -76,7 +78,7 @@ function onReqHandlerWrapper (fastify, hook) {
       if (cookieHeader) {
         fastifyReq.cookies = fastify.parseCookie(cookieHeader)
       }
-      fastifyRes.setCookieSet = new Set()
+      fastifyRes[kReplySetCookies] = new Set()
       done()
     }
     : function fastifyCookieHandler (fastifyReq, fastifyRes, done) {
@@ -85,7 +87,7 @@ function onReqHandlerWrapper (fastify, hook) {
       if (cookieHeader) {
         fastifyReq.cookies = fastify.parseCookie(cookieHeader)
       }
-      fastifyRes.setCookieSet = new Set()
+      fastifyRes[kReplySetCookies] = new Set()
       done()
     }
 }
@@ -126,7 +128,7 @@ function plugin (fastify, options, next) {
   }
 
   fastify.decorateRequest('cookies', null)
-  fastify.decorateReply('setCookieSet', null)
+  fastify.decorateReply(kReplySetCookies, null)
 
   fastify.decorateReply('cookie', setCookie)
   fastify.decorateReply('setCookie', setCookie)
