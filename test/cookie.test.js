@@ -122,6 +122,77 @@ test('cookies get set correctly with millisecond dates', (t) => {
   })
 })
 
+test('share options for setCookie and clearCookie', (t) => {
+  t.plan(8)
+  const fastify = Fastify()
+  const secret = 'testsecret'
+  fastify.register(plugin, { secret })
+
+  const cookieOptions = {
+    signed: true,
+    maxAge: 36000
+  }
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .setCookie('foo', 'foo', cookieOptions)
+      .clearCookie('foo', cookieOptions)
+      .send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.equal(cookies.length, 1)
+    t.equal(cookies[0].name, 'foo')
+    t.equal(cookies[0].value, '')
+    t.equal(cookies[0].maxAge, undefined)
+
+    t.ok(new Date(cookies[0].expires) < new Date())
+  })
+})
+
+test('expires should not be overridden in clearCookie', (t) => {
+  t.plan(7)
+  const fastify = Fastify()
+  const secret = 'testsecret'
+  fastify.register(plugin, { secret })
+
+  const cookieOptions = {
+    signed: true,
+    expires: Date.now() + 1000
+  }
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .setCookie('foo', 'foo', cookieOptions)
+      .clearCookie('foo', cookieOptions)
+      .send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.equal(cookies.length, 1)
+    t.equal(cookies[0].name, 'foo')
+    t.equal(cookies[0].value, '')
+    const expires = new Date(cookies[0].expires)
+    t.ok(expires < new Date(Date.now() + 5000))
+  })
+})
+
 test('parses incoming cookies', (t) => {
   t.plan(15)
   const fastify = Fastify()
@@ -864,77 +935,6 @@ test('if cookies are not set, then the handler creates an empty req.cookies obje
   })
 })
 
-test('share options for setCookie and clearCookie', (t) => {
-  t.plan(8)
-  const fastify = Fastify()
-  const secret = 'testsecret'
-  fastify.register(plugin, { secret })
-
-  const cookieOptions = {
-    signed: true,
-    maxAge: 36000
-  }
-
-  fastify.get('/test1', (req, reply) => {
-    reply
-      .setCookie('foo', 'foo', cookieOptions)
-      .clearCookie('foo', cookieOptions)
-      .send({ hello: 'world' })
-  })
-
-  fastify.inject({
-    method: 'GET',
-    url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
-
-    const cookies = res.cookies
-    t.equal(cookies.length, 1)
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, '')
-    t.equal(cookies[0].maxAge, undefined)
-
-    t.ok(new Date(cookies[0].expires) < new Date())
-  })
-})
-
-test('expires should not be overridden in clearCookie', (t) => {
-  t.plan(7)
-  const fastify = Fastify()
-  const secret = 'testsecret'
-  fastify.register(plugin, { secret })
-
-  const cookieOptions = {
-    signed: true,
-    expires: Date.now() + 1000
-  }
-
-  fastify.get('/test1', (req, reply) => {
-    reply
-      .setCookie('foo', 'foo', cookieOptions)
-      .clearCookie('foo', cookieOptions)
-      .send({ hello: 'world' })
-  })
-
-  fastify.inject({
-    method: 'GET',
-    url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
-
-    const cookies = res.cookies
-    t.equal(cookies.length, 1)
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, '')
-    const expires = new Date(cookies[0].expires)
-    t.ok(expires < new Date(Date.now() + 5000))
-  })
-})
-
 test('clearCookie should include parseOptions', (t) => {
   t.plan(9)
   const fastify = Fastify()
@@ -977,7 +977,7 @@ test('clearCookie should include parseOptions', (t) => {
   })
 })
 
-test('new test for #218', (t) => {
+test('should update a cookie value when setCookie is called multiple times', (t) => {
   t.plan(13)
   const fastify = Fastify()
   const secret = 'testsecret'
