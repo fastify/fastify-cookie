@@ -26,38 +26,8 @@ function fastifyCookieSetCookie (reply, name, value, options, signer) {
     }
   }
 
-  const serialized = cookie.serialize(name, value, opts)
-  let setCookie = reply.getHeader('Set-Cookie')
-  if (!setCookie) {
-    reply.header('Set-Cookie', serialized)
-    return reply
-  }
+  reply[kReplySetCookies].set(`${name}.${opts.domain}.${opts.path ?? '/'}`, { name, value, opts })
 
-  const cookieNameWithEqual = name + '='
-  if (typeof setCookie === 'string') {
-    if (setCookie.startsWith(cookieNameWithEqual)) {
-      setCookie = serialized
-    } else {
-      reply[kReplySetCookies].add(setCookie.slice(0, setCookie.indexOf('=')))
-      reply[kReplySetCookies].add(name)
-      setCookie = [setCookie, serialized]
-    }
-  } else {
-    if (reply[kReplySetCookies].has(name)) {
-      for (let i = 0; i < setCookie.length; ++i) {
-        if (setCookie[i].startsWith(cookieNameWithEqual)) {
-          setCookie[i] = serialized
-          break
-        }
-      }
-    } else {
-      reply[kReplySetCookies].add(name)
-      setCookie.push(serialized)
-    }
-  }
-
-  reply.removeHeader('Set-Cookie')
-  reply.header('Set-Cookie', setCookie)
   return reply
 }
 
@@ -78,7 +48,7 @@ function onReqHandlerWrapper (fastify, hook) {
       if (cookieHeader) {
         fastifyReq.cookies = fastify.parseCookie(cookieHeader)
       }
-      fastifyRes[kReplySetCookies] = new Set()
+      fastifyRes[kReplySetCookies] = new Map()
       done()
     }
     : function fastifyCookieHandler (fastifyReq, fastifyRes, done) {
@@ -87,9 +57,27 @@ function onReqHandlerWrapper (fastify, hook) {
       if (cookieHeader) {
         fastifyReq.cookies = fastify.parseCookie(cookieHeader)
       }
-      fastifyRes[kReplySetCookies] = new Set()
+      fastifyRes[kReplySetCookies] = new Map()
       done()
     }
+}
+
+function onSendHandlerWrapper (fastify) {
+  return function fastifyCookieHandler (fastifyReq, fastifyRes, payload, done) {
+    if (fastifyRes[kReplySetCookies].size) {
+      const setCookie = []
+
+      for (const [, c] of fastifyRes[kReplySetCookies]) {
+        const serialized = fastify.serializeCookie(c.name, c.value, c.opts)
+
+        setCookie.push(serialized)
+      }
+
+      fastifyRes.header('Set-Cookie', setCookie)
+    }
+
+    done()
+  }
 }
 
 function getHook (hook = 'onRequest') {
@@ -114,6 +102,7 @@ function plugin (fastify, options, next) {
   const algorithm = options.algorithm || 'sha256'
   const signer = isSigner ? secret : new Signer(secret, algorithm)
 
+  fastify.decorate('serializeCookie', serializeCookie)
   fastify.decorate('parseCookie', parseCookie)
 
   if (typeof secret !== 'undefined') {
@@ -136,11 +125,16 @@ function plugin (fastify, options, next) {
 
   if (hook) {
     fastify.addHook(hook, onReqHandlerWrapper(fastify, hook))
+    fastify.addHook('onSend', onSendHandlerWrapper(fastify))
   }
 
   next()
 
   // ***************************
+  function serializeCookie (name, value, options) {
+    return cookie.serialize(name, value, options)
+  }
+
   function parseCookie (cookieHeader) {
     return cookie.parse(cookieHeader, options.parseOptions)
   }

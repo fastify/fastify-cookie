@@ -978,12 +978,18 @@ test('clearCookie should include parseOptions', (t) => {
 })
 
 test('should update a cookie value when setCookie is called multiple times', (t) => {
-  t.plan(13)
+  t.plan(15)
   const fastify = Fastify()
   const secret = 'testsecret'
   fastify.register(plugin, { secret })
 
   const cookieOptions = {
+    signed: true,
+    path: '/foo',
+    maxAge: 36000
+  }
+
+  const cookieOptions2 = {
     signed: true,
     maxAge: 36000
   }
@@ -992,11 +998,9 @@ test('should update a cookie value when setCookie is called multiple times', (t)
     reply
       .setCookie('foo', 'foo', cookieOptions)
       .clearCookie('foo', cookieOptions)
-      .setCookie('foo', 'foo', cookieOptions)
+      .setCookie('foo', 'foo', cookieOptions2)
       .setCookie('foos', 'foos', cookieOptions)
       .setCookie('foos', 'foosy', cookieOptions)
-      .setCookie('boo', 'boo', cookieOptions)
-      .clearCookie('boo', cookieOptions)
       .send({ hello: 'world' })
   })
 
@@ -1012,15 +1016,18 @@ test('should update a cookie value when setCookie is called multiple times', (t)
     t.equal(cookies.length, 3)
 
     t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, sign('foo', secret))
-    t.equal(cookies[0].maxAge, 36000)
+    t.equal(cookies[0].value, '')
+    t.equal(cookies[0].path, '/foo')
 
-    t.equal(cookies[1].name, 'foos')
-    t.equal(cookies[1].value, sign('foosy', secret))
+    t.equal(cookies[1].name, 'foo')
+    t.equal(cookies[1].value, sign('foo', secret))
     t.equal(cookies[1].maxAge, 36000)
 
-    t.equal(cookies[2].name, 'boo')
-    t.equal(cookies[2].value, '')
-    t.ok(new Date(cookies[2].expires) < new Date())
+    t.equal(cookies[2].name, 'foos')
+    t.equal(cookies[2].value, sign('foosy', secret))
+    t.equal(cookies[2].path, '/foo')
+    t.equal(cookies[2].maxAge, 36000)
+
+    t.ok(new Date(cookies[0].expires) < new Date())
   })
 })
