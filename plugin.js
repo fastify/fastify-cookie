@@ -26,7 +26,7 @@ function fastifyCookieSetCookie (reply, name, value, options, signer) {
     }
   }
 
-  reply[kReplySetCookies].set(`${name}.${opts.domain}.${opts.path ?? '/'}`, { name, value, opts })
+  reply[kReplySetCookies].set(`${name};${opts.domain};${opts.path ?? '/'}`, { name, value, opts })
 
   return reply
 }
@@ -68,9 +68,7 @@ function onSendHandlerWrapper (fastify) {
       const setCookie = []
 
       for (const [, c] of fastifyRes[kReplySetCookies]) {
-        const serialized = fastify.serializeCookie(c.name, c.value, c.opts)
-
-        setCookie.push(serialized)
+        setCookie.push(fastify.serializeCookie(c.name, c.value, c.opts))
       }
 
       fastifyRes.header('Set-Cookie', setCookie)
