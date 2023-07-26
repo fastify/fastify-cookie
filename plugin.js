@@ -11,7 +11,7 @@ function fastifyCookieSetCookie (reply, name, value, options, signer) {
     opts.expires = new Date(opts.expires)
   }
 
-  if (opts.signed) {
+  if (opts.signed && signer) {
     value = signer.sign(value)
   }
 
