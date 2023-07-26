@@ -26,7 +26,7 @@ function fastifyCookieSetCookie (reply, name, value, options, signer) {
     }
   }
 
-  reply[kReplySetCookies].set(`${name};${opts.domain};${opts.path ?? '/'}`, { name, value, opts })
+  reply[kReplySetCookies].set(`${name};${opts.domain};${opts.path || '/'}`, { name, value, opts })
 
   return reply
 }
