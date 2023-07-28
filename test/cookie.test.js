@@ -1032,3 +1032,115 @@ test('should update a cookie value when setCookie is called multiple times', (t)
     t.ok(new Date(cookies[0].expires) < new Date())
   })
 })
+
+test('should update a cookie value when setCookie is called multiple times (empty header)', (t) => {
+  t.plan(15)
+  const fastify = Fastify()
+  const secret = 'testsecret'
+  fastify.register(plugin, { secret })
+
+  const cookieOptions = {
+    signed: true,
+    path: '/foo',
+    maxAge: 36000
+  }
+
+  const cookieOptions2 = {
+    signed: true,
+    maxAge: 36000
+  }
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .header('Set-Cookie', '', cookieOptions)
+      .setCookie('foo', 'foo', cookieOptions)
+      .clearCookie('foo', cookieOptions)
+      .setCookie('foo', 'foo', cookieOptions2)
+      .setCookie('foos', 'foos', cookieOptions)
+      .setCookie('foos', 'foosy', cookieOptions)
+      .send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.equal(cookies.length, 3)
+
+    t.equal(cookies[0].name, 'foo')
+    t.equal(cookies[0].value, '')
+    t.equal(cookies[0].path, '/foo')
+
+    t.equal(cookies[1].name, 'foo')
+    t.equal(cookies[1].value, sign('foo', secret))
+    t.equal(cookies[1].maxAge, 36000)
+
+    t.equal(cookies[2].name, 'foos')
+    t.equal(cookies[2].value, sign('foosy', secret))
+    t.equal(cookies[2].path, '/foo')
+    t.equal(cookies[2].maxAge, 36000)
+
+    t.ok(new Date(cookies[0].expires) < new Date())
+  })
+})
+
+test('should update a cookie value when setCookie is called multiple times (non-empty header)', (t) => {
+  t.plan(15)
+  const fastify = Fastify()
+  const secret = 'testsecret'
+  fastify.register(plugin, { secret })
+
+  const cookieOptions = {
+    signed: true,
+    path: '/foo',
+    maxAge: 36000
+  }
+
+  const cookieOptions2 = {
+    signed: true,
+    maxAge: 36000
+  }
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .header('Set-Cookie', 'manual=manual', cookieOptions)
+      .setCookie('foo', 'foo', cookieOptions)
+      .clearCookie('foo', cookieOptions)
+      .setCookie('foo', 'foo', cookieOptions2)
+      .setCookie('foos', 'foos', cookieOptions)
+      .setCookie('foos', 'foosy', cookieOptions)
+      .send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.equal(cookies.length, 4)
+
+    t.equal(cookies[1].name, 'foo')
+    t.equal(cookies[1].value, '')
+    t.equal(cookies[1].path, '/foo')
+
+    t.equal(cookies[2].name, 'foo')
+    t.equal(cookies[2].value, sign('foo', secret))
+    t.equal(cookies[2].maxAge, 36000)
+
+    t.equal(cookies[3].name, 'foos')
+    t.equal(cookies[3].value, sign('foosy', secret))
+    t.equal(cookies[3].path, '/foo')
+    t.equal(cookies[3].maxAge, 36000)
+
+    t.ok(new Date(cookies[1].expires) < new Date())
+  })
+})

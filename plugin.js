@@ -64,12 +64,21 @@ function onReqHandlerWrapper (fastify, hook) {
 
 function fastifyCookieOnSendHandler (fastifyReq, fastifyRes, payload, done) {
   if (fastifyRes[kReplySetCookies].size) {
-    const setCookie = []
+    let setCookie = fastifyRes.getHeader('Set-Cookie')
+
+    if (!setCookie) {
+      setCookie = []
+    }
+
+    if (typeof setCookie === 'string') {
+      setCookie = [setCookie]
+    }
 
     for (const [, c] of fastifyRes[kReplySetCookies]) {
       setCookie.push(cookie.serialize(c.name, c.value, c.opts))
     }
 
+    fastifyRes.removeHeader('Set-Cookie')
     fastifyRes.header('Set-Cookie', setCookie)
   }
 
