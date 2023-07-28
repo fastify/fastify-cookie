@@ -74,7 +74,7 @@ function fastifyCookieOnSendHandler (fastifyReq, fastifyRes, payload, done) {
       setCookie = [setCookie]
     }
 
-    for (const [, c] of fastifyRes[kReplySetCookies]) {
+    for (const c of fastifyRes[kReplySetCookies].values()) {
       setCookie.push(cookie.serialize(c.name, c.value, c.opts))
     }
 
