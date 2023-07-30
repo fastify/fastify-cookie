@@ -703,6 +703,18 @@ test('issue 53', (t) => {
   })
 })
 
+test('serialize cookie manually using decorator', (t) => {
+  t.plan(2)
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  fastify.ready(() => {
+    t.ok(fastify.serializeCookie)
+    t.same(fastify.serializeCookie('foo', 'bar', {}), 'foo=bar')
+    t.end()
+  })
+})
+
 test('parse cookie manually using decorator', (t) => {
   t.plan(2)
   const fastify = Fastify()

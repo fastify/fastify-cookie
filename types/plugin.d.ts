@@ -5,6 +5,15 @@ import { FastifyPluginCallback } from "fastify";
 declare module "fastify" {
   interface FastifyInstance extends SignerMethods {
     /**
+     * Serialize a cookie name-value pair into a Set-Cookie header string
+     * @param name Cookie name
+     * @param value Cookie value
+     * @param opts Options
+     * @throws {TypeError} When maxAge option is invalid
+     */
+    serializeCookie(name: string, value: string, opts?: any): string;
+
+    /**
      * Manual cookie parsing method
      * @docs https://github.com/fastify/fastify-cookie#manual-cookie-parsing
      * @param cookieHeader Raw cookie header value
