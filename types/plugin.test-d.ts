@@ -59,9 +59,12 @@ server.after((_err) => {
     );
   });
 
+  expectType<(value: string) => string>(server.signCookie)
   expectType<(value: string) => fastifyCookieStar.UnsignResult>(server.unsignCookie)
 
   server.get('/', (request, reply) => {
+    expectType<(value: string) => string>(request.signCookie)
+    expectType<(value: string) => string>(reply.signCookie)
     expectType<(value: string) => fastifyCookieStar.UnsignResult>(request.unsignCookie)
     expectType<(value: string) => fastifyCookieStar.UnsignResult>(reply.unsignCookie)
   });

@@ -30,6 +30,12 @@ declare module "fastify" {
 
   interface SignerMethods {
     /**
+     * Signs the specified cookie using the secret/signer provided.
+     * @param value cookie value
+     */
+     signCookie(value: string): string;
+
+    /**
      * Unsigns the specified cookie using the secret/signer provided.
      * @param value Cookie value
      */
