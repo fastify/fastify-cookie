@@ -104,8 +104,7 @@ function plugin (fastify, options, next) {
     return next(new Error('@fastify/cookie: Invalid value provided for the hook-option. You can set the hook-option only to false, \'onRequest\' , \'preParsing\' , \'preValidation\' or \'preHandler\''))
   }
   const isSigner = !secret || (typeof secret.sign === 'function' && typeof secret.unsign === 'function')
-  const algorithm = options.algorithm || 'sha256'
-  const signer = isSigner ? secret : new Signer(secret, algorithm)
+  const signer = isSigner ? secret : new Signer(secret, options.algorithm || 'sha256')
 
   fastify.decorate('serializeCookie', cookie.serialize)
   fastify.decorate('parseCookie', parseCookie)
