@@ -749,6 +749,26 @@ test('cookies set with plugin options parseOptions field', (t) => {
   )
 })
 
+test('create signed cookie manually using signCookie decorator', async (t) => {
+  const fastify = Fastify()
+
+  await fastify.register(plugin, { secret: 'secret' })
+
+  fastify.get('/test1', (req, reply) => {
+    reply.send({
+      unsigned: req.unsignCookie(req.cookies.foo)
+    })
+  })
+
+  const res = await fastify.inject({
+    method: 'GET',
+    url: '/test1',
+    headers: { cookie: `foo=${fastify.signCookie('bar')}` }
+  })
+  t.equal(res.statusCode, 200)
+  t.same(JSON.parse(res.body), { unsigned: { value: 'bar', renew: false, valid: true } })
+})
+
 test('handle secure:auto of cookieOptions', async (t) => {
   const fastify = Fastify()
 

@@ -109,10 +109,13 @@ function plugin (fastify, options, next) {
   fastify.decorate('parseCookie', parseCookie)
 
   if (typeof secret !== 'undefined') {
+    fastify.decorate('signCookie', signCookie)
     fastify.decorate('unsignCookie', unsignCookie)
 
+    fastify.decorateRequest('signCookie', signCookie)
     fastify.decorateRequest('unsignCookie', unsignCookie)
 
+    fastify.decorateReply('signCookie', signCookie)
     fastify.decorateReply('unsignCookie', unsignCookie)
   }
 
@@ -133,6 +136,10 @@ function plugin (fastify, options, next) {
   // ***************************
   function parseCookie (cookieHeader) {
     return cookie.parse(cookieHeader, options.parseOptions)
+  }
+
+  function signCookie (value) {
+    return signer.sign(value)
   }
 
   function unsignCookie (value) {
