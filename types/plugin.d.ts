@@ -2,24 +2,6 @@
 
 import { FastifyPluginCallback } from "fastify";
 
-interface SerializeOptions {
-  /**  The `Domain` attribute. */
-  domain?: string;
-  /**  The expiration `date` used for the `Expires` attribute. If both `expires` and `maxAge` are set, then `expires` is used. */
-  expires?: Date;
-  /**  The `boolean` value of the `HttpOnly` attribute. Defaults to true. */
-  httpOnly?: boolean;
-  /**  A `number` in seconds that specifies the `Expires` attribute by adding the specified seconds to the current date. If both `expires` and `maxAge` are set, then `expires` is used. */
-  maxAge?: number;
-  /**  The `Path` attribute. Defaults to `/` (the root path).  */
-  path?: string;
-  priority?: "low" | "medium" | "high";
-  /** A `boolean` or one of the `SameSite` string attributes. E.g.: `lax`, `none` or `strict`.  */
-  sameSite?: 'lax' | 'none' | 'strict' | boolean;
-  /**  The `boolean` value of the `Secure` attribute. Set this option to false when communicating over an unencrypted (HTTP) connection. Value can be set to `auto`; in this case the `Secure` attribute will be set to false for HTTP request, in case of HTTPS it will be set to true.  Defaults to true. */
-  secure?: boolean;
-}
-
 declare module "fastify" {
   interface FastifyInstance extends SignerMethods {
     /**
@@ -29,7 +11,7 @@ declare module "fastify" {
      * @param opts Options
      * @throws {TypeError} When maxAge option is invalid
      */
-    serializeCookie(name: string, value: string, opts?: SerializeOptions): string;
+    serializeCookie(name: string, value: string, opts?: fastifyCookie.SerializeOptions): string;
 
     /**
      * Manual cookie parsing method
@@ -130,6 +112,24 @@ declare namespace fastifyCookie {
     constructor (secrets: string | Array<string> | Buffer | Array<Buffer>, algorithm?: string)
     sign: (value: string) => string;
     unsign: (input: string) => UnsignResult;
+  }
+
+  export interface SerializeOptions {
+    /**  The `Domain` attribute. */
+    domain?: string;
+    /**  The expiration `date` used for the `Expires` attribute. If both `expires` and `maxAge` are set, then `expires` is used. */
+    expires?: Date;
+    /**  The `boolean` value of the `HttpOnly` attribute. Defaults to true. */
+    httpOnly?: boolean;
+    /**  A `number` in seconds that specifies the `Expires` attribute by adding the specified seconds to the current date. If both `expires` and `maxAge` are set, then `expires` is used. */
+    maxAge?: number;
+    /**  The `Path` attribute. Defaults to `/` (the root path).  */
+    path?: string;
+    priority?: "low" | "medium" | "high";
+    /** A `boolean` or one of the `SameSite` string attributes. E.g.: `lax`, `none` or `strict`.  */
+    sameSite?: 'lax' | 'none' | 'strict' | boolean;
+    /**  The `boolean` value of the `Secure` attribute. Set this option to false when communicating over an unencrypted (HTTP) connection. Value can be set to `auto`; in this case the `Secure` attribute will be set to false for HTTP request, in case of HTTPS it will be set to true.  Defaults to true. */
+    secure?: boolean;
   }
 
   export interface CookieSerializeOptions extends Omit<SerializeOptions, 'secure'> {
