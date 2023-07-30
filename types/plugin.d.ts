@@ -117,6 +117,8 @@ declare namespace fastifyCookie {
   export interface SerializeOptions {
     /**  The `Domain` attribute. */
     domain?: string;
+    /** Specifies a function that will be used to encode a cookie's value. Since value of a cookie has a limited character set (and must be a simple string), this function can be used to encode a value into a string suited for a cookie's value. */
+    encode?(val: string): string;
     /**  The expiration `date` used for the `Expires` attribute. If both `expires` and `maxAge` are set, then `expires` is used. */
     expires?: Date;
     /**  The `boolean` value of the `HttpOnly` attribute. Defaults to true. */
@@ -133,7 +135,6 @@ declare namespace fastifyCookie {
   }
 
   export interface CookieSerializeOptions extends Omit<SerializeOptions, 'secure'> {
-    encode?(val: string): string;
     secure?: boolean | 'auto';
     signed?: boolean;
   }
