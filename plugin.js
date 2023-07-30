@@ -7,14 +7,15 @@ const { Signer, sign, unsign } = require('./signer')
 
 const kReplySetCookies = Symbol('fastify.reply.setCookies')
 
-function fastifyCookieSetCookie (reply, name, value, options, signer) {
+function fastifyCookieSetCookie (reply, name, value, options) {
   const opts = Object.assign({}, options)
+
   if (opts.expires && Number.isInteger(opts.expires)) {
     opts.expires = new Date(opts.expires)
   }
 
   if (opts.signed) {
-    value = signer.sign(value)
+    value = reply.signCookie(value)
   }
 
   if (opts.secure === 'auto') {
@@ -106,6 +107,7 @@ function plugin (fastify, options, next) {
   const algorithm = options.algorithm || 'sha256'
   const signer = isSigner ? secret : new Signer(secret, algorithm)
 
+  fastify.decorate('serializeCookie', cookie.serialize)
   fastify.decorate('parseCookie', parseCookie)
 
   if (typeof secret !== 'undefined') {
@@ -148,7 +150,7 @@ function plugin (fastify, options, next) {
 
   function setCookie (name, value, cookieOptions) {
     const opts = Object.assign({}, options.parseOptions, cookieOptions)
-    return fastifyCookieSetCookie(this, name, value, opts, signer)
+    return fastifyCookieSetCookie(this, name, value, opts)
   }
 
   function clearCookie (name, cookieOptions) {
