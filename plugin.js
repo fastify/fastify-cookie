@@ -70,9 +70,9 @@ function fastifyCookieOnSendHandler (fastifyReq, fastifyRes, payload, done) {
     /* istanbul ignore else */
     if (!setCookie) {
       if (fastifyRes[kReplySetCookies].size === 1) {
-        const c = fastifyRes[kReplySetCookies].values().next().value
-
-        fastifyRes.header('Set-Cookie', cookie.serialize(c.name, c.value, c.opts))
+        for (const c of fastifyRes[kReplySetCookies].values()) {
+          fastifyRes.header('Set-Cookie', cookie.serialize(c.name, c.value, c.opts))
+        }
 
         return done()
       }
