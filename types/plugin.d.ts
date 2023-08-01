@@ -5,6 +5,15 @@ import { FastifyPluginCallback } from "fastify";
 declare module "fastify" {
   interface FastifyInstance extends SignerMethods {
     /**
+     * Serialize a cookie name-value pair into a Set-Cookie header string
+     * @param name Cookie name
+     * @param value Cookie value
+     * @param opts Options
+     * @throws {TypeError} When maxAge option is invalid
+     */
+    serializeCookie(name: string, value: string, opts?: fastifyCookie.SerializeOptions): string;
+
+    /**
      * Manual cookie parsing method
      * @docs https://github.com/fastify/fastify-cookie#manual-cookie-parsing
      * @param cookieHeader Raw cookie header value
@@ -105,9 +114,10 @@ declare namespace fastifyCookie {
     unsign: (input: string) => UnsignResult;
   }
 
-  export interface CookieSerializeOptions {
+  export interface SerializeOptions {
     /**  The `Domain` attribute. */
     domain?: string;
+    /** Specifies a function that will be used to encode a cookie's value. Since value of a cookie has a limited character set (and must be a simple string), this function can be used to encode a value into a string suited for a cookie's value. */
     encode?(val: string): string;
     /**  The expiration `date` used for the `Expires` attribute. If both `expires` and `maxAge` are set, then `expires` is used. */
     expires?: Date;
@@ -121,6 +131,10 @@ declare namespace fastifyCookie {
     /** A `boolean` or one of the `SameSite` string attributes. E.g.: `lax`, `none` or `strict`.  */
     sameSite?: 'lax' | 'none' | 'strict' | boolean;
     /**  The `boolean` value of the `Secure` attribute. Set this option to false when communicating over an unencrypted (HTTP) connection. Value can be set to `auto`; in this case the `Secure` attribute will be set to false for HTTP request, in case of HTTPS it will be set to true.  Defaults to true. */
+    secure?: boolean;
+  }
+
+  export interface CookieSerializeOptions extends Omit<SerializeOptions, 'secure'> {
     secure?: boolean | 'auto';
     signed?: boolean;
   }

@@ -1,3 +1,2 @@
-100: true
-check-coverage: true
-coverage: true
+files:
+  - test/**/*.test.js

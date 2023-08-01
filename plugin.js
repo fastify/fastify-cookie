@@ -5,14 +5,17 @@ const cookie = require('cookie')
 
 const { Signer, sign, unsign } = require('./signer')
 
-function fastifyCookieSetCookie (reply, name, value, options, signer) {
+const kReplySetCookies = Symbol('fastify.reply.setCookies')
+
+function fastifyCookieSetCookie (reply, name, value, options) {
   const opts = Object.assign({}, options)
+
   if (opts.expires && Number.isInteger(opts.expires)) {
     opts.expires = new Date(opts.expires)
   }
 
   if (opts.signed) {
-    value = signer.sign(value)
+    value = reply.signCookie(value)
   }
 
   if (opts.secure === 'auto') {
@@ -24,20 +27,8 @@ function fastifyCookieSetCookie (reply, name, value, options, signer) {
     }
   }
 
-  const serialized = cookie.serialize(name, value, opts)
-  let setCookie = reply.getHeader('Set-Cookie')
-  if (!setCookie) {
-    reply.header('Set-Cookie', serialized)
-    return reply
-  }
+  reply[kReplySetCookies].set(`${name};${opts.domain};${opts.path || '/'}`, { name, value, opts })
 
-  if (typeof setCookie === 'string') {
-    setCookie = [setCookie]
-  }
-
-  setCookie.push(serialized)
-  reply.removeHeader('Set-Cookie')
-  reply.header('Set-Cookie', setCookie)
   return reply
 }
 
@@ -58,6 +49,7 @@ function onReqHandlerWrapper (fastify, hook) {
       if (cookieHeader) {
         fastifyReq.cookies = fastify.parseCookie(cookieHeader)
       }
+      fastifyRes[kReplySetCookies] = new Map()
       done()
     }
     : function fastifyCookieHandler (fastifyReq, fastifyRes, done) {
@@ -66,8 +58,39 @@ function onReqHandlerWrapper (fastify, hook) {
       if (cookieHeader) {
         fastifyReq.cookies = fastify.parseCookie(cookieHeader)
       }
+      fastifyRes[kReplySetCookies] = new Map()
       done()
     }
+}
+
+function fastifyCookieOnSendHandler (fastifyReq, fastifyRes, payload, done) {
+  if (fastifyRes[kReplySetCookies].size) {
+    let setCookie = fastifyRes.getHeader('Set-Cookie')
+
+    /* istanbul ignore else */
+    if (setCookie === undefined) {
+      if (fastifyRes[kReplySetCookies].size === 1) {
+        for (const c of fastifyRes[kReplySetCookies].values()) {
+          fastifyRes.header('Set-Cookie', cookie.serialize(c.name, c.value, c.opts))
+        }
+
+        return done()
+      }
+
+      setCookie = []
+    } else if (typeof setCookie === 'string') {
+      setCookie = [setCookie]
+    }
+
+    for (const c of fastifyRes[kReplySetCookies].values()) {
+      setCookie.push(cookie.serialize(c.name, c.value, c.opts))
+    }
+
+    fastifyRes.removeHeader('Set-Cookie')
+    fastifyRes.header('Set-Cookie', setCookie)
+  }
+
+  done()
 }
 
 function getHook (hook = 'onRequest') {
@@ -89,9 +112,9 @@ function plugin (fastify, options, next) {
     return next(new Error('@fastify/cookie: Invalid value provided for the hook-option. You can set the hook-option only to false, \'onRequest\' , \'preParsing\' , \'preValidation\' or \'preHandler\''))
   }
   const isSigner = !secret || (typeof secret.sign === 'function' && typeof secret.unsign === 'function')
-  const algorithm = options.algorithm || 'sha256'
-  const signer = isSigner ? secret : new Signer(secret, algorithm)
+  const signer = isSigner ? secret : new Signer(secret, options.algorithm || 'sha256')
 
+  fastify.decorate('serializeCookie', cookie.serialize)
   fastify.decorate('parseCookie', parseCookie)
 
   if (typeof secret !== 'undefined') {
@@ -106,13 +129,15 @@ function plugin (fastify, options, next) {
   }
 
   fastify.decorateRequest('cookies', null)
-  fastify.decorateReply('cookie', setCookie)
+  fastify.decorateReply(kReplySetCookies, null)
 
+  fastify.decorateReply('cookie', setCookie)
   fastify.decorateReply('setCookie', setCookie)
   fastify.decorateReply('clearCookie', clearCookie)
 
   if (hook) {
     fastify.addHook(hook, onReqHandlerWrapper(fastify, hook))
+    fastify.addHook('onSend', fastifyCookieOnSendHandler)
   }
 
   next()
@@ -132,7 +157,7 @@ function plugin (fastify, options, next) {
 
   function setCookie (name, value, cookieOptions) {
     const opts = Object.assign({}, options.parseOptions, cookieOptions)
-    return fastifyCookieSetCookie(this, name, value, opts, signer)
+    return fastifyCookieSetCookie(this, name, value, opts)
   }
 
   function clearCookie (name, cookieOptions) {

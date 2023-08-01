@@ -5,14 +5,14 @@
   "main": "plugin.js",
   "types": "types/plugin.d.ts",
   "scripts": {
+    "coverage": "npm run test:unit -- --coverage-report=html",
     "lint": "standard | snazzy",
     "lint:ci": "standard",
     "lint:fix": "standard --fix",
-    "test": "npm run unit && npm run typescript",
-    "typescript": "tsd",
-    "unit": "tap -J \"test/*.test.js\"",
-    "unit:report": "npm run unit -- --coverage-report=html",
-    "unit:verbose": "npm run unit -- -Rspec"
+    "test": "npm run test:unit && npm run test:typescript",
+    "test:typescript": "tsd",
+    "test:unit": "tap",
+    "test:unit:verbose": "npm run test:unit -- -Rspec"
   },
   "precommit": [
     "lint",

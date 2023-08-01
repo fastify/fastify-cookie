@@ -39,6 +39,10 @@ const server = fastify();
 server.register(cookie);
 
 server.after((_err) => {
+  expectType< string >(
+    server.serializeCookie('sessionId', 'aYb4uTIhdBXC')
+  );
+
   expectType<{ [key: string]: string }>(
     // See https://github.com/fastify/fastify-cookie#manual-cookie-parsing
     server.parseCookie('sessionId=aYb4uTIhdBXC')
