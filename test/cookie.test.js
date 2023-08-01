@@ -1156,3 +1156,34 @@ test('should update a cookie value when setCookie is called multiple times (non-
     t.ok(new Date(cookies[1].expires) < new Date())
   })
 })
+
+test('cookies get set correctly if set inside onSend', (t) => {
+  t.plan(7)
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  fastify.addHook('onSend', async (req, reply, payload) => {
+    reply.setCookie('foo', 'foo', { path: '/' })
+    return payload
+  })
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.equal(cookies.length, 1)
+    t.equal(cookies[0].name, 'foo')
+    t.equal(cookies[0].value, 'foo')
+    t.equal(cookies[0].path, '/')
+  })
+})

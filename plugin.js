@@ -8,6 +8,11 @@ const { Signer, sign, unsign } = require('./signer')
 const kReplySetCookies = Symbol('fastify.reply.setCookies')
 
 function fastifyCookieSetCookie (reply, name, value, options) {
+  let sendHeaders = false
+  if (reply[kReplySetCookies] === null) {
+    sendHeaders = true
+    reply[kReplySetCookies] = new Map()
+  }
   const opts = Object.assign({}, options)
 
   if (opts.expires && Number.isInteger(opts.expires)) {
@@ -28,6 +33,10 @@ function fastifyCookieSetCookie (reply, name, value, options) {
   }
 
   reply[kReplySetCookies].set(`${name};${opts.domain};${opts.path || '/'}`, { name, value, opts })
+
+  if (sendHeaders) {
+    setCookies(reply)
+  }
 
   return reply
 }
@@ -63,32 +72,40 @@ function onReqHandlerWrapper (fastify, hook) {
     }
 }
 
-function fastifyCookieOnSendHandler (fastifyReq, fastifyRes, payload, done) {
-  if (fastifyRes[kReplySetCookies].size) {
-    let setCookie = fastifyRes.getHeader('Set-Cookie')
+function setCookies (reply) {
+  let setCookie = reply.getHeader('Set-Cookie')
 
-    /* istanbul ignore else */
-    if (setCookie === undefined) {
-      if (fastifyRes[kReplySetCookies].size === 1) {
-        for (const c of fastifyRes[kReplySetCookies].values()) {
-          fastifyRes.header('Set-Cookie', cookie.serialize(c.name, c.value, c.opts))
-        }
-
-        return done()
+  /* istanbul ignore else */
+  if (setCookie === undefined) {
+    if (reply[kReplySetCookies].size === 1) {
+      for (const c of reply[kReplySetCookies].values()) {
+        reply.header('Set-Cookie', cookie.serialize(c.name, c.value, c.opts))
       }
 
-      setCookie = []
-    } else if (typeof setCookie === 'string') {
-      setCookie = [setCookie]
+      return
     }
 
-    for (const c of fastifyRes[kReplySetCookies].values()) {
-      setCookie.push(cookie.serialize(c.name, c.value, c.opts))
-    }
-
-    fastifyRes.removeHeader('Set-Cookie')
-    fastifyRes.header('Set-Cookie', setCookie)
+    setCookie = []
+  } else if (typeof setCookie === 'string') {
+    setCookie = [setCookie]
   }
+
+  for (const c of reply[kReplySetCookies].values()) {
+    setCookie.push(cookie.serialize(c.name, c.value, c.opts))
+  }
+
+  reply.removeHeader('Set-Cookie')
+  reply.header('Set-Cookie', setCookie)
+}
+
+function fastifyCookieOnSendHandler (fastifyReq, fastifyRes, payload, done) {
+  if (fastifyRes[kReplySetCookies].size) {
+    setCookies(fastifyRes)
+  }
+
+  // Explicitly set the property to null so that we can
+  // check if the header was already set
+  fastifyRes[kReplySetCookies] = null
 
   done()
 }
