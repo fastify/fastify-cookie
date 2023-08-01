@@ -1187,3 +1187,42 @@ test('cookies get set correctly if set inside onSend', (t) => {
     t.equal(cookies[0].path, '/')
   })
 })
+
+test('cookies get set correctly if set inside multiple onSends', (t) => {
+  t.plan(10)
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  fastify.addHook('onSend', async (req, reply, payload) => {
+    reply.setCookie('foo', 'foo', { path: '/' })
+  })
+
+  fastify.addHook('onSend', async (req, reply, payload) => {
+    reply.setCookie('foo', 'foos', { path: '/' })
+    return payload
+  })
+
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.equal(cookies.length, 2)
+    t.equal(cookies[0].name, 'foo')
+    t.equal(cookies[0].value, 'foo')
+    t.equal(cookies[0].path, '/')
+
+    t.equal(cookies[1].name, 'foo')
+    t.equal(cookies[1].value, 'foos')
+    t.equal(cookies[1].path, '/')
+  })
+})

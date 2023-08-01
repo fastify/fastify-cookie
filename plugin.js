@@ -13,6 +13,7 @@ function fastifyCookieSetCookie (reply, name, value, options) {
     sendHeaders = true
     reply[kReplySetCookies] = new Map()
   }
+
   const opts = Object.assign({}, options)
 
   if (opts.expires && Number.isInteger(opts.expires)) {
@@ -36,6 +37,7 @@ function fastifyCookieSetCookie (reply, name, value, options) {
 
   if (sendHeaders) {
     setCookies(reply)
+    reply[kReplySetCookies] = null
   }
 
   return reply
