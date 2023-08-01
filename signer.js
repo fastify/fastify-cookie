@@ -24,7 +24,8 @@ function Signer (secrets, algorithm = 'sha256') {
 }
 
 function validateSecrets (secrets) {
-  for (const secret of secrets) {
+  for (let i = 0; i < secrets.length; ++i) {
+    const secret = secrets[i]
     if (typeof secret !== 'string' && Buffer.isBuffer(secret) === false) {
       throw new TypeError('Secret key must be a string or Buffer.')
     }
@@ -59,7 +60,8 @@ function _unsign (signedValue, secrets, algorithm) {
   const value = signedValue.slice(0, signedValue.lastIndexOf('.'))
   const actual = Buffer.from(signedValue.slice(signedValue.lastIndexOf('.') + 1))
 
-  for (const secret of secrets) {
+  for (let i = 0; i < secrets.length; ++i) {
+    const secret = secrets[i]
     const expected = Buffer.from(crypto
       .createHmac(algorithm, secret)
       .update(value)
