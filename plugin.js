@@ -6,13 +6,9 @@ const cookie = require('cookie')
 const { Signer, sign, unsign } = require('./signer')
 
 const kReplySetCookies = Symbol('fastify.reply.setCookies')
+const kReplySetCookiesHookRan = Symbol('fastify.reply.setCookiesHookRan')
 
 function fastifyCookieSetCookie (reply, name, value, options) {
-  let sendHeaders = false
-  if (reply[kReplySetCookies] === null) {
-    sendHeaders = true
-    reply[kReplySetCookies] = new Map()
-  }
   const opts = Object.assign({}, options)
 
   if (opts.expires && Number.isInteger(opts.expires)) {
@@ -34,8 +30,9 @@ function fastifyCookieSetCookie (reply, name, value, options) {
 
   reply[kReplySetCookies].set(`${name};${opts.domain};${opts.path || '/'}`, { name, value, opts })
 
-  if (sendHeaders) {
+  if (reply[kReplySetCookiesHookRan]) {
     setCookies(reply)
+    reply[kReplySetCookies].clear()
   }
 
   return reply
@@ -103,9 +100,8 @@ function fastifyCookieOnSendHandler (fastifyReq, fastifyRes, payload, done) {
     setCookies(fastifyRes)
   }
 
-  // Explicitly set the property to null so that we can
-  // check if the header was already set
-  fastifyRes[kReplySetCookies] = null
+  fastifyRes[kReplySetCookies].clear()
+  fastifyRes[kReplySetCookiesHookRan] = true
 
   done()
 }
@@ -147,6 +143,7 @@ function plugin (fastify, options, next) {
 
   fastify.decorateRequest('cookies', null)
   fastify.decorateReply(kReplySetCookies, null)
+  fastify.decorateReply(kReplySetCookiesHookRan, false)
 
   fastify.decorateReply('cookie', setCookie)
   fastify.decorateReply('setCookie', setCookie)
