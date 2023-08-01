@@ -98,9 +98,9 @@ function setCookies (reply) {
 function fastifyCookieOnSendHandler (fastifyReq, fastifyRes, payload, done) {
   if (fastifyRes[kReplySetCookies].size) {
     setCookies(fastifyRes)
+    fastifyRes[kReplySetCookies].clear()
   }
 
-  fastifyRes[kReplySetCookies].clear()
   fastifyRes[kReplySetCookiesHookRan] = true
 
   done()
