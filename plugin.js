@@ -56,7 +56,6 @@ function onReqHandlerWrapper (fastify, hook) {
         fastifyReq.cookies = fastify.parseCookie(cookieHeader)
       }
       fastifyRes[kReplySetCookies] = new Map()
-      fastifyRes[kReplySetCookiesHookRan] = false
       done()
     }
     : function fastifyCookieHandler (fastifyReq, fastifyRes, done) {
@@ -66,7 +65,6 @@ function onReqHandlerWrapper (fastify, hook) {
         fastifyReq.cookies = fastify.parseCookie(cookieHeader)
       }
       fastifyRes[kReplySetCookies] = new Map()
-      fastifyRes[kReplySetCookiesHookRan] = false
       done()
     }
 }
