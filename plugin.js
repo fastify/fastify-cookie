@@ -6,7 +6,7 @@ const cookie = require('cookie')
 const { Signer, sign, unsign } = require('./signer')
 
 const kReplySetCookies = Symbol('fastify.reply.setCookies')
-const kReplySetCookiesHookRan = Symbol('fastify.reply.setCookiesOnSendRan')
+const kReplySetCookiesHookRan = Symbol('fastify.reply.setCookiesHookRan')
 
 function fastifyCookieSetCookie (reply, name, value, options) {
   const opts = Object.assign({}, options)
