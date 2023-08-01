@@ -32,7 +32,6 @@ function fastifyCookieSetCookie (reply, name, value, options) {
 
   if (reply[kReplySetCookiesHookRan]) {
     setCookies(reply)
-    reply[kReplySetCookies].clear()
   }
 
   return reply
@@ -71,9 +70,10 @@ function onReqHandlerWrapper (fastify, hook) {
 
 function setCookies (reply) {
   let setCookie = reply.getHeader('Set-Cookie')
+  const setCookieIsUndefined = setCookie === undefined
 
   /* istanbul ignore else */
-  if (setCookie === undefined) {
+  if (setCookieIsUndefined) {
     if (reply[kReplySetCookies].size === 1) {
       for (const c of reply[kReplySetCookies].values()) {
         reply.header('Set-Cookie', cookie.serialize(c.name, c.value, c.opts))
@@ -91,14 +91,14 @@ function setCookies (reply) {
     setCookie.push(cookie.serialize(c.name, c.value, c.opts))
   }
 
-  reply.removeHeader('Set-Cookie')
+  if (!setCookieIsUndefined) reply.removeHeader('Set-Cookie')
   reply.header('Set-Cookie', setCookie)
+  reply[kReplySetCookies].clear()
 }
 
 function fastifyCookieOnSendHandler (fastifyReq, fastifyRes, payload, done) {
   if (fastifyRes[kReplySetCookies].size) {
     setCookies(fastifyRes)
-    fastifyRes[kReplySetCookies].clear()
   }
 
   fastifyRes[kReplySetCookiesHookRan] = true
