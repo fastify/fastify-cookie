@@ -79,6 +79,8 @@ function setCookies (reply) {
         reply.header('Set-Cookie', cookie.serialize(c.name, c.value, c.opts))
       }
 
+      reply[kReplySetCookies].clear()
+
       return
     }
 
