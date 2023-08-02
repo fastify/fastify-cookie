@@ -102,6 +102,11 @@ function setCookies (reply) {
 }
 
 function fastifyCookieOnSendHandler (fastifyReq, fastifyRes, payload, done) {
+  if (!fastifyRes[kReplySetCookies]) {
+    done()
+    return
+  }
+
   if (fastifyRes[kReplySetCookies].size) {
     setCookies(fastifyRes)
   }

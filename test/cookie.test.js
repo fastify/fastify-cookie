@@ -1252,3 +1252,25 @@ test('cookies get set correctly if set inside onRequest', (t) => {
     t.equal(cookies[0].path, '/')
   })
 })
+
+test('do not crash if the onRequest hook is not run', (t) => {
+  t.plan(3)
+  const fastify = Fastify()
+  fastify.addHook('onRequest', async (req, reply) => {
+    return reply.send({ hello: 'world' })
+  })
+
+  fastify.register(plugin)
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1',
+    headers: {
+      cookie: 'foo=foo'
+    }
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+  })
+})
