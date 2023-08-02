@@ -9,6 +9,8 @@ const kReplySetCookies = Symbol('fastify.reply.setCookies')
 const kReplySetCookiesHookRan = Symbol('fastify.reply.setCookiesHookRan')
 
 function fastifyCookieSetCookie (reply, name, value, options) {
+  parseCookies(reply.context.server, reply.request, reply)
+
   const opts = Object.assign({}, options)
 
   if (opts.expires && Number.isInteger(opts.expires)) {
@@ -46,24 +48,25 @@ function fastifyCookieClearCookie (reply, name, options) {
   return fastifyCookieSetCookie(reply, name, '', opts)
 }
 
+function parseCookies (fastify, request, reply) {
+  if (reply[kReplySetCookies]) return
+
+  request.cookies = {} // New container per request. Issue #53
+  const cookieHeader = request.raw.headers.cookie
+  if (cookieHeader) {
+    request.cookies = fastify.parseCookie(cookieHeader)
+  }
+  reply[kReplySetCookies] = new Map()
+}
+
 function onReqHandlerWrapper (fastify, hook) {
   return hook === 'preParsing'
     ? function fastifyCookieHandler (fastifyReq, fastifyRes, payload, done) {
-      fastifyReq.cookies = {} // New container per request. Issue #53
-      const cookieHeader = fastifyReq.raw.headers.cookie
-      if (cookieHeader) {
-        fastifyReq.cookies = fastify.parseCookie(cookieHeader)
-      }
-      fastifyRes[kReplySetCookies] = new Map()
+      parseCookies(fastify, fastifyReq, fastifyRes)
       done()
     }
     : function fastifyCookieHandler (fastifyReq, fastifyRes, done) {
-      fastifyReq.cookies = {} // New container per request. Issue #53
-      const cookieHeader = fastifyReq.raw.headers.cookie
-      if (cookieHeader) {
-        fastifyReq.cookies = fastify.parseCookie(cookieHeader)
-      }
-      fastifyRes[kReplySetCookies] = new Map()
+      parseCookies(fastify, fastifyReq, fastifyRes)
       done()
     }
 }
