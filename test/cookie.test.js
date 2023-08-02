@@ -1226,3 +1226,29 @@ test('cookies get set correctly if set inside multiple onSends', (t) => {
     t.equal(cookies[1].path, '/')
   })
 })
+
+test('cookies get set correctly if set inside onRequest', (t) => {
+  t.plan(7)
+  const fastify = Fastify()
+  fastify.addHook('onRequest', async (req, reply) => {
+    reply.setCookie('foo', 'foo', { path: '/' })
+    return reply.send({ hello: 'world' })
+  })
+
+  fastify.register(plugin)
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.equal(cookies.length, 1)
+    t.equal(cookies[0].name, 'foo')
+    t.equal(cookies[0].value, 'foo')
+    t.equal(cookies[0].path, '/')
+  })
+})
