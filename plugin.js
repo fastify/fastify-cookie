@@ -9,7 +9,7 @@ const kReplySetCookies = Symbol('fastify.reply.setCookies')
 const kReplySetCookiesHookRan = Symbol('fastify.reply.setCookiesHookRan')
 
 function fastifyCookieSetCookie (reply, name, value, options) {
-  parseCookies(reply.context.server, reply.request, reply)
+  parseCookies(reply.server, reply.request, reply)
 
   const opts = Object.assign({}, options)
 
@@ -51,11 +51,9 @@ function fastifyCookieClearCookie (reply, name, options) {
 function parseCookies (fastify, request, reply) {
   if (reply[kReplySetCookies]) return
 
-  request.cookies = {} // New container per request. Issue #53
   const cookieHeader = request.raw.headers.cookie
-  if (cookieHeader) {
-    request.cookies = fastify.parseCookie(cookieHeader)
-  }
+
+  request.cookies = cookieHeader ? fastify.parseCookie(cookieHeader) : {} // New container per request. Issue #53
   reply[kReplySetCookies] = new Map()
 }
 
@@ -114,18 +112,6 @@ function fastifyCookieOnSendHandler (fastifyReq, fastifyRes, payload, done) {
   fastifyRes[kReplySetCookiesHookRan] = true
 
   done()
-}
-
-function getHook (hook = 'onRequest') {
-  const hooks = {
-    onRequest: 'onRequest',
-    preParsing: 'preParsing',
-    preValidation: 'preValidation',
-    preHandler: 'preHandler',
-    [false]: false
-  }
-
-  return hooks[hook]
 }
 
 function plugin (fastify, options, next) {
@@ -188,6 +174,18 @@ function plugin (fastify, options, next) {
     const opts = Object.assign({}, options.parseOptions, cookieOptions)
     return fastifyCookieClearCookie(this, name, opts)
   }
+}
+
+function getHook (hook = 'onRequest') {
+  const hooks = {
+    onRequest: 'onRequest',
+    preParsing: 'preParsing',
+    preValidation: 'preValidation',
+    preHandler: 'preHandler',
+    [false]: false
+  }
+
+  return hooks[hook]
 }
 
 function isConnectionSecure (request) {
