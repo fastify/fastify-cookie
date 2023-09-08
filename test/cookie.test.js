@@ -1,7 +1,6 @@
 'use strict'
 
-const tap = require('tap')
-const test = tap.test
+const { test } = require('tap')
 const Fastify = require('fastify')
 const sinon = require('sinon')
 const { sign, unsign } = require('../signer')

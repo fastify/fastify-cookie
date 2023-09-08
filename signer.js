@@ -6,7 +6,7 @@
 // The MIT License
 // Copyright (c) 2012–2022 LearnBoost <tj@learnboost.com> and other contributors;
 
-const crypto = require('crypto')
+const crypto = require('node:crypto')
 
 const base64PaddingRE = /=/g
 
