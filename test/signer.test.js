@@ -2,7 +2,7 @@
 
 const { test } = require('tap')
 const sinon = require('sinon')
-const crypto = require('crypto')
+const crypto = require('node:crypto')
 const { Signer, sign, unsign } = require('../signer')
 
 test('default', t => {
