@@ -210,15 +210,9 @@ const fastifyCookie = fp(plugin, {
  * - `import { fastifyCookie } from 'fastify-cookie'`
  * - `import fastifyCookie from 'fastify-cookie'`
  */
-fastifyCookie.signerFactory = Signer
-fastifyCookie.fastifyCookie = fastifyCookie
-fastifyCookie.default = fastifyCookie
 module.exports = fastifyCookie
-
-fastifyCookie.fastifyCookie.signerFactory = Signer
-fastifyCookie.fastifyCookie.Signer = Signer
-fastifyCookie.fastifyCookie.sign = sign
-fastifyCookie.fastifyCookie.unsign = unsign
+module.exports.default = fastifyCookie // supersedes fastifyCookie.default = fastifyCookie
+module.exports.fastifyCookie = fastifyCookie // supersedes fastifyCookie.fastifyCookie = fastifyCookie
 
 module.exports.signerFactory = Signer
 module.exports.Signer = Signer
