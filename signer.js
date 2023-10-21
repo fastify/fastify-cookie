@@ -8,7 +8,7 @@
 
 const crypto = require('node:crypto')
 
-const base64PaddingRE = /=/g
+const base64PaddingRE = /=/gu
 
 function Signer (secrets, algorithm = 'sha256') {
   if (!(this instanceof Signer)) {
