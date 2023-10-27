@@ -3,6 +3,7 @@
   "version": "9.1.0",
   "description": "Plugin for fastify to add support for cookies",
   "main": "plugin.js",
+  "type": "commonjs",
   "types": "types/plugin.d.ts",
   "scripts": {
     "coverage": "npm run test:unit -- --coverage-report=html",
