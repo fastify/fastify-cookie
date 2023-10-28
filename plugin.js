@@ -126,7 +126,7 @@ function plugin (fastify, options, next) {
   fastify.decorate('serializeCookie', cookie.serialize)
   fastify.decorate('parseCookie', parseCookie)
 
-  if (typeof secret !== 'undefined') {
+  if (secret !== undefined) {
     fastify.decorate('signCookie', signCookie)
     fastify.decorate('unsignCookie', unsignCookie)
 
