@@ -95,7 +95,7 @@ function parse (str, options) {
     const key = str.substring(pos, eqIdx++).trim()
 
     // only assign once
-    if (undefined === result[key]) {
+    if (result[key] === undefined) {
       const val = (str.charCodeAt(eqIdx) === 0x22)
         ? str.substring(eqIdx + 1, terminatorPos - 1).trim()
         : str.substring(eqIdx, terminatorPos).trim()
@@ -181,6 +181,10 @@ function serialize (name, val, options) {
 
   if (opt.secure) {
     str += '; Secure'
+  }
+
+  if (opt.partitioned) {
+    str += '; Partitioned'
   }
 
   if (opt.sameSite) {

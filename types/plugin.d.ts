@@ -125,9 +125,9 @@ declare namespace fastifyCookie {
     httpOnly?: boolean;
     /**  A `number` in seconds that specifies the `Expires` attribute by adding the specified seconds to the current date. If both `expires` and `maxAge` are set, then `expires` is used. */
     maxAge?: number;
+    partitioned?: boolean;
     /**  The `Path` attribute. Defaults to `/` (the root path).  */
     path?: string;
-    priority?: "low" | "medium" | "high";
     /** A `boolean` or one of the `SameSite` string attributes. E.g.: `lax`, `none` or `strict`.  */
     sameSite?: 'lax' | 'none' | 'strict' | boolean;
     /**  The `boolean` value of the `Secure` attribute. Set this option to false when communicating over an unencrypted (HTTP) connection. Value can be set to `auto`; in this case the `Secure` attribute will be set to false for HTTP request, in case of HTTPS it will be set to true.  Defaults to true. */
