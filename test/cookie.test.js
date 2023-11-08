@@ -93,14 +93,16 @@ test('should set multiple cookies', (t) => {
 })
 
 test('should set multiple cookies', (t) => {
-  t.plan(11)
+  t.plan(12)
   const fastify = Fastify()
   fastify.register(plugin)
 
   fastify.get('/', (req, reply) => {
     reply
       .setCookie('foo', 'foo')
-      .cookie('bar', 'test')
+      .cookie('bar', 'test', {
+        partitioned: true
+      })
       .setCookie('wee', 'woo', {
         partitioned: true,
         secure: true
@@ -125,6 +127,7 @@ test('should set multiple cookies', (t) => {
     t.equal(cookies[2].name, 'wee')
     t.equal(cookies[2].value, 'woo')
 
+    t.equal(res.headers['set-cookie'][1], 'bar=test; Partitioned')
     t.equal(res.headers['set-cookie'][2], 'wee=woo; Secure; Partitioned')
   })
 })
