@@ -183,6 +183,8 @@ function serialize (name, val, options) {
     str += '; Secure'
   }
 
+  // Draft implementation to support Chrome from 2024-Q1 forward.
+  // See https://datatracker.ietf.org/doc/html/draft-cutler-httpbis-partitioned-cookies#section-2.1
   if (opt.partitioned) {
     str += '; Partitioned'
   }
