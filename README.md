@@ -78,6 +78,7 @@ app.register(cookie, {
   - More sophisticated cookie signing mechanisms can be implemented by supplying an `Object`. Read more about it in [Custom cookie signer](#custom-cookie-signer).
 
 - `parseOptions`: An `Object` to pass as options to [cookie parse](https://github.com/jshttp/cookie#cookieparsestr-options).
+  - **Note:** The experimental `partitioned` option can be enabled in order to set the non-standard [Partitioned attribute](https://datatracker.ietf.org/doc/html/draft-cutler-httpbis-partitioned-cookies#name-the-partitioned-attribute). The reason for its existence is to support Chrome's [upcoming changes](https://github.com/fastify/fastify-cookie/pull/261#issuecomment-1803234334).
 
 ## API
 
