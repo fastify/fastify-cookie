@@ -128,7 +128,7 @@ Specifies the `boolean` value for the [`Partitioned` `Set-Cookie`](rfc-cutler-ht
 attribute. When truthy, the `Partitioned` attribute is set, otherwise it is not. By default, the
 `Partitioned` attribute is not set.
 
-**Note:** This is an attribute that has not yet been fully standardized, and may change in the future.
+⚠️ **Warning:** This is an attribute that has not yet been fully standardized, and may change in the future without reflecting the semver versioning.
 This also means many clients may ignore this attribute until they understand it.
 
 More information about can be found in [the proposal](https://github.com/privacycg/CHIPS).
