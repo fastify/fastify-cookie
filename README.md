@@ -83,7 +83,7 @@ app.register(cookie, {
 
 ##### domain
 
-Specifies the value for the [`Domain` `Set-Cookie` attribute][rfc-6265-5.2.3]. By default, no
+Specifies the value for the [`Domain` `Set-Cookie` attribute](https://datatracker.ietf.org/doc/html/rfc6265#section-5.2.3). By default, no
 domain is set, and most clients will consider the cookie to apply to only the current domain.
 
 ##### encode
@@ -97,17 +97,17 @@ into UTF-8 byte sequences and then URL-encode any that fall outside of the cooki
 
 ##### expires
 
-Specifies the `Date` object to be the value for the [`Expires` `Set-Cookie` attribute][rfc-6265-5.2.1].
+Specifies the `Date` object to be the value for the [`Expires` `Set-Cookie` attribute](https://datatracker.ietf.org/doc/html/rfc6265#section-5.2.1).
 By default, no expiration is set, and most clients will consider this a "non-persistent cookie" and
 will delete it on a condition like exiting a web browser application.
 
-**Note:** the [cookie storage model specification][rfc-6265-5.3] states that if both `expires` and
+**Note:** the [cookie storage model specification](https://datatracker.ietf.org/doc/html/rfc6265#section-5.3) states that if both `expires` and
 `maxAge` are set, then `maxAge` takes precedence, but it is possible not all clients by obey this,
 so if both are set, they should point to the same date and time.
 
 ##### httpOnly
 
-Specifies the `boolean` value for the [`HttpOnly` `Set-Cookie` attribute][rfc-6265-5.2.6]. When truthy,
+Specifies the `boolean` value for the [`HttpOnly` `Set-Cookie` attribute](https://datatracker.ietf.org/doc/html/rfc6265#section-5.2.6). When truthy,
 the `HttpOnly` attribute is set, otherwise it is not. By default, the `HttpOnly` attribute is not set.
 
 **Note:** be careful when setting this to `true`, as compliant clients will not allow client-side
@@ -115,32 +115,32 @@ JavaScript to see the cookie in `document.cookie`.
 
 ##### maxAge
 
-Specifies the `number` (in seconds) to be the value for the [`Max-Age` `Set-Cookie` attribute][rfc-6265-5.2.2].
+Specifies the `number` (in seconds) to be the value for the [`Max-Age` `Set-Cookie` attribute](https://datatracker.ietf.org/doc/html/rfc6265#section-5.2.2).
 The given number will be converted to an integer by rounding down. By default, no maximum age is set.
 
-**Note:** the [cookie storage model specification][rfc-6265-5.3] states that if both `expires` and
+**Note:** the [cookie storage model specification](https://datatracker.ietf.org/doc/html/rfc6265#section-5.3) states that if both `expires` and
 `maxAge` are set, then `maxAge` takes precedence, but it is possible not all clients by obey this,
 so if both are set, they should point to the same date and time.
 
 ##### partitioned
 
-Specifies the `boolean` value for the [`Partitioned` `Set-Cookie`](rfc-cutler-httpbis-partitioned-cookies)
+Specifies the `boolean` value for the [`Partitioned` `Set-Cookie`](https://datatracker.ietf.org/doc/html/draft-cutler-httpbis-partitioned-cookies#section-2.1)
 attribute. When truthy, the `Partitioned` attribute is set, otherwise it is not. By default, the
 `Partitioned` attribute is not set.
 
 ⚠️ **Warning:** This is an attribute that has not yet been fully standardized, and may change in the future without reflecting the semver versioning.
-This also means many clients may ignore this attribute until they understand it.
+This also means many clients may ignore the attribute until they understand it.
 
 More information about can be found in [the proposal](https://github.com/privacycg/CHIPS).
 
 ##### path
 
-Specifies the value for the [`Path` `Set-Cookie` attribute][rfc-6265-5.2.4]. By default, the path
-is considered the ["default path"][rfc-6265-5.1.4].
+Specifies the value for the [`Path` `Set-Cookie` attribute](https://datatracker.ietf.org/doc/html/rfc6265#section-5.2.4). By default, the path
+is considered the ["default path"](https://datatracker.ietf.org/doc/html/rfc6265#section-5.1.4).
 
 ##### sameSite
 
-Specifies the `boolean` or `string` to be the value for the [`SameSite` `Set-Cookie` attribute][rfc-6265bis-09-5.4.7].
+Specifies the `boolean` or `string` to be the value for the [`SameSite` `Set-Cookie` attribute](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-09#section-5.4.7).
 
   - `true` will set the `SameSite` attribute to `Strict` for strict same site enforcement.
   - `false` will not set the `SameSite` attribute.
@@ -149,14 +149,14 @@ Specifies the `boolean` or `string` to be the value for the [`SameSite` `Set-Coo
   - `'strict'` will set the `SameSite` attribute to `Strict` for strict same site enforcement.
 
 More information about the different enforcement levels can be found in
-[the specification][rfc-6265bis-09-5.4.7].
+[the specification](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-09#section-5.4.7).
 
 **Note:** This is an attribute that has not yet been fully standardized, and may change in the future.
 This also means many clients may ignore this attribute until they understand it.
 
 ##### secure
 
-Specifies the `boolean` value for the [`Secure` `Set-Cookie` attribute][rfc-6265-5.2.5]. When truthy,
+Specifies the `boolean` value for the [`Secure` `Set-Cookie` attribute](https://datatracker.ietf.org/doc/html/rfc6265#section-5.2.5). When truthy,
 the `Secure` attribute is set, otherwise it is not. By default, the `Secure` attribute is not set.
 
 **Note:** be careful when setting this to `true`, as compliant clients will not send the cookie back to
