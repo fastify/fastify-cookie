@@ -122,7 +122,7 @@ The given number will be converted to an integer by rounding down. By default, n
 `maxAge` are set, then `maxAge` takes precedence, but it is possible not all clients by obey this,
 so if both are set, they should point to the same date and time.
 
-##### partitioned
+##### partitioned (**experimental**: non-standard)
 
 Specifies the `boolean` value for the [`Partitioned` `Set-Cookie`](rfc-cutler-httpbis-partitioned-cookies)
 attribute. When truthy, the `Partitioned` attribute is set, otherwise it is not. By default, the
