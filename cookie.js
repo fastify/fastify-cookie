@@ -29,14 +29,6 @@
 'use strict'
 
 /**
- * Module exports.
- * @public
- */
-
-exports.parse = parse
-exports.serialize = serialize
-
-/**
  * Module variables.
  * @private
  */
@@ -222,4 +214,14 @@ function tryDecode (str, decode) {
   } catch (e) {
     return str
   }
+}
+
+/**
+ * Module exports.
+ * @public
+ */
+
+module.exports = {
+  parse,
+  serialize
 }

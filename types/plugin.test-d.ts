@@ -231,3 +231,6 @@ appWithHook.register(cookie, { hook: 'preSerialization' });
 appWithHook.register(cookie, { hook: 'preValidation' });
 expectError(appWithHook.register(cookie, { hook: true }));
 expectError(appWithHook.register(cookie, { hook: 'false' }));
+
+expectType<(cookieHeader: string, opts?: fastifyCookieStar.ParseOptions) => { [key: string]: string }>(fastifyCookieDefault.parse);
+expectType<(name: string, value: string, opts?: fastifyCookieStar.SerializeOptions) => string>(fastifyCookieDefault.serialize);

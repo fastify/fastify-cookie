@@ -139,6 +139,10 @@ declare namespace fastifyCookie {
     signed?: boolean;
   }
 
+  export interface ParseOptions {
+    decode?: (encodedURIComponent: string) => string;
+  }
+
   type HookType = 'onRequest' | 'preParsing' | 'preValidation' | 'preHandler'  | 'preSerialization';
 
   export interface FastifyCookieOptions {
@@ -162,6 +166,8 @@ declare namespace fastifyCookie {
   export const unsign: Unsign;
 
   export interface FastifyCookie extends FastifyCookiePlugin {
+    parse: (cookieHeader: string, opts?: ParseOptions) => { [key: string]: string };
+    serialize: (name: string, value: string, opts?: SerializeOptions) => string;
     signerFactory: SignerFactory;
     Signer: Signer;
     sign: Sign;
