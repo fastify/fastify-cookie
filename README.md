@@ -128,8 +128,7 @@ Specifies the `boolean` value for the [`Partitioned` `Set-Cookie`](https://datat
 attribute. When truthy, the `Partitioned` attribute is set, otherwise it is not. By default, the
 `Partitioned` attribute is not set.
 
-⚠️ **Warning:** This is an attribute that has not yet been fully standardized, and may change in the future without reflecting the semver versioning.
-This also means many clients may ignore the attribute until they understand it.
+⚠️ **Warning:** [This is an attribute that has not yet been fully standardized](https://github.com/fastify/fastify-cookie/pull/261#issuecomment-1803234334), and may change in the future without reflecting the semver versioning. This also means many clients may ignore the attribute until they understand it.
 
 More information about can be found in [the proposal](https://github.com/privacycg/CHIPS).
 
