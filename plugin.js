@@ -214,7 +214,8 @@ module.exports = fastifyCookie
 module.exports.default = fastifyCookie // supersedes fastifyCookie.default = fastifyCookie
 module.exports.fastifyCookie = fastifyCookie // supersedes fastifyCookie.fastifyCookie = fastifyCookie
 
-module.exports.cookie = cookie
+module.exports.serialize = cookie.serialize
+module.exports.parse = cookie.parse
 
 module.exports.signerFactory = Signer
 module.exports.Signer = Signer
