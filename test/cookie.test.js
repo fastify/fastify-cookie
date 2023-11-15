@@ -92,6 +92,46 @@ test('should set multiple cookies', (t) => {
   })
 })
 
+test('should set multiple cookies', (t) => {
+  t.plan(12)
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  fastify.get('/', (req, reply) => {
+    reply
+      .setCookie('foo', 'foo')
+      .cookie('bar', 'test', {
+        partitioned: true
+      })
+      .setCookie('wee', 'woo', {
+        partitioned: true,
+        secure: true
+      })
+      .send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/'
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.equal(cookies.length, 3)
+    t.equal(cookies[0].name, 'foo')
+    t.equal(cookies[0].value, 'foo')
+    t.equal(cookies[1].name, 'bar')
+    t.equal(cookies[1].value, 'test')
+    t.equal(cookies[2].name, 'wee')
+    t.equal(cookies[2].value, 'woo')
+
+    t.equal(res.headers['set-cookie'][1], 'bar=test; Partitioned')
+    t.equal(res.headers['set-cookie'][2], 'wee=woo; Secure; Partitioned')
+  })
+})
+
 test('cookies get set correctly with millisecond dates', (t) => {
   t.plan(8)
   const fastify = Fastify()

@@ -172,6 +172,7 @@ const parseOptions: fastifyCookieStar.CookieSerializeOptions = {
   sameSite: 'lax',
   secure: true,
   signed: true,
+  partitioned: false,
 };
 expectType<fastifyCookieStar.CookieSerializeOptions>(parseOptions);
 
