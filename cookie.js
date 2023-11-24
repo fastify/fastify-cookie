@@ -53,7 +53,7 @@ const fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/ // eslint-dis
  * The object has the various cookies as keys(names) => values
  *
  * @param {string} str
- * @param {object} [options]
+ * @param {object} opt
  * @return {object}
  * @public
  */
@@ -120,22 +120,24 @@ function parse (str, opt) {
  * @public
  */
 
-function serialize (name, val, opt = {}) {
-  const enc = opt.encode || encodeURIComponent
+function serialize (name, val, opt) {
+  if (name.length && !fieldContentRegExp.test(name)) {
+    throw new TypeError('argument name is invalid')
+  }
+
+  const enc = opt?.encode || encodeURIComponent
   if (typeof enc !== 'function') {
     throw new TypeError('option encode is invalid')
   }
 
-  if (!fieldContentRegExp.test(name)) {
-    throw new TypeError('argument name is invalid')
-  }
-
   const value = enc(val)
-  if (value && !fieldContentRegExp.test(value)) {
+  if (value.length && !fieldContentRegExp.test(value)) {
     throw new TypeError('argument val is invalid')
   }
 
   let str = name + '=' + value
+
+  if (opt == null) return str
 
   if (opt.maxAge != null) {
     const maxAge = +opt.maxAge
@@ -216,6 +218,7 @@ function serialize (name, val, opt = {}) {
  *
  * @param {string} str
  * @param {function} decode
+ * @returns {string}
  * @private
  */
 function tryDecode (str, decode) {
