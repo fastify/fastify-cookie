@@ -121,7 +121,7 @@ function parse (str, opt) {
  */
 
 function serialize (name, val, opt) {
-  if (!fieldContentRegExp.test(name)) {
+  if (name.length && !fieldContentRegExp.test(name)) {
     throw new TypeError('argument name is invalid')
   }
 
