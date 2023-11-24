@@ -53,7 +53,7 @@ const fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/ // eslint-dis
  * The object has the various cookies as keys(names) => values
  *
  * @param {string} str
- * @param {object} opt
+ * @param {object} [opt]
  * @return {object}
  * @public
  */
@@ -115,7 +115,7 @@ function parse (str, opt) {
  *
  * @param {string} name
  * @param {string} val
- * @param {object} [options]
+ * @param {object} [opt]
  * @return {string}
  * @public
  */
