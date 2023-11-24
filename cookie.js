@@ -66,13 +66,13 @@ const fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/ // eslint-dis
  * @public
  */
 
-function parse (str, options) {
+function parse (str, opt = {}) {
   if (typeof str !== 'string') {
     throw new TypeError('argument str must be a string')
   }
 
   const result = {}
-  const dec = (options && options.decode) || decode
+  const dec = opt.decode || decode
 
   let pos = 0
   let terminatorPos = 0
@@ -82,6 +82,7 @@ function parse (str, options) {
     if (terminatorPos === str.length) {
       break
     }
+
     terminatorPos = str.indexOf(';', pos)
     terminatorPos = (terminatorPos === -1) ? str.length : terminatorPos
     eqIdx = str.indexOf('=', pos)
@@ -104,8 +105,10 @@ function parse (str, options) {
         ? tryDecode(val, dec)
         : val
     }
+
     pos = terminatorPos + 1
   }
+
   return result
 }
 
@@ -125,8 +128,7 @@ function parse (str, options) {
  * @public
  */
 
-function serialize (name, val, options) {
-  const opt = options || {}
+function serialize (name, val, opt = {}) {
   const enc = opt.encode || encode
   if (typeof enc !== 'function') {
     throw new TypeError('option encode is invalid')
@@ -142,13 +144,15 @@ function serialize (name, val, options) {
   }
 
   let str = name + '=' + value
+
   if (opt.maxAge != null) {
-    const maxAge = opt.maxAge - 0
-    if (isNaN(maxAge) || !isFinite(maxAge)) {
+    const maxAge = +opt.maxAge
+
+    if (!isFinite(maxAge)) {
       throw new TypeError('option maxAge is invalid')
     }
 
-    str += '; Max-Age=' + Math.floor(maxAge)
+    str += '; Max-Age=' + Math.trunc(maxAge)
   }
 
   if (opt.domain) {
@@ -193,6 +197,7 @@ function serialize (name, val, options) {
     const sameSite = typeof opt.sameSite === 'string'
       ? opt.sameSite.toLowerCase()
       : opt.sameSite
+
     switch (sameSite) {
       case true:
         str += '; SameSite=Strict'
@@ -221,11 +226,10 @@ function serialize (name, val, options) {
  * @param {function} decode
  * @private
  */
-
 function tryDecode (str, decode) {
   try {
     return decode(str)
-  } catch (e) {
+  } catch {
     return str
   }
 }
