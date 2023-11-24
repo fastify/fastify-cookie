@@ -37,14 +37,6 @@ exports.parse = parse
 exports.serialize = serialize
 
 /**
- * Module variables.
- * @private
- */
-
-const decode = decodeURIComponent
-const encode = encodeURIComponent
-
-/**
  * RegExp to match field-content in RFC 7230 sec 3.2
  *
  * field-content = field-vchar [ 1*( SP / HTAB ) field-vchar ]
@@ -66,13 +58,13 @@ const fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/ // eslint-dis
  * @public
  */
 
-function parse (str, opt = {}) {
+function parse (str, opt) {
   if (typeof str !== 'string') {
     throw new TypeError('argument str must be a string')
   }
 
   const result = {}
-  const dec = opt.decode || decode
+  const dec = opt?.decode || decodeURIComponent
 
   let pos = 0
   let terminatorPos = 0
@@ -101,7 +93,7 @@ function parse (str, opt = {}) {
         ? str.substring(eqIdx + 1, terminatorPos - 1).trim()
         : str.substring(eqIdx, terminatorPos).trim()
 
-      result[key] = (dec !== decode || val.indexOf('%') !== -1)
+      result[key] = (dec !== decodeURIComponent || val.indexOf('%') !== -1)
         ? tryDecode(val, dec)
         : val
     }
@@ -129,7 +121,7 @@ function parse (str, opt = {}) {
  */
 
 function serialize (name, val, opt = {}) {
-  const enc = opt.encode || encode
+  const enc = opt.encode || encodeURIComponent
   if (typeof enc !== 'function') {
     throw new TypeError('option encode is invalid')
   }
