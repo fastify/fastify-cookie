@@ -126,12 +126,12 @@ function serialize (name, val, opt) {
     throw new TypeError('option encode is invalid')
   }
 
-  if (name.length && !fieldContentRegExp.test(name)) {
+  if (name && !fieldContentRegExp.test(name)) {
     throw new TypeError('argument name is invalid')
   }
 
   const value = enc(val)
-  if (value.length && !fieldContentRegExp.test(value)) {
+  if (value && !fieldContentRegExp.test(value)) {
     throw new TypeError('argument val is invalid')
   }
 
