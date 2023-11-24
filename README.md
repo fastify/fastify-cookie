@@ -11,6 +11,8 @@ This plugin's cookie parsing works via Fastify's `onRequest` hook. Therefore,
 you should register it prior to any other `onRequest` hooks that will depend
 upon this plugin's actions.
 
+It is also possible to import the low-level cookie parsing and serialization functions.
+
 `@fastify/cookie` [v2.x](https://github.com/fastify/fastify-cookie/tree/v2.x)
 supports both Fastify@1 and Fastify@2.
 `@fastify/cookie` v3 only supports Fastify@2.
@@ -68,6 +70,23 @@ app.register(cookie, {
   secret: "my-secret", // for cookies signature
   parseOptions: {}     // options for parsing cookies
 } as FastifyCookieOptions)
+```
+
+## Importing `serialize` and `parse`
+
+```js
+const { serialize, parse } = require('@fastify/cookie')
+const fastify = require('fastify')()
+
+fastify.get('/', (req, reply) => {
+  const cookie = serialize('lang', 'en', {
+    maxAge: 60_000,
+  })
+
+  reply.header('Set-Cookie', cookie)
+
+  reply.send('Language set!')
+})
 ```
 
 ## Options
