@@ -121,13 +121,13 @@ function parse (str, opt) {
  */
 
 function serialize (name, val, opt) {
-  if (name.length && !fieldContentRegExp.test(name)) {
-    throw new TypeError('argument name is invalid')
-  }
-
   const enc = opt?.encode || encodeURIComponent
   if (typeof enc !== 'function') {
     throw new TypeError('option encode is invalid')
+  }
+
+  if (name.length && !fieldContentRegExp.test(name)) {
+    throw new TypeError('argument name is invalid')
   }
 
   const value = enc(val)
