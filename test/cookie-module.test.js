@@ -3,7 +3,7 @@
 const tap = require('tap')
 const test = tap.test
 
-const cookie = require('../cookie')
+const cookie = require('..')
 
 test('parse: argument validation', (t) => {
   t.plan(2)
