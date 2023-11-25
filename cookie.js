@@ -37,14 +37,6 @@ exports.parse = parse
 exports.serialize = serialize
 
 /**
- * Module variables.
- * @private
- */
-
-const decode = decodeURIComponent
-const encode = encodeURIComponent
-
-/**
  * RegExp to match field-content in RFC 7230 sec 3.2
  *
  * field-content = field-vchar [ 1*( SP / HTAB ) field-vchar ]
