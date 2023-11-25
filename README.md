@@ -11,7 +11,7 @@ This plugin's cookie parsing works via Fastify's `onRequest` hook. Therefore,
 you should register it prior to any other `onRequest` hooks that will depend
 upon this plugin's actions.
 
-It is also possible to import the low-level cookie parsing and serialization functions.
+It is also possible to [import the low-level cookie parsing and serialization functions](#importing-serialize-and-parse).
 
 `@fastify/cookie` [v2.x](https://github.com/fastify/fastify-cookie/tree/v2.x)
 supports both Fastify@1 and Fastify@2.
