@@ -29,14 +29,6 @@
 'use strict'
 
 /**
- * Module variables.
- * @private
- */
-
-const decode = decodeURIComponent
-const encode = encodeURIComponent
-
-/**
  * RegExp to match field-content in RFC 7230 sec 3.2
  *
  * field-content = field-vchar [ 1*( SP / HTAB ) field-vchar ]
@@ -53,18 +45,18 @@ const fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/ // eslint-dis
  * The object has the various cookies as keys(names) => values
  *
  * @param {string} str
- * @param {object} [options]
+ * @param {object} [opt]
  * @return {object}
  * @public
  */
 
-function parse (str, options) {
+function parse (str, opt) {
   if (typeof str !== 'string') {
     throw new TypeError('argument str must be a string')
   }
 
   const result = {}
-  const dec = (options && options.decode) || decode
+  const dec = opt?.decode || decodeURIComponent
 
   let pos = 0
   let terminatorPos = 0
@@ -74,6 +66,7 @@ function parse (str, options) {
     if (terminatorPos === str.length) {
       break
     }
+
     terminatorPos = str.indexOf(';', pos)
     terminatorPos = (terminatorPos === -1) ? str.length : terminatorPos
     eqIdx = str.indexOf('=', pos)
@@ -92,12 +85,14 @@ function parse (str, options) {
         ? str.substring(eqIdx + 1, terminatorPos - 1).trim()
         : str.substring(eqIdx, terminatorPos).trim()
 
-      result[key] = (dec !== decode || val.indexOf('%') !== -1)
+      result[key] = (dec !== decodeURIComponent || val.indexOf('%') !== -1)
         ? tryDecode(val, dec)
         : val
     }
+
     pos = terminatorPos + 1
   }
+
   return result
 }
 
@@ -112,19 +107,18 @@ function parse (str, options) {
  *
  * @param {string} name
  * @param {string} val
- * @param {object} [options]
+ * @param {object} [opt]
  * @return {string}
  * @public
  */
 
-function serialize (name, val, options) {
-  const opt = options || {}
-  const enc = opt.encode || encode
+function serialize (name, val, opt) {
+  const enc = opt?.encode || encodeURIComponent
   if (typeof enc !== 'function') {
     throw new TypeError('option encode is invalid')
   }
 
-  if (!fieldContentRegExp.test(name)) {
+  if (name && !fieldContentRegExp.test(name)) {
     throw new TypeError('argument name is invalid')
   }
 
@@ -134,13 +128,17 @@ function serialize (name, val, options) {
   }
 
   let str = name + '=' + value
+
+  if (opt == null) return str
+
   if (opt.maxAge != null) {
-    const maxAge = opt.maxAge - 0
-    if (isNaN(maxAge) || !isFinite(maxAge)) {
+    const maxAge = +opt.maxAge
+
+    if (!isFinite(maxAge)) {
       throw new TypeError('option maxAge is invalid')
     }
 
-    str += '; Max-Age=' + Math.floor(maxAge)
+    str += '; Max-Age=' + Math.trunc(maxAge)
   }
 
   if (opt.domain) {
@@ -185,6 +183,7 @@ function serialize (name, val, options) {
     const sameSite = typeof opt.sameSite === 'string'
       ? opt.sameSite.toLowerCase()
       : opt.sameSite
+
     switch (sameSite) {
       case true:
         str += '; SameSite=Strict'
@@ -211,13 +210,13 @@ function serialize (name, val, options) {
  *
  * @param {string} str
  * @param {function} decode
+ * @returns {string}
  * @private
  */
-
 function tryDecode (str, decode) {
   try {
     return decode(str)
-  } catch (e) {
+  } catch {
     return str
   }
 }
