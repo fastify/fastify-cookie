@@ -13,7 +13,7 @@ function fastifyCookieGetCookie (cookieName) {
 
   const cookies = []
 
-  for (const [name, cookie] of this[kReplySetCookies].entries()) {
+  for (const [name, cookie] of this[kReplySetCookies]) {
     if (cookieName === name.split(';', 1)[0]) {
       cookies.push(cookie)
     }
