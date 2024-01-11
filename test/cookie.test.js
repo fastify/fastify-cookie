@@ -71,7 +71,7 @@ test('cookies can be retrieved correctly', (t) => {
 })
 
 test('cookies can be retrieved correctly (early call)', (t) => {
-  t.plan(10)
+  t.plan(11)
   const fastify = Fastify()
 
   fastify.addHook('onRequest', async (req, reply) => {
@@ -91,9 +91,11 @@ test('cookies can be retrieved correctly (early call)', (t) => {
     reply.setCookie('foo', 'foo', { path: '/only' })
     reply.setCookie('notfoo', 'foo', { path: '/' })
 
-    const [cookie] = reply.getSetCookie('foo')
+    const cookies = reply.getSetCookie('foo')
 
-    t.same(cookie, { name: 'foo', value: 'foo', options: { path: '/' } })
+    t.same(cookies.length, 2)
+
+    t.same(cookies[0], { name: 'foo', value: 'foo', options: { path: '/' } })
 
     reply.send({ hello: 'world' })
   })
