@@ -33,6 +33,85 @@ test('cookies get set correctly', (t) => {
   })
 })
 
+test('cookies can be retrieved correctly', (t) => {
+  t.plan(9)
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  fastify.get('/test1', (req, reply) => {
+    const early = reply.getSetCookie('foo')
+
+    t.same(early, null)
+
+    reply.setCookie('foo', 'foo', {path: '/'})
+    reply.setCookie('foo', 'foo', {path: '/only'})
+    reply.setCookie('notfoo', 'foo', {path: '/'})
+
+    const [cookie] = reply.getSetCookie('foo')
+
+    t.same(cookie, { name: 'foo', value: 'foo', opts: { path: '/'} })
+      
+
+    reply.send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.equal(cookies.length, 3)
+    t.equal(cookies[0].name, 'foo')
+    t.equal(cookies[0].value, 'foo')
+    t.equal(cookies[0].path, '/')
+  })
+})
+
+test('cookies can be retrieved correctly (early call)', (t) => {
+  t.plan(9)
+  const fastify = Fastify()
+
+  fastify.register(async (fastify) => {
+    fastify.register(plugin)
+
+    fastify.get('/test1', (req, reply) => {
+      const early = reply.getSetCookie('foo')
+  
+      t.same(early, null)
+  
+      reply.setCookie('foo', 'foo', {path: '/'})
+      reply.setCookie('foo', 'foo', {path: '/only'})
+      reply.setCookie('notfoo', 'foo', {path: '/'})
+  
+      const [cookie] = reply.getSetCookie('foo')
+  
+      t.same(cookie, { name: 'foo', value: 'foo', opts: { path: '/'} })
+        
+  
+      reply.send({ hello: 'world' })
+    })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.equal(cookies.length, 3)
+    t.equal(cookies[0].name, 'foo')
+    t.equal(cookies[0].value, 'foo')
+    t.equal(cookies[0].path, '/')
+  })
+})
+
 test('express cookie compatibility', (t) => {
   t.plan(7)
   const fastify = Fastify()
