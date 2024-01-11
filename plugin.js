@@ -19,7 +19,7 @@ function fastifyCookieGetCookie (name) {
     }
   }
 
-  return cookies
+  return cookies.length ? cookies : null
 }
 
 function fastifyCookieSetCookie (reply, name, value, options) {

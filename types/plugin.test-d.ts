@@ -59,7 +59,7 @@ server.after((_err) => {
     reply
     .setCookie('test', test!, { domain: 'example.com', path: '/' })
 
-    expectType<Array<{name: string, value: string, options: fastifyCookieCjsImport.SerializeOptions}>>(
+    expectType<Array<{name: string, value: string, options: fastifyCookieCjsImport.SerializeOptions}> | null>(
       reply.getCookie('test')
     );
 

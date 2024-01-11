@@ -48,10 +48,10 @@ test('cookies can be retrieved correctly', (t) => {
     reply.setCookie('notfoo', 'foo', { path: '/' })
 
     const [cookie] = reply.getCookie('foo')
-    const [cookie2] = reply.getCookie('bar')
+    const cookie2 = reply.getCookie('bar')
 
     t.same(cookie, { name: 'foo', value: 'foo', options: { path: '/' } })
-    t.same(cookie2, undefined)
+    t.same(cookie2, null)
 
     reply.send({ hello: 'world' })
   })

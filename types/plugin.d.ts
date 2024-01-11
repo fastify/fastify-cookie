@@ -57,7 +57,7 @@ declare module "fastify" {
     options?: fastifyCookie.CookieSerializeOptions
   ) => FastifyReply;
 
-  export type GetCookieWrapper = (cookieName: string) => Array<{name: string, value: string, options: fastifyCookie.SerializeOptions}>;
+  export type GetCookieWrapper = (cookieName: string) => Array<{name: string, value: string, options: fastifyCookie.SerializeOptions}> | null;
 
   interface FastifyReply {
     /**
