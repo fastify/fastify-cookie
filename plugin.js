@@ -8,13 +8,13 @@ const { Signer, sign, unsign } = require('./signer')
 const kReplySetCookies = Symbol('fastify.reply.setCookies')
 const kReplySetCookiesHookRan = Symbol('fastify.reply.setCookiesHookRan')
 
-function fastifyCookieGetCookie (cookieName) {
-  if (!this[kReplySetCookies]) return null
+function fastifyCookieGetCookie (name) {
+  if (!this[kReplySetCookies]?.size) return null
 
   const cookies = []
 
-  for (const [name, cookie] of this[kReplySetCookies]) {
-    if (cookieName === name.split(';', 1)[0]) {
+  for (const [cookieName, cookie] of this[kReplySetCookies]) {
+    if (cookieName.split(';', 1)[0] === name) {
       cookies.push(cookie)
     }
   }

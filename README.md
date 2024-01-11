@@ -204,6 +204,10 @@ with a value of `'foo'` on the cookie path `/`.
 + `options.signed`: the cookie should be signed
 + `options.secure`: if set to `true` it will set the Secure-flag. If it is set to `"auto"` Secure-flag is set when the connection is using tls.
 
+### Getting
+
+The method `getCookie(name)` is used to retrieve a specific cookie from the response object. It accepts a single parameter, `name`, which is a string representing the name of the cookie. This method will always return an array since multiple cookies that share the same name can be set.
+
 #### Securing the cookie
 
 Following are _some_ of the precautions that should be taken to ensure the integrity of an application:

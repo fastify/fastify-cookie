@@ -72,7 +72,7 @@ declare module "fastify" {
     /**
      * Get set response cookie
      * @name getCookie
-     * @param cookieName cookieName
+     * @param name name
      */
     getCookie: GetCookieWrapper;
 
