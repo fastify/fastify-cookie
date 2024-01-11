@@ -148,6 +148,38 @@ test('should set multiple cookies', (t) => {
   const fastify = Fastify()
   fastify.register(plugin)
 
+  fastify.get('/test1', (req, reply) => {
+    reply
+      .header('Set-Cookie', ['bar=bar'])
+      .setCookie('foo', 'foo', { path: '/' })
+      .send({ hello: 'world' })
+  })
+
+  fastify.inject({
+    method: 'GET',
+    url: '/test1'
+  }, (err, res) => {
+    t.error(err)
+    t.equal(res.statusCode, 200)
+    t.same(JSON.parse(res.body), { hello: 'world' })
+
+    const cookies = res.cookies
+    t.equal(cookies.length, 2)
+    t.equal(cookies[0].name, 'bar')
+    t.equal(cookies[0].value, 'bar')
+    t.equal(cookies[0].path, undefined)
+
+    t.equal(cookies[1].name, 'foo')
+    t.equal(cookies[1].value, 'foo')
+    t.equal(cookies[1].path, '/')
+  })
+})
+
+test('should set multiple cookies', (t) => {
+  t.plan(10)
+  const fastify = Fastify()
+  fastify.register(plugin)
+
   fastify.get('/', (req, reply) => {
     reply
       .setCookie('foo', 'foo')
