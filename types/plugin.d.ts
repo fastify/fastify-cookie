@@ -57,6 +57,8 @@ declare module "fastify" {
     options?: fastifyCookie.CookieSerializeOptions
   ) => FastifyReply;
 
+  export type getSetCookieWrapper = (cookieName: string) => Array<{name: string, value: string, options: fastifyCookie.SerializeOptions}> | null;
+
   interface FastifyReply {
     /**
      * Set response cookie
@@ -65,11 +67,14 @@ declare module "fastify" {
      * @param value Cookie value
      * @param options Serialize options
      */
-    setCookie(
-      name: string,
-      value: string,
-      options?: fastifyCookie.CookieSerializeOptions
-    ): this;
+    setCookie: setCookieWrapper;
+
+    /**
+     * Get set response cookie
+     * @name getSetCookie
+     * @param cookieName cookieName
+     */
+    getSetCookie: getSetCookieWrapper;
 
     /**
      * @alias setCookie

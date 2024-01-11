@@ -2,8 +2,8 @@ import cookie from '..';
 import { expectError, expectType } from 'tsd';
 import * as fastifyCookieStar from '..';
 import fastifyCookieCjsImport = require('..');
-import fastifyCookieDefault, { fastifyCookie as fastifyCookieNamed  } from '..';
-import fastify, { FastifyInstance, FastifyReply, setCookieWrapper } from 'fastify';
+import fastifyCookieDefault, { fastifyCookie as fastifyCookieNamed } from '..';
+import fastify, { FastifyInstance, FastifyReply, setCookieWrapper, } from 'fastify';
 
 const fastifyCookieCjs = require('..');
 
@@ -54,6 +54,14 @@ server.after((_err) => {
 
     expectType<setCookieWrapper>(reply.cookie);
     expectType<setCookieWrapper>(reply.setCookie);
+    expectType<setCookieWrapper>(reply.setCookie);
+
+    reply
+    .setCookie('test', test!, { domain: 'example.com', path: '/' })
+
+    expectType<Array<{name: string, value: string, options: fastifyCookieCjsImport.SerializeOptions}> | null>(
+      reply.getSetCookie('test1')
+    );
 
     expectType<FastifyReply>(
       reply
