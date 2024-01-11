@@ -13,9 +13,9 @@ function fastifyCookieGetCookie (name) {
 
   const cookies = []
 
-  for (const [cookieName, cookie] of this[kReplySetCookies]) {
-    if (cookieName.split(';', 1)[0] === name) {
-      cookies.push(cookie)
+  for (const c of this[kReplySetCookies].values()) {
+    if (c.name.split(';', 1)[0] === name) {
+      cookies.push(c)
     }
   }
 
