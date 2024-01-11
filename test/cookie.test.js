@@ -34,7 +34,7 @@ test('cookies get set correctly', (t) => {
 })
 
 test('cookies can be retrieved correctly', (t) => {
-  t.plan(9)
+  t.plan(10)
   const fastify = Fastify()
   fastify.register(plugin)
 
@@ -48,8 +48,10 @@ test('cookies can be retrieved correctly', (t) => {
     reply.setCookie('notfoo', 'foo', { path: '/' })
 
     const [cookie] = reply.getCookie('foo')
+    const [cookie2] = reply.getCookie('bar')
 
     t.same(cookie, { name: 'foo', value: 'foo', options: { path: '/' } })
+    t.same(cookie2, undefined)
 
     reply.send({ hello: 'world' })
   })
