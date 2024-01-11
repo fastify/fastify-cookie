@@ -8,7 +8,7 @@ const { Signer, sign, unsign } = require('./signer')
 const kReplySetCookies = Symbol('fastify.reply.setCookies')
 const kReplySetCookiesHookRan = Symbol('fastify.reply.setCookiesHookRan')
 
-function fastifyCookieGetCookie (cookieName) {
+function fastifyCookieGetSetCookie (cookieName) {
   if (!this[kReplySetCookies]) return null
 
   const cookies = []
@@ -44,7 +44,7 @@ function fastifyCookieSetCookie (reply, name, value, options) {
     }
   }
 
-  reply[kReplySetCookies].set(`${name};${opts.domain};${opts.path || '/'}`, { name, value, opts })
+  reply[kReplySetCookies].set(`${name};${opts.domain};${opts.path || '/'}`, { name, value, options: opts })
 
   if (reply[kReplySetCookiesHookRan]) {
     setCookies(reply)
@@ -65,9 +65,7 @@ function fastifyCookieClearCookie (reply, name, options) {
 function parseCookies (fastify, request, reply) {
   if (reply[kReplySetCookies]) return
 
-  const cookieHeader = request.raw.headers.cookie
-
-  request.cookies = cookieHeader ? fastify.parseCookie(cookieHeader) : {} // New container per request. Issue #53
+  request.cookies = request.raw.headers.cookie ? fastify.parseCookie(request.raw.headers.cookie) : {} // New container per request. Issue #53
   reply[kReplySetCookies] = new Map()
 }
 
@@ -91,7 +89,7 @@ function setCookies (reply) {
   if (setCookieIsUndefined) {
     if (reply[kReplySetCookies].size === 1) {
       for (const c of reply[kReplySetCookies].values()) {
-        reply.header('Set-Cookie', cookie.serialize(c.name, c.value, c.opts))
+        reply.header('Set-Cookie', cookie.serialize(c.name, c.value, c.options))
       }
 
       reply[kReplySetCookies].clear()
@@ -105,7 +103,7 @@ function setCookies (reply) {
   }
 
   for (const c of reply[kReplySetCookies].values()) {
-    setCookie.push(cookie.serialize(c.name, c.value, c.opts))
+    setCookie.push(cookie.serialize(c.name, c.value, c.options))
   }
 
   if (!setCookieIsUndefined) reply.removeHeader('Set-Cookie')
@@ -157,7 +155,7 @@ function plugin (fastify, options, next) {
 
   fastify.decorateReply('cookie', setCookie)
   fastify.decorateReply('setCookie', setCookie)
-  fastify.decorateReply('getSetCookie', fastifyCookieGetCookie)
+  fastify.decorateReply('getSetCookie', fastifyCookieGetSetCookie)
   fastify.decorateReply('clearCookie', clearCookie)
 
   if (hook) {
