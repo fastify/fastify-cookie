@@ -206,7 +206,7 @@ with a value of `'foo'` on the cookie path `/`.
 
 ### Getting
 
-The method `getCookie(name)` is used to retrieve a specific cookie from the response object. It accepts a single parameter, `name`, which is a string representing the name of the cookie. This method will always return an array since multiple cookies that share the same name can be set.
+The `getCookie(name)` method is designed to fetch a specific cookie from the response object. It takes a single argument, `name`. If no cookies match the provided name, the method returns null. Conversely, if one or more cookies match, it returns an array containing the matching cookies.
 
 #### Securing the cookie
 
