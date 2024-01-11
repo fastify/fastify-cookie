@@ -43,14 +43,13 @@ test('cookies can be retrieved correctly', (t) => {
 
     t.same(early, null)
 
-    reply.setCookie('foo', 'foo', {path: '/'})
-    reply.setCookie('foo', 'foo', {path: '/only'})
-    reply.setCookie('notfoo', 'foo', {path: '/'})
+    reply.setCookie('foo', 'foo', { path: '/' })
+    reply.setCookie('foo', 'foo', { path: '/only' })
+    reply.setCookie('notfoo', 'foo', { path: '/' })
 
     const [cookie] = reply.getSetCookie('foo')
 
-    t.same(cookie, { name: 'foo', value: 'foo', options: { path: '/'} })
-      
+    t.same(cookie, { name: 'foo', value: 'foo', options: { path: '/' } })
 
     reply.send({ hello: 'world' })
   })
@@ -88,14 +87,13 @@ test('cookies can be retrieved correctly (early call)', (t) => {
 
     t.same(early, null)
 
-    reply.setCookie('foo', 'foo', {path: '/'})
-    reply.setCookie('foo', 'foo', {path: '/only'})
-    reply.setCookie('notfoo', 'foo', {path: '/'})
+    reply.setCookie('foo', 'foo', { path: '/' })
+    reply.setCookie('foo', 'foo', { path: '/only' })
+    reply.setCookie('notfoo', 'foo', { path: '/' })
 
     const [cookie] = reply.getSetCookie('foo')
 
-    t.same(cookie, { name: 'foo', value: 'foo', options: { path: '/'} })
-      
+    t.same(cookie, { name: 'foo', value: 'foo', options: { path: '/' } })
 
     reply.send({ hello: 'world' })
   })
