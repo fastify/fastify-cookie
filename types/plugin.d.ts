@@ -65,11 +65,7 @@ declare module "fastify" {
      * @param value Cookie value
      * @param options Serialize options
      */
-    setCookie(
-      name: string,
-      value: string,
-      options?: fastifyCookie.CookieSerializeOptions
-    ): this;
+    setCookie: setCookieWrapper;
 
     /**
      * @alias setCookie
