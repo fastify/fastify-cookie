@@ -70,10 +70,10 @@ function onReqHandlerWrapper (fastify, hook) {
 }
 
 function setCookies (reply) {
-  const setCookieHeader = reply.getHeader('Set-Cookie')
-  let setCookie
+  const setCookieHeaderValue = reply.getHeader('Set-Cookie')
+  let cookieValue
 
-  if (setCookieHeader === undefined) {
+  if (setCookieHeaderValue === undefined) {
     if (reply[kReplySetCookies].size === 1) {
       // Fast path for single cookie
       const c = reply[kReplySetCookies].values().next().value
@@ -82,19 +82,19 @@ function setCookies (reply) {
       return
     }
 
-    setCookie = []
-  } else if (typeof setCookieHeader === 'string') {
-    setCookie = [setCookieHeader]
+    cookieValue = []
+  } else if (typeof setCookieHeaderValue === 'string') {
+    cookieValue = [setCookieHeaderValue]
   } else {
-    setCookie = setCookieHeader
+    cookieValue = setCookieHeaderValue
   }
 
   for (const c of reply[kReplySetCookies].values()) {
-    setCookie.push(cookie.serialize(c.name, c.value, c.opts))
+    cookieValue.push(cookie.serialize(c.name, c.value, c.opts))
   }
 
   reply.removeHeader('Set-Cookie')
-  reply.header('Set-Cookie', setCookie)
+  reply.header('Set-Cookie', cookieValue)
   reply[kReplySetCookies].clear()
 }
 
