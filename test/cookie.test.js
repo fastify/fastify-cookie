@@ -141,6 +141,7 @@ test('should set multiple cookies (an array already exists)', (t) => {
     reply
       .header('Set-Cookie', ['bar=bar'])
       .setCookie('foo', 'foo', { path: '/' })
+      .setCookie('foo', 'foo', { path: '/path' })
       .send({ hello: 'world' })
   })
 
@@ -153,14 +154,14 @@ test('should set multiple cookies (an array already exists)', (t) => {
     t.same(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.equal(cookies.length, 2)
+    t.equal(cookies.length, 3)
     t.equal(cookies[0].name, 'bar')
     t.equal(cookies[0].value, 'bar')
     t.equal(cookies[0].path, undefined)
 
     t.equal(cookies[1].name, 'foo')
     t.equal(cookies[1].value, 'foo')
-    t.equal(cookies[1].path, '/')
+    t.equal(cookies[2].path, '/path')
   })
 })
 
