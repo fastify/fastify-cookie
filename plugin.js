@@ -70,32 +70,31 @@ function onReqHandlerWrapper (fastify, hook) {
 }
 
 function setCookies (reply) {
-  let setCookie = reply.getHeader('Set-Cookie')
-  const setCookieIsUndefined = setCookie === undefined
+  const setCookieHeaderValue = reply.getHeader('Set-Cookie')
+  let cookieValue
 
-  /* istanbul ignore else */
-  if (setCookieIsUndefined) {
+  if (setCookieHeaderValue === undefined) {
     if (reply[kReplySetCookies].size === 1) {
-      for (const c of reply[kReplySetCookies].values()) {
-        reply.header('Set-Cookie', cookie.serialize(c.name, c.value, c.opts))
-      }
-
+      // Fast path for single cookie
+      const c = reply[kReplySetCookies].values().next().value
+      reply.header('Set-Cookie', cookie.serialize(c.name, c.value, c.opts))
       reply[kReplySetCookies].clear()
-
       return
     }
 
-    setCookie = []
-  } else if (typeof setCookie === 'string') {
-    setCookie = [setCookie]
+    cookieValue = []
+  } else if (typeof setCookieHeaderValue === 'string') {
+    cookieValue = [setCookieHeaderValue]
+  } else {
+    cookieValue = setCookieHeaderValue
   }
 
   for (const c of reply[kReplySetCookies].values()) {
-    setCookie.push(cookie.serialize(c.name, c.value, c.opts))
+    cookieValue.push(cookie.serialize(c.name, c.value, c.opts))
   }
 
-  if (!setCookieIsUndefined) reply.removeHeader('Set-Cookie')
-  reply.header('Set-Cookie', setCookie)
+  reply.removeHeader('Set-Cookie')
+  reply.header('Set-Cookie', cookieValue)
   reply[kReplySetCookies].clear()
 }
 
