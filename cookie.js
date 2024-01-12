@@ -55,37 +55,32 @@ function parse (str, opt) {
     throw new TypeError('argument str must be a string')
   }
 
-  const result = {}
   const dec = opt?.decode || decodeURIComponent
+  const result = {}
 
+  const strLen = str.length
   let pos = 0
   let terminatorPos = 0
-  let eqIdx = 0
-
   while (true) {
-    if (terminatorPos === str.length) {
-      break
-    }
-
+    if (terminatorPos === strLen) break
     terminatorPos = str.indexOf(';', pos)
-    terminatorPos = (terminatorPos === -1) ? str.length : terminatorPos
-    eqIdx = str.indexOf('=', pos)
+    if (terminatorPos === -1) terminatorPos = strLen // This is the last pair
 
-    // skip things that don't look like key=value
-    if (eqIdx === -1 || eqIdx > terminatorPos) {
+    let eqIdx = str.indexOf('=', pos)
+    if (eqIdx === -1) break // No key-value pairs left
+    if (eqIdx > terminatorPos) {
+      // Malformed key-value pair
       pos = terminatorPos + 1
       continue
     }
 
     const key = str.substring(pos, eqIdx++).trim()
-
-    // only assign once
     if (result[key] === undefined) {
-      const val = (str.charCodeAt(eqIdx) === 0x22)
+      const val = str.charCodeAt(eqIdx) === 0x22
         ? str.substring(eqIdx + 1, terminatorPos - 1).trim()
         : str.substring(eqIdx, terminatorPos).trim()
 
-      result[key] = (dec !== decodeURIComponent || val.indexOf('%') !== -1)
+      result[key] = !(dec === decodeURIComponent && val.indexOf('%') === -1)
         ? tryDecode(val, dec)
         : val
     }
