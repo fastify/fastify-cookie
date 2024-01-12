@@ -93,7 +93,7 @@ function setCookies (reply) {
     setCookie.push(cookie.serialize(c.name, c.value, c.opts))
   }
 
-  if (setCookieHeader !== undefined) reply.removeHeader('Set-Cookie')
+  reply.removeHeader('Set-Cookie')
   reply.header('Set-Cookie', setCookie)
   reply[kReplySetCookies].clear()
 }
