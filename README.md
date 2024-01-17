@@ -151,6 +151,20 @@ attribute. When truthy, the `Partitioned` attribute is set, otherwise it is not.
 
 More information about can be found in [the proposal](https://github.com/privacycg/CHIPS).
 
+
+##### priority
+
+Specifies the `string` to be the value for the [`Priority` `Set-Cookie` attribute](https://tools.ietf.org/html/draft-west-cookie-priority-00#section-4.1).
+
+  - `'low'` will set the `Priority` attribute to `Low`.
+  - `'medium'` will set the `Priority` attribute to `Medium`, the default priority when not set.
+  - `'high'` will set the `Priority` attribute to `High`.
+
+More information about the different priority levels can be found in
+[the specification](https://tools.ietf.org/html/draft-west-cookie-priority-00#section-4.1).
+
+⚠️ **Warning:** This is an attribute that has not yet been fully standardized, and may change in the future without reflecting the semver versioning. This also means many clients may ignore the attribute until they understand it.
+
 ##### path
 
 Specifies the value for the [`Path` `Set-Cookie` attribute](https://datatracker.ietf.org/doc/html/rfc6265#section-5.2.4). By default, the path
