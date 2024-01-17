@@ -127,7 +127,7 @@ declare namespace fastifyCookie {
     path?: string;
     /** A `boolean` or one of the `SameSite` string attributes. E.g.: `lax`, `none` or `strict`.  */
     sameSite?: 'lax' | 'none' | 'strict' | boolean;
-    /** One of the `Priority` string attributes ()`low`, `medium` or `high`) specifying a retention priority for HTTP cookies that will be respected by user agents during cookie eviction. */
+    /** One of the `Priority` string attributes (`low`, `medium` or `high`) specifying a retention priority for HTTP cookies that will be respected by user agents during cookie eviction. */
     priority?: 'low' | 'medium' | 'high';
     /** The `boolean` value of the `Secure` attribute. Set this option to false when communicating over an unencrypted (HTTP) connection. Value can be set to `auto`; in this case the `Secure` attribute will be set to false for HTTP request, in case of HTTPS it will be set to true.  Defaults to true. */
     secure?: boolean;
