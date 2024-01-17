@@ -115,18 +115,21 @@ declare namespace fastifyCookie {
     domain?: string;
     /** Specifies a function that will be used to encode a cookie's value. Since value of a cookie has a limited character set (and must be a simple string), this function can be used to encode a value into a string suited for a cookie's value. */
     encode?(val: string): string;
-    /**  The expiration `date` used for the `Expires` attribute. If both `expires` and `maxAge` are set, then `expires` is used. */
+    /** The expiration `date` used for the `Expires` attribute. If both `expires` and `maxAge` are set, then `expires` is used. */
     expires?: Date;
-    /**  The `boolean` value of the `HttpOnly` attribute. Defaults to true. */
+    /** The `boolean` value of the `HttpOnly` attribute. Defaults to true. */
     httpOnly?: boolean;
-    /**  A `number` in seconds that specifies the `Expires` attribute by adding the specified seconds to the current date. If both `expires` and `maxAge` are set, then `expires` is used. */
+    /** A `number` in seconds that specifies the `Expires` attribute by adding the specified seconds to the current date. If both `expires` and `maxAge` are set, then `expires` is used. */
     maxAge?: number;
+    /** A `boolean` indicating whether the cookie is tied to the top-level site where it's initially set and cannot be accessed from elsewhere. */
     partitioned?: boolean;
-    /**  The `Path` attribute. Defaults to `/` (the root path).  */
+    /** The `Path` attribute. Defaults to `/` (the root path).  */
     path?: string;
     /** A `boolean` or one of the `SameSite` string attributes. E.g.: `lax`, `none` or `strict`.  */
     sameSite?: 'lax' | 'none' | 'strict' | boolean;
-    /**  The `boolean` value of the `Secure` attribute. Set this option to false when communicating over an unencrypted (HTTP) connection. Value can be set to `auto`; in this case the `Secure` attribute will be set to false for HTTP request, in case of HTTPS it will be set to true.  Defaults to true. */
+    /** One of the `Priority` string attributes (`low`, `medium` or `high`) specifying a retention priority for HTTP cookies that will be respected by user agents during cookie eviction. */
+    priority?: 'low' | 'medium' | 'high';
+    /** The `boolean` value of the `Secure` attribute. Set this option to false when communicating over an unencrypted (HTTP) connection. Value can be set to `auto`; in this case the `Secure` attribute will be set to false for HTTP request, in case of HTTPS it will be set to true.  Defaults to true. */
     secure?: boolean;
   }
 

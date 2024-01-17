@@ -152,6 +152,26 @@ function serialize (name, val, opt) {
     str += '; Path=' + opt.path
   }
 
+  if (opt.priority) {
+    const priority = typeof opt.priority === 'string'
+      ? opt.priority.toLowerCase()
+      : opt.priority
+
+    switch (priority) {
+      case 'low':
+        str += '; Priority=Low'
+        break
+      case 'medium':
+        str += '; Priority=Medium'
+        break
+      case 'high':
+        str += '; Priority=High'
+        break
+      default:
+        throw new TypeError('option priority is invalid')
+    }
+  }
+
   if (opt.expires) {
     if (typeof opt.expires.toUTCString !== 'function') {
       throw new TypeError('option expires is invalid')

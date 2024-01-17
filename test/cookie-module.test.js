@@ -203,3 +203,21 @@ test('unencoded', (t) => {
   }), /argument val is invalid/)
   t.end()
 })
+
+test('serializer: priority', (t) => {
+  t.plan(8)
+  t.same(cookie.serialize('foo', 'bar', { priority: 'Low' }), 'foo=bar; Priority=Low')
+  t.same(cookie.serialize('foo', 'bar', { priority: 'low' }), 'foo=bar; Priority=Low')
+  t.same(cookie.serialize('foo', 'bar', { priority: 'Medium' }), 'foo=bar; Priority=Medium')
+  t.same(cookie.serialize('foo', 'bar', { priority: 'medium' }), 'foo=bar; Priority=Medium')
+  t.same(cookie.serialize('foo', 'bar', { priority: 'High' }), 'foo=bar; Priority=High')
+  t.same(cookie.serialize('foo', 'bar', { priority: 'high' }), 'foo=bar; Priority=High')
+
+  t.throws(cookie.serialize.bind(cookie, 'foo', 'bar', {
+    priority: 'foo'
+  }), /option priority is invalid/)
+  t.throws(cookie.serialize.bind(cookie, 'foo', 'bar', {
+    priority: true
+  }), /option priority is invalid/)
+  t.end()
+})
