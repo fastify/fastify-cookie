@@ -957,7 +957,7 @@ test('result in an error if hook-option is set to an invalid value', (t) => {
   const fastify = Fastify()
 
   t.rejects(
-    () => fastify.register(plugin, { hook: true }),
+    async () => fastify.register(plugin, { hook: true }),
     new Error("@fastify/cookie: Invalid value provided for the hook-option. You can set the hook-option only to false, 'onRequest' , 'preParsing' , 'preValidation' or 'preHandler'")
   )
 })
