@@ -22,7 +22,7 @@ function fastifyCookieSetCookie (reply, name, value, options) {
   }
 
   if (opts.secure === 'auto') {
-    if (isConnectionSecure(reply.request)) {
+    if (reply.request.protocol === 'https') {
       opts.secure = true
     } else {
       opts.sameSite = 'lax'
@@ -185,13 +185,6 @@ function getHook (hook = 'onRequest') {
   }
 
   return hooks[hook]
-}
-
-function isConnectionSecure (request) {
-  return (
-    request.raw.socket?.encrypted === true ||
-    request.headers['x-forwarded-proto'] === 'https'
-  )
 }
 
 const fastifyCookie = fp(plugin, {
