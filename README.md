@@ -104,7 +104,7 @@ fastify.get('/', (req, reply) => {
 
 ### :warning: Security Considerations :warning:
 
-It's recommended to use `sha256` or stronger hashing algorithm as well as a `secret` that is at least 20 bytes long.
+It's recommended to use `sha256` or stronger hashing algorithm as well as a `secret`, that is at least 20 bytes long.
 
 #### parseOptions
 
