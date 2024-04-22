@@ -117,7 +117,7 @@ declare namespace fastifyCookie {
     encode?(val: string): string;
     /** The expiration `date` used for the `Expires` attribute. */
     expires?: Date;
-    /** The `boolean` value of the `HttpOnly` attribute. */
+    /** Add the `HttpOnly` attribute. Defaults to `false`. */
     httpOnly?: boolean;
     /** A `number` in seconds that specifies the `Max-Age` attribute. */
     maxAge?: number;
@@ -129,11 +129,12 @@ declare namespace fastifyCookie {
     sameSite?: 'lax' | 'none' | 'strict' | boolean;
     /** One of the `Priority` string attributes (`low`, `medium` or `high`) specifying a retention priority for HTTP cookies that will be respected by user agents during cookie eviction. */
     priority?: 'low' | 'medium' | 'high';
-    /** The `boolean` value of the `Secure` attribute. Set this option to false when communicating over an unencrypted (HTTP) connection. Value can be set to `auto`; in this case the `Secure` attribute will be set to false for HTTP request, in case of HTTPS it will be set to true. */
+    /** Add the `Secure` attribute. Defaults to `false`. */
     secure?: boolean;
   }
 
   export interface CookieSerializeOptions extends Omit<SerializeOptions, 'secure'> {
+    /** Add the `Secure` attribute. Value can be set to `"auto"`; in this case the `Secure` attribute will only be added for HTTPS requests. Defaults to `false`. */
     secure?: boolean | 'auto';
     signed?: boolean;
   }
