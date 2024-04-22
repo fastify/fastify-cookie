@@ -96,7 +96,15 @@ fastify.get('/', (req, reply) => {
   - An `Array` can be passed if key rotation is desired. Read more about it in [Rotating signing secret](#rotating-secret).
   - More sophisticated cookie signing mechanisms can be implemented by supplying an `Object`. Read more about it in [Custom cookie signer](#custom-cookie-signer).
 
+- `hook`: the [Fastify Hook](https://fastify.dev/docs/latest/Reference/Lifecycle/#lifecycle) to register the parsing of cookie into. Default: `onRequest`.
+
+- `algorithm`: the [algorithm](https://nodejs.org/api/crypto.html#cryptogethashes) to use to sign the cookies. Default: `sha256`.
+
 - `parseOptions`: An `Object` to modify the serialization of set cookies.
+
+### :warning: Security Considerations :warning:
+
+It is recommended to use `sha256` or stronger hashing algorithm as well as a `secret` that is at least 20 bytes long.
 
 #### parseOptions
 
