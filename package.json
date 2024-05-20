@@ -44,7 +44,7 @@
     "@types/node": "^20.1.0",
     "benchmark": "^2.1.4",
     "fastify": "^4.0.0",
-    "sinon": "^17.0.0",
+    "sinon": "^18.0.0",
     "snazzy": "^9.0.0",
     "standard": "^17.0.0",
     "tap": "^16.0.0",
