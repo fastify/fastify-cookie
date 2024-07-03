@@ -155,10 +155,14 @@ declare namespace fastifyCookie {
   export type Unsign = (input: string, secret: string | Buffer, algorithm?: string) => UnsignResult;
   export type SignerFactory = (secrets: string | string[] | Buffer | Buffer[], algorithm?: string) => SignerBase;
 
-  export interface UnsignResult {
-    valid: boolean;
+  export type UnsignResult = {
+    valid: true;
     renew: boolean;
-    value: string | null;
+    value: string;
+  } | {
+    valid: false;
+    renew: false;
+    value: null;
   }
 
   export const signerFactory: SignerFactory;
