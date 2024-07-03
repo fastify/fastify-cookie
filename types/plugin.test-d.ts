@@ -150,11 +150,15 @@ appWithRotationSecret.register(cookie, {
 appWithRotationSecret.after(() => {
   server.get('/', (request, reply) => {
     reply.unsignCookie(request.cookies.test!);
-    const { valid, renew, value } = reply.unsignCookie('test');
+    const unsigned = reply.unsignCookie('test');
 
-    expectType<boolean>(valid);
-    expectType<boolean>(renew);
-    expectType<string | null>(value);
+    expectType<boolean>(unsigned.valid);
+    if (unsigned.valid) {
+      expectType<string>(unsigned.value);
+    } else {
+      expectType<null>(unsigned.value);
+    }
+    expectType<boolean>(unsigned.renew);
 
     reply.send({ hello: 'world' });
   });
@@ -182,11 +186,15 @@ appWithParseOptions.register(cookie, {
 });
 appWithParseOptions.after(() => {
   server.get('/', (request, reply) => {
-    const { valid, renew, value } = reply.unsignCookie(request.cookies.test!);
+    const unsigned = reply.unsignCookie(request.cookies.test!);
 
-    expectType<boolean>(valid);
-    expectType<boolean>(renew);
-    expectType<string | null>(value);
+    expectType<boolean>(unsigned.valid);
+    if (unsigned.valid) {
+      expectType<string>(unsigned.value);
+    } else {
+      expectType<null>(unsigned.value);
+    }
+    expectType<boolean>(unsigned.renew);
   });
 });
 
@@ -204,11 +212,15 @@ appWithCustomSigner.register(cookie, {
 appWithCustomSigner.after(() => {
   server.get('/', (request, reply) => {
     reply.unsignCookie(request.cookies.test!)
-    const { valid, renew, value } = reply.unsignCookie('test')
+    const unsigned = reply.unsignCookie('test')
 
-    expectType<boolean>(valid)
-    expectType<boolean>(renew)
-    expectType<string | null>(value)
+    expectType<boolean>(unsigned.valid);
+    if (unsigned.valid) {
+      expectType<string>(unsigned.value);
+    } else {
+      expectType<null>(unsigned.value);
+    }
+    expectType<boolean>(unsigned.renew);
 
     reply.send({ hello: 'world' })
   })
