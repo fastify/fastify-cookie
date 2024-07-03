@@ -854,7 +854,7 @@ test('create signed cookie manually using signCookie decorator', async (t) => {
 })
 
 test('handle secure:auto of cookieOptions', async (t) => {
-  const fastify = Fastify()
+  const fastify = Fastify({ trustProxy: true })
 
   await fastify.register(plugin)
 
