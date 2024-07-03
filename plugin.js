@@ -11,7 +11,7 @@ const kReplySetCookiesHookRan = Symbol('fastify.reply.setCookiesHookRan')
 function fastifyCookieSetCookie (reply, name, value, options) {
   parseCookies(reply.server, reply.request, reply)
 
-  const opts = Object.assign({}, options)
+  const opts = Object.assign({ sameSite: 'lax' }, options)
 
   if (opts.expires && Number.isInteger(opts.expires)) {
     opts.expires = new Date(opts.expires)
@@ -25,7 +25,6 @@ function fastifyCookieSetCookie (reply, name, value, options) {
     if (reply.request.protocol === 'https') {
       opts.secure = true
     } else {
-      opts.sameSite = 'lax'
       opts.secure = false
     }
   }
@@ -45,6 +44,7 @@ function fastifyCookieClearCookie (reply, name, options) {
     signed: undefined,
     maxAge: undefined
   })
+
   return fastifyCookieSetCookie(reply, name, '', opts)
 }
 

@@ -127,8 +127,8 @@ test('should set multiple cookies', (t) => {
     t.equal(cookies[2].name, 'wee')
     t.equal(cookies[2].value, 'woo')
 
-    t.equal(res.headers['set-cookie'][1], 'bar=test; Partitioned')
-    t.equal(res.headers['set-cookie'][2], 'wee=woo; Secure; Partitioned')
+    t.equal(res.headers['set-cookie'][1], 'bar=test; Partitioned; SameSite=Lax')
+    t.equal(res.headers['set-cookie'][2], 'wee=woo; Secure; Partitioned; SameSite=Lax')
   })
 })
 
@@ -957,7 +957,7 @@ test('result in an error if hook-option is set to an invalid value', (t) => {
   const fastify = Fastify()
 
   t.rejects(
-    () => fastify.register(plugin, { hook: true }),
+    async () => fastify.register(plugin, { hook: true }),
     new Error("@fastify/cookie: Invalid value provided for the hook-option. You can set the hook-option only to false, 'onRequest' , 'preParsing' , 'preValidation' or 'preHandler'")
   )
 })
