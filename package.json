@@ -41,7 +41,7 @@
   "homepage": "https://github.com/fastify/fastify-cookie#readme",
   "devDependencies": {
     "@fastify/pre-commit": "^2.1.0",
-    "@types/node": "^20.11.6",
+    "@types/node": "^22.0.0",
     "benchmark": "^2.1.4",
     "fastify": "^5.0.0-alpha.3",
     "sinon": "^18.0.0",
