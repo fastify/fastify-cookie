@@ -188,7 +188,7 @@ function getHook (hook = 'onRequest') {
 }
 
 const fastifyCookie = fp(plugin, {
-  fastify: '4.x',
+  fastify: '5.x',
   name: '@fastify/cookie'
 })
 
