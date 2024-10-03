@@ -1,7 +1,7 @@
 'use strict'
 
 const fp = require('fastify-plugin')
-const cookie = require('./cookie')
+const cookie = require('cookie')
 
 const { Signer, sign, unsign } = require('./signer')
 

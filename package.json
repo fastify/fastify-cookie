@@ -51,8 +51,9 @@
     "tsd": "^0.31.1"
   },
   "dependencies": {
-    "fastify-plugin": "^5.0.0",
-    "cookie-signature": "^1.2.1"
+    "cookie": "^0.7.1",
+    "cookie-signature": "^1.2.1",
+    "fastify-plugin": "^5.0.0"
   },
   "tsd": {
     "directory": "test"
