@@ -52,7 +52,6 @@
   },
   "dependencies": {
     "cookie": "^1.0.0",
-    "cookie-signature": "^1.2.1",
     "fastify-plugin": "^5.0.0"
   },
   "tsd": {
