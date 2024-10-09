@@ -42,7 +42,7 @@ function fastifyCookieClearCookie (reply, name, options) {
   const opts = Object.assign({ path: '/' }, options, {
     expires: new Date(1),
     signed: undefined,
-    maxAge: undefined
+    maxAge: 0
   })
 
   return fastifyCookieSetCookie(reply, name, '', opts)
