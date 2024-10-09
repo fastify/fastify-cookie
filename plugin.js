@@ -40,9 +40,9 @@ function fastifyCookieSetCookie (reply, name, value, options) {
 
 function fastifyCookieClearCookie (reply, name, options) {
   const opts = Object.assign({ path: '/' }, options, {
-    expires: new Date(1),
-    signed: undefined,
-    maxAge: undefined
+    expires: new Date(0),
+    maxAge: 0,
+    signed: false
   })
 
   return fastifyCookieSetCookie(reply, name, '', opts)

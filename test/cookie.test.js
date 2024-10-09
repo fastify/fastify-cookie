@@ -224,7 +224,7 @@ test('share options for setCookie and clearCookie', (t) => {
     t.equal(cookies.length, 1)
     t.equal(cookies[0].name, 'foo')
     t.equal(cookies[0].value, '')
-    t.equal(cookies[0].maxAge, undefined)
+    t.equal(cookies[0].maxAge, 0)
 
     t.ok(new Date(cookies[0].expires) < new Date())
   })
@@ -1054,7 +1054,7 @@ test('clearCookie should include parseOptions', (t) => {
     t.equal(cookies.length, 1)
     t.equal(cookies[0].name, 'foo')
     t.equal(cookies[0].value, '')
-    t.equal(cookies[0].maxAge, undefined)
+    t.equal(cookies[0].maxAge, 0)
     t.equal(cookies[0].path, '/test')
     t.equal(cookies[0].domain, 'example.com')
 
