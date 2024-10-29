@@ -1,13 +1,13 @@
 'use strict'
 
-const { test } = require('tap')
+const { describe, test } = require('node:test')
+const assert = require('node:assert/strict')
 const Fastify = require('fastify')
 const sinon = require('sinon')
 const { sign, unsign } = require('../signer')
 const plugin = require('../')
 
 test('cookies get set correctly', (t) => {
-  t.plan(7)
   const fastify = Fastify()
   fastify.register(plugin)
 
@@ -20,21 +20,21 @@ test('cookies get set correctly', (t) => {
   fastify.inject({
     method: 'GET',
     url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
+  }).then(res => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.equal(cookies.length, 1)
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, 'foo')
-    t.equal(cookies[0].path, '/')
+    assert.strictEqual(cookies.length, 1)
+    assert.strictEqual(cookies[0].name, 'foo')
+    assert.strictEqual(cookies[0].value, 'foo')
+    assert.strictEqual(cookies[0].path, '/')
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('express cookie compatibility', (t) => {
-  t.plan(7)
   const fastify = Fastify()
   fastify.register(plugin)
 
@@ -47,21 +47,21 @@ test('express cookie compatibility', (t) => {
   fastify.inject({
     method: 'GET',
     url: '/espresso'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
+  }).then(res => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.equal(cookies.length, 1)
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, 'foo')
-    t.equal(cookies[0].path, '/')
+    assert.strictEqual(cookies.length, 1)
+    assert.strictEqual(cookies[0].name, 'foo')
+    assert.strictEqual(cookies[0].value, 'foo')
+    assert.strictEqual(cookies[0].path, '/')
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('should set multiple cookies', (t) => {
-  t.plan(10)
   const fastify = Fastify()
   fastify.register(plugin)
 
@@ -76,24 +76,24 @@ test('should set multiple cookies', (t) => {
   fastify.inject({
     method: 'GET',
     url: '/'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
+  }).then(res => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.equal(cookies.length, 3)
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, 'foo')
-    t.equal(cookies[1].name, 'bar')
-    t.equal(cookies[1].value, 'test')
-    t.equal(cookies[2].name, 'wee')
-    t.equal(cookies[2].value, 'woo')
+    assert.strictEqual(cookies.length, 3)
+    assert.strictEqual(cookies[0].name, 'foo')
+    assert.strictEqual(cookies[0].value, 'foo')
+    assert.strictEqual(cookies[1].name, 'bar')
+    assert.strictEqual(cookies[1].value, 'test')
+    assert.strictEqual(cookies[2].name, 'wee')
+    assert.strictEqual(cookies[2].value, 'woo')
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('should set multiple cookies', (t) => {
-  t.plan(12)
   const fastify = Fastify()
   fastify.register(plugin)
 
@@ -113,27 +113,27 @@ test('should set multiple cookies', (t) => {
   fastify.inject({
     method: 'GET',
     url: '/'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
+  }).then(res => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.equal(cookies.length, 3)
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, 'foo')
-    t.equal(cookies[1].name, 'bar')
-    t.equal(cookies[1].value, 'test')
-    t.equal(cookies[2].name, 'wee')
-    t.equal(cookies[2].value, 'woo')
+    assert.strictEqual(cookies.length, 3)
+    assert.strictEqual(cookies[0].name, 'foo')
+    assert.strictEqual(cookies[0].value, 'foo')
+    assert.strictEqual(cookies[1].name, 'bar')
+    assert.strictEqual(cookies[1].value, 'test')
+    assert.strictEqual(cookies[2].name, 'wee')
+    assert.strictEqual(cookies[2].value, 'woo')
 
-    t.equal(res.headers['set-cookie'][1], 'bar=test; Partitioned; SameSite=Lax')
-    t.equal(res.headers['set-cookie'][2], 'wee=woo; Secure; Partitioned; SameSite=Lax')
+    assert.strictEqual(res.headers['set-cookie'][1], 'bar=test; Partitioned; SameSite=Lax')
+    assert.strictEqual(res.headers['set-cookie'][2], 'wee=woo; Secure; Partitioned; SameSite=Lax')
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('should set multiple cookies (an array already exists)', (t) => {
-  t.plan(10)
   const fastify = Fastify()
   fastify.register(plugin)
 
@@ -148,25 +148,25 @@ test('should set multiple cookies (an array already exists)', (t) => {
   fastify.inject({
     method: 'GET',
     url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
+  }).then(res => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.equal(cookies.length, 3)
-    t.equal(cookies[0].name, 'bar')
-    t.equal(cookies[0].value, 'bar')
-    t.equal(cookies[0].path, undefined)
+    assert.strictEqual(cookies.length, 3)
+    assert.strictEqual(cookies[0].name, 'bar')
+    assert.strictEqual(cookies[0].value, 'bar')
+    assert.strictEqual(cookies[0].path, undefined)
 
-    t.equal(cookies[1].name, 'foo')
-    t.equal(cookies[1].value, 'foo')
-    t.equal(cookies[2].path, '/path')
+    assert.strictEqual(cookies[1].name, 'foo')
+    assert.strictEqual(cookies[1].value, 'foo')
+    assert.strictEqual(cookies[2].path, '/path')
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('cookies get set correctly with millisecond dates', (t) => {
-  t.plan(8)
   const fastify = Fastify()
   fastify.register(plugin)
 
@@ -179,23 +179,23 @@ test('cookies get set correctly with millisecond dates', (t) => {
   fastify.inject({
     method: 'GET',
     url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
+  }).then(res => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.equal(cookies.length, 1)
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, 'foo')
-    t.equal(cookies[0].path, '/')
+    assert.strictEqual(cookies.length, 1)
+    assert.strictEqual(cookies[0].name, 'foo')
+    assert.strictEqual(cookies[0].value, 'foo')
+    assert.strictEqual(cookies[0].path, '/')
     const expires = new Date(cookies[0].expires)
-    t.ok(expires < new Date(Date.now() + 5000))
+    assert.ok(expires < new Date(Date.now() + 5000))
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('share options for setCookie and clearCookie', (t) => {
-  t.plan(8)
   const fastify = Fastify()
   const secret = 'testsecret'
   fastify.register(plugin, { secret })
@@ -215,23 +215,23 @@ test('share options for setCookie and clearCookie', (t) => {
   fastify.inject({
     method: 'GET',
     url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
+  }).then((res) => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.equal(cookies.length, 1)
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, '')
-    t.equal(cookies[0].maxAge, 0)
+    assert.strictEqual(cookies.length, 1)
+    assert.strictEqual(cookies[0].name, 'foo')
+    assert.strictEqual(cookies[0].value, '')
+    assert.strictEqual(cookies[0].maxAge, 0)
 
-    t.ok(new Date(cookies[0].expires) < new Date())
+    assert.ok(new Date(cookies[0].expires) < new Date())
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('expires should not be overridden in clearCookie', (t) => {
-  t.plan(7)
   const fastify = Fastify()
   const secret = 'testsecret'
   fastify.register(plugin, { secret })
@@ -251,46 +251,44 @@ test('expires should not be overridden in clearCookie', (t) => {
   fastify.inject({
     method: 'GET',
     url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
+  }).then((res) => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.equal(cookies.length, 1)
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, '')
+    assert.strictEqual(cookies.length, 1)
+    assert.strictEqual(cookies[0].name, 'foo')
+    assert.strictEqual(cookies[0].value, '')
     const expires = new Date(cookies[0].expires)
-    t.ok(expires < new Date(Date.now() + 5000))
+    assert.ok(expires < new Date(Date.now() + 5000))
   })
 })
 
 test('parses incoming cookies', (t) => {
-  t.plan(15)
   const fastify = Fastify()
   fastify.register(plugin)
 
   // check that it parses the cookies in the onRequest hook
   for (const hook of ['preValidation', 'preHandler']) {
     fastify.addHook(hook, (req, reply, done) => {
-      t.ok(req.cookies)
-      t.ok(req.cookies.bar)
-      t.equal(req.cookies.bar, 'bar')
+      assert.ok(req.cookies)
+      assert.ok(req.cookies.bar)
+      assert.strictEqual(req.cookies.bar, 'bar')
       done()
     })
   }
 
   fastify.addHook('preParsing', (req, reply, payload, done) => {
-    t.ok(req.cookies)
-    t.ok(req.cookies.bar)
-    t.equal(req.cookies.bar, 'bar')
+    assert.ok(req.cookies)
+    assert.ok(req.cookies.bar)
+    assert.strictEqual(req.cookies.bar, 'bar')
     done()
   })
 
   fastify.get('/test2', (req, reply) => {
-    t.ok(req.cookies)
-    t.ok(req.cookies.bar)
-    t.equal(req.cookies.bar, 'bar')
+    assert.ok(req.cookies)
+    assert.ok(req.cookies.bar)
+    assert.strictEqual(req.cookies.bar, 'bar')
     reply.send({ hello: 'world' })
   })
 
@@ -300,51 +298,49 @@ test('parses incoming cookies', (t) => {
     headers: {
       cookie: 'bar=bar'
     }
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
+  }).then((res) => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('defined and undefined cookies', (t) => {
-  t.plan(23)
   const fastify = Fastify()
   fastify.register(plugin)
 
   // check that it parses the cookies in the onRequest hook
   for (const hook of ['preValidation', 'preHandler']) {
     fastify.addHook(hook, (req, reply, done) => {
-      t.ok(req.cookies)
+      assert.ok(req.cookies)
 
-      t.ok(req.cookies.bar)
-      t.notOk(req.cookies.baz)
+      assert.ok(req.cookies.bar)
+      assert.ok(!req.cookies.baz)
 
-      t.equal(req.cookies.bar, 'bar')
-      t.equal(req.cookies.baz, undefined)
-      done()
+      assert.strictEqual(req.cookies.bar, 'bar')
+      assert.strictEqual(req.cookies.baz, undefined)
     })
   }
 
   fastify.addHook('preParsing', (req, reply, payload, done) => {
-    t.ok(req.cookies)
+    assert.ok(req.cookies)
 
-    t.ok(req.cookies.bar)
-    t.notOk(req.cookies.baz)
+    assert.ok(req.cookies.bar)
+    assert.ok(!req.cookies.baz)
 
-    t.equal(req.cookies.bar, 'bar')
-    t.equal(req.cookies.baz, undefined)
-    done()
+    assert.strictEqual(req.cookies.bar, 'bar')
+    assert.strictEqual(req.cookies.baz, undefined)
   })
 
   fastify.get('/test2', (req, reply) => {
-    t.ok(req.cookies)
+    assert.ok(req.cookies)
 
-    t.ok(req.cookies.bar)
-    t.notOk(req.cookies.baz)
+    assert.ok(req.cookies.bar)
+    assert.ok(!req.cookies.baz)
 
-    t.equal(req.cookies.bar, 'bar')
-    t.equal(req.cookies.baz, undefined)
+    assert.strictEqual(req.cookies.bar, 'bar')
+    assert.strictEqual(req.cookies.baz, undefined)
 
     reply.send({ hello: 'world' })
   })
@@ -355,15 +351,15 @@ test('defined and undefined cookies', (t) => {
     headers: {
       cookie: 'bar=bar'
     }
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
+  }).then((res) => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('does not modify supplied cookie options object', (t) => {
-  t.plan(3)
   const expireDate = Date.now() + 1000
   const cookieOptions = {
     path: '/',
@@ -381,18 +377,18 @@ test('does not modify supplied cookie options object', (t) => {
   fastify.inject({
     method: 'GET',
     url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.strictSame(cookieOptions, {
+  }).then(res => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(cookieOptions, {
       path: '/',
       expires: expireDate
     })
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('cookies gets cleared correctly', (t) => {
-  t.plan(5)
   const fastify = Fastify()
   fastify.register(plugin)
 
@@ -405,22 +401,20 @@ test('cookies gets cleared correctly', (t) => {
   fastify.inject({
     method: 'GET',
     url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
+  }).then((res) => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.equal(cookies.length, 1)
-    t.equal(new Date(cookies[0].expires) < new Date(), true)
+    assert.strictEqual(cookies.length, 1)
+    assert.strictEqual(new Date(cookies[0].expires) < new Date(), true)
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
-test('cookies signature', (t) => {
-  t.plan(9)
-
-  t.test('unsign', t => {
-    t.plan(6)
+describe('cookies signature', () => {
+  test('unsign', t => {
     const fastify = Fastify()
     const secret = 'bar'
     fastify.register(plugin, { secret })
@@ -434,20 +428,20 @@ test('cookies signature', (t) => {
     fastify.inject({
       method: 'GET',
       url: '/test1'
-    }, (err, res) => {
-      t.error(err)
-      t.equal(res.statusCode, 200)
-      t.same(JSON.parse(res.body), { hello: 'world' })
+    }).then((res) => {
+      assert.strictEqual(res.statusCode, 200)
+      assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 
       const cookies = res.cookies
-      t.equal(cookies.length, 1)
-      t.equal(cookies[0].name, 'foo')
-      t.same(unsign(cookies[0].value, secret), { valid: true, renew: false, value: 'foo' })
+      assert.strictEqual(cookies.length, 1)
+      assert.strictEqual(cookies[0].name, 'foo')
+      assert.deepStrictEqual(unsign(cookies[0].value, secret), { valid: true, renew: false, value: 'foo' })
+    }).catch(err => {
+      assert.fail(err)
     })
   })
 
-  t.test('key rotation uses first key to sign', t => {
-    t.plan(6)
+  test('key rotation uses first key to sign', t => {
     const fastify = Fastify()
     const secret1 = 'secret-1'
     const secret2 = 'secret-2'
@@ -462,20 +456,20 @@ test('cookies signature', (t) => {
     fastify.inject({
       method: 'GET',
       url: '/test1'
-    }, (err, res) => {
-      t.error(err)
-      t.equal(res.statusCode, 200)
-      t.same(JSON.parse(res.body), { hello: 'world' })
+    }).then((res) => {
+      assert.strictEqual(res.statusCode, 200)
+      assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 
       const cookies = res.cookies
-      t.equal(cookies.length, 1)
-      t.equal(cookies[0].name, 'foo')
-      t.same(unsign(cookies[0].value, secret1), { valid: true, renew: false, value: 'cookieVal' }) // decode using first key
+      assert.strictEqual(cookies.length, 1)
+      assert.strictEqual(cookies[0].name, 'foo')
+      assert.deepStrictEqual(unsign(cookies[0].value, secret1), { valid: true, renew: false, value: 'cookieVal' }) // decode using first key
+    }).catch(err => {
+      assert.fail(err)
     })
   })
 
-  t.test('unsginCookie via fastify instance', t => {
-    t.plan(3)
+  test('unsginCookie via fastify instance', t => {
     const fastify = Fastify()
     const secret = 'bar'
 
@@ -493,15 +487,15 @@ test('cookies signature', (t) => {
       headers: {
         cookie: `foo=${sign('foo', secret)}`
       }
-    }, (err, res) => {
-      t.error(err)
-      t.equal(res.statusCode, 200)
-      t.same(JSON.parse(res.body), { unsigned: { value: 'foo', renew: false, valid: true } })
+    }).then((res) => {
+      assert.strictEqual(res.statusCode, 200)
+      assert.deepStrictEqual(JSON.parse(res.body), { unsigned: { value: 'foo', renew: false, valid: true } })
+    }).catch(err => {
+      assert.fail(err)
     })
   })
 
-  t.test('unsignCookie via request decorator', t => {
-    t.plan(3)
+  test('unsignCookie via request decorator', t => {
     const fastify = Fastify()
     const secret = 'bar'
     fastify.register(plugin, { secret })
@@ -518,15 +512,15 @@ test('cookies signature', (t) => {
       headers: {
         cookie: `foo=${sign('foo', secret)}`
       }
-    }, (err, res) => {
-      t.error(err)
-      t.equal(res.statusCode, 200)
-      t.same(JSON.parse(res.body), { unsigned: { value: 'foo', renew: false, valid: true } })
+    }).then((res) => {
+      assert.strictEqual(res.statusCode, 200)
+      assert.deepStrictEqual(JSON.parse(res.body), { unsigned: { value: 'foo', renew: false, valid: true } })
+    }).catch(err => {
+      assert.fail(err)
     })
   })
 
-  t.test('unsignCookie via reply decorator', t => {
-    t.plan(3)
+  test('unsignCookie via reply decorator', t => {
     const fastify = Fastify()
     const secret = 'bar'
     fastify.register(plugin, { secret })
@@ -543,15 +537,15 @@ test('cookies signature', (t) => {
       headers: {
         cookie: `foo=${sign('foo', secret)}`
       }
-    }, (err, res) => {
-      t.error(err)
-      t.equal(res.statusCode, 200)
-      t.same(JSON.parse(res.body), { unsigned: { value: 'foo', renew: false, valid: true } })
+    }).then((res) => {
+      assert.strictEqual(res.statusCode, 200)
+      assert.deepStrictEqual(JSON.parse(res.body), { unsigned: { value: 'foo', renew: false, valid: true } })
+    }).catch(err => {
+      assert.fail(err)
     })
   })
 
-  t.test('unsignCookie via request decorator after rotation', t => {
-    t.plan(3)
+  test('unsignCookie via request decorator after rotation', t => {
     const fastify = Fastify()
     const secret1 = 'sec-1'
     const secret2 = 'sec-2'
@@ -569,15 +563,15 @@ test('cookies signature', (t) => {
       headers: {
         cookie: `foo=${sign('foo', secret2)}`
       }
-    }, (err, res) => {
-      t.error(err)
-      t.equal(res.statusCode, 200)
-      t.same(JSON.parse(res.body), { unsigned: { value: 'foo', renew: true, valid: true } })
+    }).then((res) => {
+      assert.strictEqual(res.statusCode, 200)
+      assert.deepStrictEqual(JSON.parse(res.body), { unsigned: { value: 'foo', renew: true, valid: true } })
+    }).catch(err => {
+      assert.fail(err)
     })
   })
 
-  t.test('unsignCookie via reply decorator after rotation', t => {
-    t.plan(3)
+  test('unsignCookie via reply decorator after rotation', t => {
     const fastify = Fastify()
     const secret1 = 'sec-1'
     const secret2 = 'sec-2'
@@ -595,15 +589,15 @@ test('cookies signature', (t) => {
       headers: {
         cookie: `foo=${sign('foo', secret2)}`
       }
-    }, (err, res) => {
-      t.error(err)
-      t.equal(res.statusCode, 200)
-      t.same(JSON.parse(res.body), { unsigned: { value: 'foo', renew: true, valid: true } })
+    }).then((res) => {
+      assert.strictEqual(res.statusCode, 200)
+      assert.deepStrictEqual(JSON.parse(res.body), { unsigned: { value: 'foo', renew: true, valid: true } })
+    }).catch(err => {
+      assert.fail(err)
     })
   })
 
-  t.test('unsignCookie via request decorator failure response', t => {
-    t.plan(3)
+  test('unsignCookie via request decorator failure response', t => {
     const fastify = Fastify()
     const secret1 = 'sec-1'
     const secret2 = 'sec-2'
@@ -621,15 +615,15 @@ test('cookies signature', (t) => {
       headers: {
         cookie: `foo=${sign('foo', 'invalid-secret')}`
       }
-    }, (err, res) => {
-      t.error(err)
-      t.equal(res.statusCode, 200)
-      t.same(JSON.parse(res.body), { unsigned: { value: null, renew: false, valid: false } })
+    }).then((res) => {
+      assert.strictEqual(res.statusCode, 200)
+      assert.deepStrictEqual(JSON.parse(res.body), { unsigned: { value: null, renew: false, valid: false } })
+    }).catch(err => {
+      assert.fail(err)
     })
   })
 
-  t.test('unsignCookie reply decorator failure response', t => {
-    t.plan(3)
+  test('unsignCookie reply decorator failure response', t => {
     const fastify = Fastify()
     const secret1 = 'sec-1'
     const secret2 = 'sec-2'
@@ -647,16 +641,16 @@ test('cookies signature', (t) => {
       headers: {
         cookie: `foo=${sign('foo', 'invalid-secret')}`
       }
-    }, (err, res) => {
-      t.error(err)
-      t.equal(res.statusCode, 200)
-      t.same(JSON.parse(res.body), { unsigned: { value: null, renew: false, valid: false } })
+    }).then((res) => {
+      assert.strictEqual(res.statusCode, 200)
+      assert.deepStrictEqual(JSON.parse(res.body), { unsigned: { value: null, renew: false, valid: false } })
+    }).catch(err => {
+      assert.fail(err)
     })
   })
 })
 
 test('custom signer', t => {
-  t.plan(7)
   const fastify = Fastify()
   const signStub = sinon.stub().returns('SIGNED-VALUE')
   const unsignStub = sinon.stub().returns('ORIGINAL VALUE')
@@ -672,21 +666,21 @@ test('custom signer', t => {
   fastify.inject({
     method: 'GET',
     url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
+  }).then((res) => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.equal(cookies.length, 1)
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, 'SIGNED-VALUE')
-    t.ok(signStub.calledOnceWithExactly('bar'))
+    assert.strictEqual(cookies.length, 1)
+    assert.strictEqual(cookies[0].name, 'foo')
+    assert.strictEqual(cookies[0].value, 'SIGNED-VALUE')
+    assert.ok(signStub.calledOnceWithExactly('bar'))
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('unsignCookie decorator with custom signer', t => {
-  t.plan(4)
   const fastify = Fastify()
   const signStub = sinon.stub().returns('SIGNED-VALUE')
   const unsignStub = sinon.stub().returns('ORIGINAL VALUE')
@@ -705,16 +699,16 @@ test('unsignCookie decorator with custom signer', t => {
     headers: {
       cookie: 'foo=SOME-SIGNED-VALUE'
     }
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { unsigned: 'ORIGINAL VALUE' })
-    t.ok(unsignStub.calledOnceWithExactly('SOME-SIGNED-VALUE'))
+  }).then((res) => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { unsigned: 'ORIGINAL VALUE' })
+    assert.ok(unsignStub.calledOnceWithExactly('SOME-SIGNED-VALUE'))
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('pass options to `cookies.parse`', (t) => {
-  t.plan(6)
   const fastify = Fastify()
   fastify.register(plugin, {
     parseOptions: {
@@ -723,9 +717,9 @@ test('pass options to `cookies.parse`', (t) => {
   })
 
   fastify.get('/test1', (req, reply) => {
-    t.ok(req.cookies)
-    t.ok(req.cookies.foo)
-    t.equal(req.cookies.foo, 'bartest')
+    assert.ok(req.cookies)
+    assert.ok(req.cookies.foo)
+    assert.strictEqual(req.cookies.foo, 'bartest')
     reply.send({ hello: 'world' })
   })
 
@@ -735,10 +729,11 @@ test('pass options to `cookies.parse`', (t) => {
     headers: {
       cookie: 'foo=bar'
     }
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
+  }).then((res) => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
+  }).catch(err => {
+    assert.fail(err)
   })
 
   function decoder (str) {
@@ -747,7 +742,6 @@ test('pass options to `cookies.parse`', (t) => {
 })
 
 test('issue 53', (t) => {
-  t.plan(5)
   const fastify = Fastify()
   fastify.register(plugin)
 
@@ -755,7 +749,7 @@ test('issue 53', (t) => {
   let count = 1
   fastify.get('/foo', (req, reply) => {
     if (count > 1) {
-      t.not(cookies, req.cookies)
+      assert.notEqual(cookies, req.cookies)
       return reply.send('done')
     }
 
@@ -764,43 +758,40 @@ test('issue 53', (t) => {
     reply.send('done')
   })
 
-  fastify.inject({ url: '/foo' }, (err, response) => {
-    t.error(err)
-    t.equal(response.body, 'done')
+  fastify.inject({ url: '/foo' }).then((res) => {
+    assert.strictEqual(res.body, 'done')
+  }).catch(err => {
+    assert.fail(err)
   })
 
-  fastify.inject({ url: '/foo' }, (err, response) => {
-    t.error(err)
-    t.equal(response.body, 'done')
+  fastify.inject({ url: '/foo' }).then((res) => {
+    assert.strictEqual(res.body, 'done')
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('serialize cookie manually using decorator', (t) => {
-  t.plan(2)
   const fastify = Fastify()
   fastify.register(plugin)
 
   fastify.ready(() => {
-    t.ok(fastify.serializeCookie)
-    t.same(fastify.serializeCookie('foo', 'bar', {}), 'foo=bar')
-    t.end()
+    assert.ok(fastify.serializeCookie)
+    assert.deepStrictEqual(fastify.serializeCookie('foo', 'bar', {}), 'foo=bar')
   })
 })
 
 test('parse cookie manually using decorator', (t) => {
-  t.plan(2)
   const fastify = Fastify()
   fastify.register(plugin)
 
   fastify.ready(() => {
-    t.ok(fastify.parseCookie)
-    t.same(fastify.parseCookie('foo=bar', {}), { foo: 'bar' })
-    t.end()
+    assert.ok(fastify.parseCookie)
+    assert.deepStrictEqual({ ...fastify.parseCookie('foo=bar', {}) }, { foo: 'bar' })
   })
 })
 
 test('cookies set with plugin options parseOptions field', (t) => {
-  t.plan(8)
   const fastify = Fastify()
   fastify.register(plugin, {
     parseOptions: {
@@ -817,20 +808,19 @@ test('cookies set with plugin options parseOptions field', (t) => {
     {
       method: 'GET',
       url: '/test'
-    },
-    (err, res) => {
-      t.error(err)
-      t.equal(res.statusCode, 200)
-      t.same(JSON.parse(res.body), { hello: 'world' })
+    }).then((res) => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 
-      const cookies = res.cookies
-      t.equal(cookies.length, 1)
-      t.equal(cookies[0].name, 'foo')
-      t.equal(cookies[0].value, 'foo')
-      t.equal(cookies[0].path, '/test')
-      t.equal(cookies[0].domain, 'example.com')
-    }
-  )
+    const cookies = res.cookies
+    assert.strictEqual(cookies.length, 1)
+    assert.strictEqual(cookies[0].name, 'foo')
+    assert.strictEqual(cookies[0].value, 'foo')
+    assert.strictEqual(cookies[0].path, '/test')
+    assert.strictEqual(cookies[0].domain, 'example.com')
+  }).catch(err => {
+    assert.fail(err)
+  })
 })
 
 test('create signed cookie manually using signCookie decorator', async (t) => {
@@ -849,8 +839,8 @@ test('create signed cookie manually using signCookie decorator', async (t) => {
     url: '/test1',
     headers: { cookie: `foo=${fastify.signCookie('bar')}` }
   })
-  t.equal(res.statusCode, 200)
-  t.same(JSON.parse(res.body), { unsigned: { value: 'bar', renew: false, valid: true } })
+  assert.strictEqual(res.statusCode, 200)
+  assert.deepStrictEqual(JSON.parse(res.body), { unsigned: { value: 'bar', renew: false, valid: true } })
 })
 
 test('handle secure:auto of cookieOptions', async (t) => {
@@ -871,11 +861,11 @@ test('handle secure:auto of cookieOptions', async (t) => {
   })
 
   const cookies = res.cookies
-  t.equal(cookies.length, 1)
-  t.equal(cookies[0].name, 'foo')
-  t.equal(cookies[0].value, 'foo')
-  t.equal(cookies[0].secure, true)
-  t.equal(cookies[0].path, '/')
+  assert.strictEqual(cookies.length, 1)
+  assert.strictEqual(cookies[0].name, 'foo')
+  assert.strictEqual(cookies[0].value, 'foo')
+  assert.strictEqual(cookies[0].secure, true)
+  assert.strictEqual(cookies[0].path, '/')
 
   const res2 = await fastify.inject({
     method: 'GET',
@@ -883,28 +873,27 @@ test('handle secure:auto of cookieOptions', async (t) => {
   })
 
   const cookies2 = res2.cookies
-  t.equal(cookies2.length, 1)
-  t.equal(cookies2[0].name, 'foo')
-  t.equal(cookies2[0].value, 'foo')
-  t.equal(cookies2[0].sameSite, 'Lax')
-  t.same(cookies2[0].secure, null)
-  t.equal(cookies2[0].path, '/')
+  assert.strictEqual(cookies2.length, 1)
+  assert.strictEqual(cookies2[0].name, 'foo')
+  assert.strictEqual(cookies2[0].value, 'foo')
+  assert.strictEqual(cookies2[0].sameSite, 'Lax')
+  assert.deepStrictEqual(cookies2[0].secure, undefined)
+  assert.strictEqual(cookies2[0].path, '/')
 })
 
 test('should not decorate fastify, request and reply if no secret was provided', async (t) => {
-  t.plan(8)
   const fastify = Fastify()
 
   await fastify.register(plugin)
 
-  t.notOk(fastify.signCookie)
-  t.notOk(fastify.unsignCookie)
+  assert.ok(!fastify.signCookie)
+  assert.ok(!fastify.unsignCookie)
 
   fastify.get('/testDecorators', (req, reply) => {
-    t.notOk(req.signCookie)
-    t.notOk(reply.signCookie)
-    t.notOk(req.unsignCookie)
-    t.notOk(reply.unsignCookie)
+    assert.ok(!req.signCookie)
+    assert.ok(!reply.signCookie)
+    assert.ok(!req.unsignCookie)
+    assert.ok(!reply.unsignCookie)
 
     reply.send({
       unsigned: req.unsignCookie(req.cookies.foo)
@@ -916,8 +905,8 @@ test('should not decorate fastify, request and reply if no secret was provided',
     url: '/testDecorators'
   })
 
-  t.equal(res.statusCode, 500)
-  t.same(JSON.parse(res.body), {
+  assert.strictEqual(res.statusCode, 500)
+  assert.deepStrictEqual(JSON.parse(res.body), {
     statusCode: 500,
     error: 'Internal Server Error',
     message: 'req.unsignCookie is not a function'
@@ -925,18 +914,17 @@ test('should not decorate fastify, request and reply if no secret was provided',
 })
 
 test('dont add auto cookie parsing to onRequest-hook if hook-option is set to false', (t) => {
-  t.plan(6)
   const fastify = Fastify()
   fastify.register(plugin, { hook: false })
 
   for (const hook of ['preValidation', 'preHandler', 'preParsing']) {
     fastify.addHook(hook, async (req) => {
-      t.equal(req.cookies, null)
+      assert.strictEqual(req.cookies, null)
     })
   }
 
   fastify.get('/disable', (req, reply) => {
-    t.equal(req.cookies, null)
+    assert.strictEqual(req.cookies, null)
     reply.send()
   })
 
@@ -946,37 +934,36 @@ test('dont add auto cookie parsing to onRequest-hook if hook-option is set to fa
     headers: {
       cookie: 'bar=bar'
     }
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
+  }).then((res) => {
+    assert.strictEqual(res.statusCode, 200)
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
-test('result in an error if hook-option is set to an invalid value', (t) => {
-  t.plan(1)
+test('result in an error if hook-option is set to an invalid value', async (t) => {
   const fastify = Fastify()
 
-  t.rejects(
+  await assert.rejects(
     async () => fastify.register(plugin, { hook: true }),
     new Error("@fastify/cookie: Invalid value provided for the hook-option. You can set the hook-option only to false, 'onRequest' , 'preParsing' , 'preValidation' or 'preHandler'")
   )
 })
 
 test('correct working plugin if hook-option to preParsing', (t) => {
-  t.plan(5)
   const fastify = Fastify()
   fastify.register(plugin, { hook: 'preParsing' })
 
   fastify.addHook('onRequest', async (req) => {
-    t.equal(req.cookies, null)
+    assert.strictEqual(req.cookies, null)
   })
 
   fastify.addHook('preValidation', async (req) => {
-    t.equal(req.cookies.bar, 'bar')
+    assert.strictEqual(req.cookies.bar, 'bar')
   })
 
   fastify.get('/preparsing', (req, reply) => {
-    t.equal(req.cookies.bar, 'bar')
+    assert.strictEqual(req.cookies.bar, 'bar')
     reply.send()
   })
 
@@ -986,41 +973,41 @@ test('correct working plugin if hook-option to preParsing', (t) => {
     headers: {
       cookie: 'bar=bar'
     }
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
+  }).then((res) => {
+    assert.strictEqual(res.statusCode, 200)
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('if cookies are not set, then the handler creates an empty req.cookies object', (t) => {
-  t.plan(5)
   const fastify = Fastify()
   fastify.register(plugin, { hook: 'preParsing' })
 
   fastify.addHook('onRequest', async (req) => {
-    t.equal(req.cookies, null)
+    assert.strictEqual(req.cookies, null)
   })
 
   fastify.addHook('preValidation', async (req) => {
-    t.ok(req.cookies)
+    assert.ok(req.cookies)
   })
 
   fastify.get('/preparsing', (req, reply) => {
-    t.ok(req.cookies)
+    assert.ok(req.cookies)
     reply.send()
   })
 
   fastify.inject({
     method: 'GET',
     url: '/preparsing'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
+  }).then((res) => {
+    assert.strictEqual(res.statusCode, 200)
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('clearCookie should include parseOptions', (t) => {
-  t.plan(10)
   const fastify = Fastify()
   fastify.register(plugin, {
     parseOptions: {
@@ -1044,26 +1031,26 @@ test('clearCookie should include parseOptions', (t) => {
   fastify.inject({
     method: 'GET',
     url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
+  }).then((res) => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
 
-    t.equal(cookies.length, 1)
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, '')
-    t.equal(cookies[0].maxAge, 0)
-    t.equal(cookies[0].path, '/test')
-    t.equal(cookies[0].domain, 'example.com')
+    assert.strictEqual(cookies.length, 1)
+    assert.strictEqual(cookies[0].name, 'foo')
+    assert.strictEqual(cookies[0].value, '')
+    assert.strictEqual(cookies[0].maxAge, 0)
+    assert.strictEqual(cookies[0].path, '/test')
+    assert.strictEqual(cookies[0].domain, 'example.com')
 
-    t.ok(new Date(cookies[0].expires) < new Date())
+    assert.ok(new Date(cookies[0].expires) < new Date())
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('should update a cookie value when setCookie is called multiple times', (t) => {
-  t.plan(15)
   const fastify = Fastify()
   const secret = 'testsecret'
   fastify.register(plugin, { secret })
@@ -1092,33 +1079,33 @@ test('should update a cookie value when setCookie is called multiple times', (t)
   fastify.inject({
     method: 'GET',
     url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
+  }).then((res) => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.equal(cookies.length, 3)
+    assert.strictEqual(cookies.length, 3)
 
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, '')
-    t.equal(cookies[0].path, '/foo')
+    assert.strictEqual(cookies[0].name, 'foo')
+    assert.strictEqual(cookies[0].value, '')
+    assert.strictEqual(cookies[0].path, '/foo')
 
-    t.equal(cookies[1].name, 'foo')
-    t.equal(cookies[1].value, sign('foo', secret))
-    t.equal(cookies[1].maxAge, 36000)
+    assert.strictEqual(cookies[1].name, 'foo')
+    assert.strictEqual(cookies[1].value, sign('foo', secret))
+    assert.strictEqual(cookies[1].maxAge, 36000)
 
-    t.equal(cookies[2].name, 'foos')
-    t.equal(cookies[2].value, sign('foosy', secret))
-    t.equal(cookies[2].path, '/foo')
-    t.equal(cookies[2].maxAge, 36000)
+    assert.strictEqual(cookies[2].name, 'foos')
+    assert.strictEqual(cookies[2].value, sign('foosy', secret))
+    assert.strictEqual(cookies[2].path, '/foo')
+    assert.strictEqual(cookies[2].maxAge, 36000)
 
-    t.ok(new Date(cookies[0].expires) < new Date())
+    assert.ok(new Date(cookies[0].expires) < new Date())
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('should update a cookie value when setCookie is called multiple times (empty header)', (t) => {
-  t.plan(15)
   const fastify = Fastify()
   const secret = 'testsecret'
   fastify.register(plugin, { secret })
@@ -1148,33 +1135,33 @@ test('should update a cookie value when setCookie is called multiple times (empt
   fastify.inject({
     method: 'GET',
     url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
+  }).then((res) => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.equal(cookies.length, 3)
+    assert.strictEqual(cookies.length, 3)
 
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, '')
-    t.equal(cookies[0].path, '/foo')
+    assert.strictEqual(cookies[0].name, 'foo')
+    assert.strictEqual(cookies[0].value, '')
+    assert.strictEqual(cookies[0].path, '/foo')
 
-    t.equal(cookies[1].name, 'foo')
-    t.equal(cookies[1].value, sign('foo', secret))
-    t.equal(cookies[1].maxAge, 36000)
+    assert.strictEqual(cookies[1].name, 'foo')
+    assert.strictEqual(cookies[1].value, sign('foo', secret))
+    assert.strictEqual(cookies[1].maxAge, 36000)
 
-    t.equal(cookies[2].name, 'foos')
-    t.equal(cookies[2].value, sign('foosy', secret))
-    t.equal(cookies[2].path, '/foo')
-    t.equal(cookies[2].maxAge, 36000)
+    assert.strictEqual(cookies[2].name, 'foos')
+    assert.strictEqual(cookies[2].value, sign('foosy', secret))
+    assert.strictEqual(cookies[2].path, '/foo')
+    assert.strictEqual(cookies[2].maxAge, 36000)
 
-    t.ok(new Date(cookies[0].expires) < new Date())
+    assert.ok(new Date(cookies[0].expires) < new Date())
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('should update a cookie value when setCookie is called multiple times (non-empty header)', (t) => {
-  t.plan(15)
   const fastify = Fastify()
   const secret = 'testsecret'
   fastify.register(plugin, { secret })
@@ -1204,33 +1191,33 @@ test('should update a cookie value when setCookie is called multiple times (non-
   fastify.inject({
     method: 'GET',
     url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
+  }).then((res) => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.equal(cookies.length, 4)
+    assert.strictEqual(cookies.length, 4)
 
-    t.equal(cookies[1].name, 'foo')
-    t.equal(cookies[1].value, '')
-    t.equal(cookies[1].path, '/foo')
+    assert.strictEqual(cookies[1].name, 'foo')
+    assert.strictEqual(cookies[1].value, '')
+    assert.strictEqual(cookies[1].path, '/foo')
 
-    t.equal(cookies[2].name, 'foo')
-    t.equal(cookies[2].value, sign('foo', secret))
-    t.equal(cookies[2].maxAge, 36000)
+    assert.strictEqual(cookies[2].name, 'foo')
+    assert.strictEqual(cookies[2].value, sign('foo', secret))
+    assert.strictEqual(cookies[2].maxAge, 36000)
 
-    t.equal(cookies[3].name, 'foos')
-    t.equal(cookies[3].value, sign('foosy', secret))
-    t.equal(cookies[3].path, '/foo')
-    t.equal(cookies[3].maxAge, 36000)
+    assert.strictEqual(cookies[3].name, 'foos')
+    assert.strictEqual(cookies[3].value, sign('foosy', secret))
+    assert.strictEqual(cookies[3].path, '/foo')
+    assert.strictEqual(cookies[3].maxAge, 36000)
 
-    t.ok(new Date(cookies[1].expires) < new Date())
+    assert.ok(new Date(cookies[1].expires) < new Date())
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('cookies get set correctly if set inside onSend', (t) => {
-  t.plan(7)
   const fastify = Fastify()
   fastify.register(plugin)
 
@@ -1247,21 +1234,21 @@ test('cookies get set correctly if set inside onSend', (t) => {
   fastify.inject({
     method: 'GET',
     url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
+  }).then((res) => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.equal(cookies.length, 1)
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, 'foo')
-    t.equal(cookies[0].path, '/')
+    assert.strictEqual(cookies.length, 1)
+    assert.strictEqual(cookies[0].name, 'foo')
+    assert.strictEqual(cookies[0].value, 'foo')
+    assert.strictEqual(cookies[0].path, '/')
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('cookies get set correctly if set inside multiple onSends', (t) => {
-  t.plan(10)
   const fastify = Fastify()
   fastify.register(plugin)
 
@@ -1282,25 +1269,25 @@ test('cookies get set correctly if set inside multiple onSends', (t) => {
   fastify.inject({
     method: 'GET',
     url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
+  }).then((res) => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.equal(cookies.length, 2)
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, 'foo')
-    t.equal(cookies[0].path, '/')
+    assert.strictEqual(cookies.length, 2)
+    assert.strictEqual(cookies[0].name, 'foo')
+    assert.strictEqual(cookies[0].value, 'foo')
+    assert.strictEqual(cookies[0].path, '/')
 
-    t.equal(cookies[1].name, 'foo')
-    t.equal(cookies[1].value, 'foos')
-    t.equal(cookies[1].path, '/')
+    assert.strictEqual(cookies[1].name, 'foo')
+    assert.strictEqual(cookies[1].value, 'foos')
+    assert.strictEqual(cookies[1].path, '/')
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('cookies get set correctly if set inside onRequest', (t) => {
-  t.plan(7)
   const fastify = Fastify()
   fastify.addHook('onRequest', async (req, reply) => {
     reply.setCookie('foo', 'foo', { path: '/' })
@@ -1312,21 +1299,21 @@ test('cookies get set correctly if set inside onRequest', (t) => {
   fastify.inject({
     method: 'GET',
     url: '/test1'
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
+  }).then((res) => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 
     const cookies = res.cookies
-    t.equal(cookies.length, 1)
-    t.equal(cookies[0].name, 'foo')
-    t.equal(cookies[0].value, 'foo')
-    t.equal(cookies[0].path, '/')
+    assert.strictEqual(cookies.length, 1)
+    assert.strictEqual(cookies[0].name, 'foo')
+    assert.strictEqual(cookies[0].value, 'foo')
+    assert.strictEqual(cookies[0].path, '/')
+  }).catch(err => {
+    assert.fail(err)
   })
 })
 
 test('do not crash if the onRequest hook is not run', (t) => {
-  t.plan(3)
   const fastify = Fastify()
   fastify.addHook('onRequest', async (req, reply) => {
     return reply.send({ hello: 'world' })
@@ -1340,9 +1327,10 @@ test('do not crash if the onRequest hook is not run', (t) => {
     headers: {
       cookie: 'foo=foo'
     }
-  }, (err, res) => {
-    t.error(err)
-    t.equal(res.statusCode, 200)
-    t.same(JSON.parse(res.body), { hello: 'world' })
+  }).then((res) => {
+    assert.strictEqual(res.statusCode, 200)
+    assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
+  }).catch(err => {
+    assert.fail(err)
   })
 })
