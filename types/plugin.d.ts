@@ -1,8 +1,8 @@
 /// <reference types='node' />
 
-import { FastifyPluginCallback } from "fastify";
+import { FastifyPluginCallback } from 'fastify'
 
-declare module "fastify" {
+declare module 'fastify' {
   interface FastifyInstance extends SignerMethods {
     /**
      * Serialize a cookie name-value pair into a Set-Cookie header string
@@ -42,7 +42,7 @@ declare module "fastify" {
      * Signs the specified cookie using the secret/signer provided.
      * @param value cookie value
      */
-     signCookie(value: string): string;
+    signCookie(value: string): string;
 
     /**
      * Unsigns the specified cookie using the secret/signer provided.
@@ -55,7 +55,7 @@ declare module "fastify" {
     name: string,
     value: string,
     options?: fastifyCookie.CookieSerializeOptions
-  ) => FastifyReply;
+  ) => FastifyReply
 
   interface FastifyReply {
     /**
@@ -96,7 +96,7 @@ declare module "fastify" {
 
 type FastifyCookiePlugin = FastifyPluginCallback<
   NonNullable<fastifyCookie.FastifyCookieOptions>
->;
+>
 
 declare namespace fastifyCookie {
   interface SignerBase {
@@ -106,8 +106,8 @@ declare namespace fastifyCookie {
 
   export class Signer implements SignerBase {
     constructor (secrets: string | Array<string> | Buffer | Array<Buffer>, algorithm?: string)
-    sign: (value: string) => string;
-    unsign: (input: string) => UnsignResult;
+    sign: (value: string) => string
+    unsign: (input: string) => UnsignResult
   }
 
   export interface SerializeOptions {
@@ -143,7 +143,7 @@ declare namespace fastifyCookie {
     decode?: (encodedURIComponent: string) => string;
   }
 
-  type HookType = 'onRequest' | 'preParsing' | 'preValidation' | 'preHandler'  | 'preSerialization';
+  type HookType = 'onRequest' | 'preParsing' | 'preValidation' | 'preHandler' | 'preSerialization'
 
   export interface FastifyCookieOptions {
     secret?: string | string[] | Buffer | Buffer[] | Signer;
@@ -151,9 +151,9 @@ declare namespace fastifyCookie {
     parseOptions?: fastifyCookie.CookieSerializeOptions;
   }
 
-  export type Sign = (value: string, secret: string | Buffer, algorithm?: string) => string;
-  export type Unsign = (input: string, secret: string | Buffer, algorithm?: string) => UnsignResult;
-  export type SignerFactory = (secrets: string | string[] | Buffer | Buffer[], algorithm?: string) => SignerBase;
+  export type Sign = (value: string, secret: string | Buffer, algorithm?: string) => string
+  export type Unsign = (input: string, secret: string | Buffer, algorithm?: string) => UnsignResult
+  export type SignerFactory = (secrets: string | string[] | Buffer | Buffer[], algorithm?: string) => SignerBase
 
   export type UnsignResult = {
     valid: true;
@@ -165,9 +165,9 @@ declare namespace fastifyCookie {
     value: null;
   }
 
-  export const signerFactory: SignerFactory;
-  export const sign: Sign;
-  export const unsign: Unsign;
+  export const signerFactory: SignerFactory
+  export const sign: Sign
+  export const unsign: Unsign
 
   export interface FastifyCookie extends FastifyCookiePlugin {
     parse: (cookieHeader: string, opts?: ParseOptions) => { [key: string]: string };
@@ -178,7 +178,7 @@ declare namespace fastifyCookie {
     unsign: Unsign;
   }
 
-  export const fastifyCookie: FastifyCookie;
+  export const fastifyCookie: FastifyCookie
 
   export interface FastifyCookieOptions {
     secret?: string | string[] | Buffer | Buffer[] | SignerBase;
@@ -186,11 +186,11 @@ declare namespace fastifyCookie {
     parseOptions?: CookieSerializeOptions;
   }
 
-  export { fastifyCookie as default };
+  export { fastifyCookie as default }
 }
 
-declare function fastifyCookie(
+declare function fastifyCookie (
   ...params: Parameters<FastifyCookiePlugin>
-): ReturnType<FastifyCookiePlugin>;
+): ReturnType<FastifyCookiePlugin>
 
-export = fastifyCookie;
+export = fastifyCookie
