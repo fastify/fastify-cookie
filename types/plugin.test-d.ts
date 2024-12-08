@@ -2,7 +2,7 @@ import cookie from '..'
 import { expectError, expectType } from 'tsd'
 import * as fastifyCookieStar from '..'
 import fastifyCookieCjsImport = require('..')
-import fastifyCookieDefault, { fastifyCookie as fastifyCookieNamed } from '..'
+import fastifyCookieDefault, { fastifyCookie as fastifyCookieNamed, Signer } from '..'
 import fastify, { FastifyInstance, FastifyReply, setCookieWrapper } from 'fastify'
 
 const fastifyCookieCjs = require('..')
@@ -226,10 +226,11 @@ appWithCustomSigner.after(() => {
   })
 })
 
-new fastifyCookieStar.Signer('secretString')
-new fastifyCookieStar.Signer(['secretStringInArray'])
-new fastifyCookieStar.Signer(Buffer.from('secretString'))
-new fastifyCookieStar.Signer([Buffer.from('secretStringInArray')])
+expectType<Signer>(new fastifyCookieStar.Signer('secretString'))
+expectType<Signer>(new fastifyCookieStar.Signer(['secretStringInArray']))
+expectType<Signer>(new fastifyCookieStar.Signer(Buffer.from('secretString')))
+expectType<Signer>(new fastifyCookieStar.Signer([Buffer.from('secretStringInArray')]))
+
 const signer = new fastifyCookieStar.Signer(['secretStringInArray'], 'sha256')
 signer.sign('Lorem Ipsum')
 signer.unsign('Lorem Ipsum')
