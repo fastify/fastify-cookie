@@ -7,9 +7,8 @@
   "types": "types/plugin.d.ts",
   "scripts": {
     "coverage": "npm run test:unit -- --coverage-report=html",
-    "lint": "standard | snazzy",
-    "lint:ci": "standard",
-    "lint:fix": "standard --fix",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
     "test": "npm run test:unit && npm run test:typescript",
     "test:typescript": "tsd",
     "test:unit": "c8 --100 node --test",
@@ -45,9 +44,8 @@
     "benchmark": "^2.1.4",
     "c8": "^10.1.2",
     "fastify": "^5.0.0",
+    "neostandard": "^0.11.9",
     "sinon": "^19.0.2",
-    "snazzy": "^9.0.0",
-    "standard": "^17.1.0",
     "tsd": "^0.31.1"
   },
   "dependencies": {
