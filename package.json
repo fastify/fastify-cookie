@@ -11,7 +11,7 @@
     "lint:fix": "eslint --fix",
     "test": "npm run test:unit && npm run test:typescript",
     "test:typescript": "tsd",
-    "test:unit": "tap",
+    "test:unit": "c8 --100 node --test",
     "test:unit:verbose": "npm run test:unit -- -Rspec"
   },
   "precommit": [
@@ -42,10 +42,10 @@
     "@fastify/pre-commit": "^2.1.0",
     "@types/node": "^22.0.0",
     "benchmark": "^2.1.4",
+    "c8": "^10.1.2",
     "fastify": "^5.0.0",
     "neostandard": "^0.11.9",
     "sinon": "^19.0.2",
-    "tap": "^18.6.1",
     "tsd": "^0.31.1"
   },
   "dependencies": {
