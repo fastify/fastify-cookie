@@ -13,20 +13,23 @@ upon this plugin's actions.
 
 It is also possible to [import the low-level cookie parsing and serialization functions](#importing-serialize-and-parse).
 
-`@fastify/cookie` [v2.x](https://github.com/fastify/fastify-cookie/tree/v2.x)
-supports both Fastify@1 and Fastify@2.
-`@fastify/cookie` v3 only supports Fastify@2.
-
-## Installation
+## Install
 ```sh
 npm i @fastify/cookie
 ```
 
-or
+### Compatibility
+| Plugin version | Fastify version |
+| ---------------|-----------------|
+| `^10.x`        | `^5.x`          |
+| `^7.x`         | `^4.x`          |
+| `^4.x`         | `^3.x`          |
+| `^2.x`         | `^2.x`          |
+| `^1.x`         | `^1.x`          |
 
-```sh
-yarn add @fastify/cookie
-```
+Please note that if a Fastify version is out of support, then so are the corresponding versions of this plugin
+in the table above.
+See [Fastify's LTS policy](https://github.com/fastify/fastify/blob/main/docs/Reference/LTS.md) for more details.
 
 ## Example
 
@@ -382,4 +385,4 @@ const unsignedvalue = fastifyCookie.unsign(signedValue, 'secret');
 
 ## License
 
-[MIT License](http://jsumners.mit-license.org/)
+Licensed under [MIT](./LICENSE).
