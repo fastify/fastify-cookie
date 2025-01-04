@@ -8,7 +8,7 @@ const secret = 'testsecret'
 const fastify = Fastify()
 fastify.register(plugin, { secret })
 
-fastify.get('/', (req, reply) => {
+fastify.get('/', (_req, reply) => {
   reply
     .setCookie('foo', 'foo')
     .setCookie('foo', 'foo', { path: '/1' })

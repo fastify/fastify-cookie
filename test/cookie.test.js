@@ -12,7 +12,7 @@ test('cookies get set correctly', async (t) => {
   const fastify = Fastify()
   fastify.register(plugin)
 
-  fastify.get('/test1', (req, reply) => {
+  fastify.get('/test1', (_req, reply) => {
     reply
       .setCookie('foo', 'foo', { path: '/' })
       .send({ hello: 'world' })
@@ -39,7 +39,7 @@ test('express cookie compatibility', async (t) => {
   const fastify = Fastify()
   fastify.register(plugin)
 
-  fastify.get('/espresso', (req, reply) => {
+  fastify.get('/espresso', (_req, reply) => {
     reply
       .cookie('foo', 'foo', { path: '/' })
       .send({ hello: 'world' })
@@ -65,7 +65,7 @@ test('should set multiple cookies', async (t) => {
   const fastify = Fastify()
   fastify.register(plugin)
 
-  fastify.get('/', (req, reply) => {
+  fastify.get('/', (_req, reply) => {
     reply
       .setCookie('foo', 'foo')
       .cookie('bar', 'test')
@@ -96,7 +96,7 @@ test('should set multiple cookies', async (t) => {
   const fastify = Fastify()
   fastify.register(plugin)
 
-  fastify.get('/', (req, reply) => {
+  fastify.get('/', (_req, reply) => {
     reply
       .setCookie('foo', 'foo')
       .cookie('bar', 'test', {
@@ -135,7 +135,7 @@ test('should set multiple cookies (an array already exists)', async (t) => {
   const fastify = Fastify()
   fastify.register(plugin)
 
-  fastify.get('/test1', (req, reply) => {
+  fastify.get('/test1', (_req, reply) => {
     reply
       .header('Set-Cookie', ['bar=bar'])
       .setCookie('foo', 'foo', { path: '/' })
@@ -167,7 +167,7 @@ test('cookies get set correctly with millisecond dates', async (t) => {
   const fastify = Fastify()
   fastify.register(plugin)
 
-  fastify.get('/test1', (req, reply) => {
+  fastify.get('/test1', (_req, reply) => {
     reply
       .setCookie('foo', 'foo', { path: '/', expires: Date.now() + 1000 })
       .send({ hello: 'world' })
@@ -201,7 +201,7 @@ test('share options for setCookie and clearCookie', async (t) => {
     maxAge: 36000
   }
 
-  fastify.get('/test1', (req, reply) => {
+  fastify.get('/test1', (_req, reply) => {
     reply
       .setCookie('foo', 'foo', cookieOptions)
       .clearCookie('foo', cookieOptions)
@@ -236,7 +236,7 @@ test('expires should not be overridden in clearCookie', async (t) => {
     expires: Date.now() + 1000
   }
 
-  fastify.get('/test1', (req, reply) => {
+  fastify.get('/test1', (_req, reply) => {
     reply
       .setCookie('foo', 'foo', cookieOptions)
       .clearCookie('foo', cookieOptions)
@@ -266,7 +266,7 @@ test('parses incoming cookies', async (t) => {
 
   // check that it parses the cookies in the onRequest hook
   for (const hook of ['preValidation', 'preHandler']) {
-    fastify.addHook(hook, (req, reply, done) => {
+    fastify.addHook(hook, (req, _reply, done) => {
       t.assert.ok(req.cookies)
       t.assert.ok(req.cookies.bar)
       t.assert.strictEqual(req.cookies.bar, 'bar')
@@ -274,7 +274,7 @@ test('parses incoming cookies', async (t) => {
     })
   }
 
-  fastify.addHook('preParsing', (req, reply, payload, done) => {
+  fastify.addHook('preParsing', (req, _reply, _payload, done) => {
     t.assert.ok(req.cookies)
     t.assert.ok(req.cookies.bar)
     t.assert.strictEqual(req.cookies.bar, 'bar')
@@ -307,7 +307,7 @@ test('defined and undefined cookies', async (t) => {
 
   // check that it parses the cookies in the onRequest hook
   for (const hook of ['preValidation', 'preHandler']) {
-    fastify.addHook(hook, (req, reply, done) => {
+    fastify.addHook(hook, (req, _reply, done) => {
       t.assert.ok(req.cookies)
 
       t.assert.ok(req.cookies.bar)
@@ -319,7 +319,7 @@ test('defined and undefined cookies', async (t) => {
     })
   }
 
-  fastify.addHook('preParsing', (req, reply, payload, done) => {
+  fastify.addHook('preParsing', (req, _reply, _payload, done) => {
     t.assert.ok(req.cookies)
 
     t.assert.ok(req.cookies.bar)
@@ -365,7 +365,7 @@ test('does not modify supplied cookie options object', async (t) => {
   const fastify = Fastify()
   fastify.register(plugin)
 
-  fastify.get('/test1', (req, reply) => {
+  fastify.get('/test1', (_req, reply) => {
     reply
       .setCookie('foo', 'foo', cookieOptions)
       .send({ hello: 'world' })
@@ -388,7 +388,7 @@ test('cookies gets cleared correctly', async (t) => {
   const fastify = Fastify()
   fastify.register(plugin)
 
-  fastify.get('/test1', (req, reply) => {
+  fastify.get('/test1', (_req, reply) => {
     reply
       .clearCookie('foo')
       .send({ hello: 'world' })
@@ -414,7 +414,7 @@ describe('cookies signature', () => {
     const secret = 'bar'
     fastify.register(plugin, { secret })
 
-    fastify.get('/test1', (req, reply) => {
+    fastify.get('/test1', (_req, reply) => {
       reply
         .setCookie('foo', 'foo', { signed: true })
         .send({ hello: 'world' })
@@ -441,7 +441,7 @@ describe('cookies signature', () => {
     const secret2 = 'secret-2'
     fastify.register(plugin, { secret: [secret1, secret2] })
 
-    fastify.get('/test1', (req, reply) => {
+    fastify.get('/test1', (_req, reply) => {
       reply
         .setCookie('foo', 'cookieVal', { signed: true })
         .send({ hello: 'world' })
@@ -643,7 +643,7 @@ test('custom signer', async (t) => {
   const secret = { sign: signStub, unsign: unsignStub }
   fastify.register(plugin, { secret })
 
-  fastify.get('/test1', (req, reply) => {
+  fastify.get('/test1', (_req, reply) => {
     reply
       .setCookie('foo', 'bar', { signed: true })
       .send({ hello: 'world' })
@@ -786,7 +786,7 @@ test('cookies set with plugin options parseOptions field', async (t) => {
     }
   })
 
-  fastify.get('/test', (req, reply) => {
+  fastify.get('/test', (_req, reply) => {
     reply.setCookie('foo', 'foo').send({ hello: 'world' })
   })
 
@@ -835,7 +835,7 @@ test('handle secure:auto of cookieOptions', async (t) => {
 
   await fastify.register(plugin)
 
-  fastify.get('/test1', (req, reply) => {
+  fastify.get('/test1', (_req, reply) => {
     reply
       .setCookie('foo', 'foo', { path: '/', secure: 'auto' })
       .send()
@@ -1011,7 +1011,7 @@ test('clearCookie should include parseOptions', async (t) => {
     maxAge: 36000
   }
 
-  fastify.get('/test1', (req, reply) => {
+  fastify.get('/test1', (_req, reply) => {
     reply
       .setCookie('foo', 'foo', cookieOptions)
       .clearCookie('foo', cookieOptions)
@@ -1055,7 +1055,7 @@ test('should update a cookie value when setCookie is called multiple times', asy
     maxAge: 36000
   }
 
-  fastify.get('/test1', (req, reply) => {
+  fastify.get('/test1', (_req, reply) => {
     reply
       .setCookie('foo', 'foo', cookieOptions)
       .clearCookie('foo', cookieOptions)
@@ -1109,7 +1109,7 @@ test('should update a cookie value when setCookie is called multiple times (empt
     maxAge: 36000
   }
 
-  fastify.get('/test1', (req, reply) => {
+  fastify.get('/test1', (_req, reply) => {
     reply
       .header('Set-Cookie', '', cookieOptions)
       .setCookie('foo', 'foo', cookieOptions)
@@ -1164,7 +1164,7 @@ test('should update a cookie value when setCookie is called multiple times (non-
     maxAge: 36000
   }
 
-  fastify.get('/test1', (req, reply) => {
+  fastify.get('/test1', (_req, reply) => {
     reply
       .header('Set-Cookie', 'manual=manual', cookieOptions)
       .setCookie('foo', 'foo', cookieOptions)
@@ -1207,12 +1207,12 @@ test('cookies get set correctly if set inside onSend', async (t) => {
   const fastify = Fastify()
   fastify.register(plugin)
 
-  fastify.addHook('onSend', async (req, reply, payload) => {
+  fastify.addHook('onSend', async (_req, reply, payload) => {
     reply.setCookie('foo', 'foo', { path: '/' })
     return payload
   })
 
-  fastify.get('/test1', (req, reply) => {
+  fastify.get('/test1', (_req, reply) => {
     reply
       .send({ hello: 'world' })
   })
@@ -1237,16 +1237,16 @@ test('cookies get set correctly if set inside multiple onSends', async (t) => {
   const fastify = Fastify()
   fastify.register(plugin)
 
-  fastify.addHook('onSend', async (req, reply, payload) => {
+  fastify.addHook('onSend', async (_req, reply, _payload) => {
     reply.setCookie('foo', 'foo', { path: '/' })
   })
 
-  fastify.addHook('onSend', async (req, reply, payload) => {
+  fastify.addHook('onSend', async (_req, reply, payload) => {
     reply.setCookie('foo', 'foos', { path: '/' })
     return payload
   })
 
-  fastify.get('/test1', (req, reply) => {
+  fastify.get('/test1', (_req, reply) => {
     reply
       .send({ hello: 'world' })
   })
@@ -1273,7 +1273,7 @@ test('cookies get set correctly if set inside onRequest', async (t) => {
   t.plan(6)
 
   const fastify = Fastify()
-  fastify.addHook('onRequest', async (req, reply) => {
+  fastify.addHook('onRequest', async (_req, reply) => {
     reply.setCookie('foo', 'foo', { path: '/' })
     return reply.send({ hello: 'world' })
   })
@@ -1298,7 +1298,7 @@ test('do not crash if the onRequest hook is not run', async (t) => {
   t.plan(2)
 
   const fastify = Fastify()
-  fastify.addHook('onRequest', async (req, reply) => {
+  fastify.addHook('onRequest', async (_req, reply) => {
     return reply.send({ hello: 'world' })
   })
 

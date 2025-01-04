@@ -59,7 +59,7 @@ function parseCookies (fastify, request, reply) {
 
 function onReqHandlerWrapper (fastify, hook) {
   return hook === 'preParsing'
-    ? function fastifyCookieHandler (fastifyReq, fastifyRes, payload, done) {
+    ? function fastifyCookieHandler (fastifyReq, fastifyRes, _payload, done) {
       parseCookies(fastify, fastifyReq, fastifyRes)
       done()
     }
@@ -98,7 +98,7 @@ function setCookies (reply) {
   reply[kReplySetCookies].clear()
 }
 
-function fastifyCookieOnSendHandler (fastifyReq, fastifyRes, payload, done) {
+function fastifyCookieOnSendHandler (_fastifyReq, fastifyRes, _payload, done) {
   if (!fastifyRes[kReplySetCookies]) {
     done()
     return
