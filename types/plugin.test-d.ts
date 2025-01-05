@@ -1,15 +1,14 @@
-import cookie from '..'
 import { expectError, expectType } from 'tsd'
 import * as fastifyCookieStar from '..'
 import fastifyCookieCjsImport = require('..')
-import fastifyCookieDefault, { fastifyCookie as fastifyCookieNamed, Signer } from '..'
+import cookie, { fastifyCookie as fastifyCookieNamed, Signer } from '..'
 import fastify, { FastifyInstance, FastifyReply, setCookieWrapper } from 'fastify'
 
 const fastifyCookieCjs = require('..')
 
 const app: FastifyInstance = fastify()
 app.register(fastifyCookieNamed)
-app.register(fastifyCookieDefault)
+app.register(cookie)
 app.register(fastifyCookieCjs)
 app.register(fastifyCookieCjsImport.default)
 app.register(fastifyCookieCjsImport.fastifyCookie)
@@ -17,7 +16,7 @@ app.register(fastifyCookieStar.default)
 app.register(fastifyCookieStar.fastifyCookie)
 
 expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieNamed)
-expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieDefault)
+expectType<fastifyCookieStar.FastifyCookie>(cookie)
 expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieCjsImport.default)
 expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieCjsImport.fastifyCookie)
 expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieStar.default)
@@ -26,9 +25,9 @@ expectType<fastifyCookieStar.FastifyCookie>(
 )
 expectType<any>(fastifyCookieCjs)
 
-expectType<fastifyCookieStar.Sign>(fastifyCookieDefault.sign)
-expectType<fastifyCookieStar.Unsign>(fastifyCookieDefault.unsign)
-expectType<fastifyCookieStar.SignerFactory >(fastifyCookieDefault.signerFactory)
+expectType<fastifyCookieStar.Sign>(cookie.sign)
+expectType<fastifyCookieStar.Unsign>(cookie.unsign)
+expectType<fastifyCookieStar.SignerFactory >(cookie.signerFactory)
 
 expectType<fastifyCookieStar.Sign>(fastifyCookieNamed.sign)
 expectType<fastifyCookieStar.Unsign>(fastifyCookieNamed.unsign)
@@ -246,5 +245,5 @@ appWithHook.register(cookie, { hook: 'preValidation' })
 expectError(appWithHook.register(cookie, { hook: true }))
 expectError(appWithHook.register(cookie, { hook: 'false' }))
 
-expectType<(cookieHeader: string, opts?: fastifyCookieStar.ParseOptions) => { [key: string]: string }>(fastifyCookieDefault.parse)
-expectType<(name: string, value: string, opts?: fastifyCookieStar.SerializeOptions) => string>(fastifyCookieDefault.serialize)
+expectType<(cookieHeader: string, opts?: fastifyCookieStar.ParseOptions) => { [key: string]: string }>(cookie.parse)
+expectType<(name: string, value: string, opts?: fastifyCookieStar.SerializeOptions) => string>(cookie.serialize)
