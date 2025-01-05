@@ -173,6 +173,7 @@ declare namespace fastifyCookie {
   }
 
   export const fastifyCookie: FastifyCookie
+
   export interface FastifyCookieOptions {
     secret?: string | string[] | Buffer | Buffer[] | Signer | SignerBase;
     algorithm?: string;
