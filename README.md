@@ -8,7 +8,7 @@ A plugin for [Fastify](http://fastify.dev/) that adds support for reading and
 setting cookies.
 
 This plugin's cookie parsing works via Fastify's `onRequest` hook. Therefore,
-you should register it prior to any other `onRequest` hooks that will depend
+you should register it before any other `onRequest` hooks that will depend
 upon this plugin's actions.
 
 It is also possible to [import the low-level cookie parsing and serialization functions](#importing-serialize-and-parse).
@@ -118,7 +118,7 @@ domain is set, and most clients will consider the cookie to apply to only the cu
 
 ##### encode
 
-Specifies a function that will be used to encode a cookie's value. Since value of a cookie
+Specifies a function that will be used to encode a cookie's value. Since the value of a cookie
 has a limited character set (and must be a simple string), this function can be used to encode
 a value into a string suited for a cookie's value.
 
@@ -132,13 +132,13 @@ By default, no expiration is set, and most clients will consider this a "non-per
 will delete it on a condition like exiting a web browser application.
 
 **Note:** the [cookie storage model specification](https://datatracker.ietf.org/doc/html/rfc6265#section-5.3) states that if both `expires` and
-`maxAge` are set, then `maxAge` takes precedence, but it is possible not all clients by obey this,
+`maxAge` are set, then `maxAge` takes precedence, but it is possible not all clients obey this,
 so if both are set, they should point to the same date and time.
 
 ##### httpOnly
 
 Specifies the `boolean` value for the [`HttpOnly` `Set-Cookie` attribute](https://datatracker.ietf.org/doc/html/rfc6265#section-5.2.6). When truthy,
-the `HttpOnly` attribute is set, otherwise it is not. By default, the `HttpOnly` attribute is not set.
+the `HttpOnly` attribute is set, otherwise, it is not. By default, the `HttpOnly` attribute is not set.
 
 **Note:** be careful when setting this to `true`, as compliant clients will not allow client-side
 JavaScript to see the cookie in `document.cookie`.
@@ -149,7 +149,7 @@ Specifies the `number` (in seconds) to be the value for the [`Max-Age` `Set-Cook
 The given number will be converted to an integer by rounding down. By default, no maximum age is set.
 
 **Note:** the [cookie storage model specification](https://datatracker.ietf.org/doc/html/rfc6265#section-5.3) states that if both `expires` and
-`maxAge` are set, then `maxAge` takes precedence, but it is possible not all clients by obey this,
+`maxAge` are set, then `maxAge` takes precedence, but it is possible not all clients obey this,
 so if both are set, they should point to the same date and time.
 
 ##### partitioned
@@ -160,7 +160,7 @@ attribute. When truthy, the `Partitioned` attribute is set, otherwise it is not.
 
 ⚠️ **Warning:** [This is an attribute that has not yet been fully standardized](https://github.com/fastify/fastify-cookie/pull/261#issuecomment-1803234334), and may change in the future without reflecting the semver versioning. This also means many clients may ignore the attribute until they understand it.
 
-More information about can be found in [the proposal](https://github.com/privacycg/CHIPS).
+More information about this can be found in [the proposal](https://github.com/privacycg/CHIPS).
 
 
 ##### priority
@@ -200,7 +200,7 @@ This also means many clients may ignore this attribute until they understand it.
 ##### secure
 
 Specifies the `boolean` value for the [`Secure` `Set-Cookie` attribute](https://datatracker.ietf.org/doc/html/rfc6265#section-5.2.5). When truthy,
-the `Secure` attribute is set, otherwise it is not. By default, the `Secure` attribute is not set.
+the `Secure` attribute is set, otherwise, it is not. By default, the `Secure` attribute is not set.
 
 **Note:** be careful when setting this to `true`, as compliant clients will not send the cookie back to
 the server in the future if the browser does not have an HTTPS connection.
@@ -234,9 +234,9 @@ with a value of `'foo'` on the cookie path `/`.
 Following are _some_ of the precautions that should be taken to ensure the integrity of an application:
 
 - It's important to use `options.httpOnly` cookies to prevent attacks like XSS.
-- Use signed cookies (`options.signed`) to ensure they are not getting tampered with on client-side by an attacker.
+- Use signed cookies (`options.signed`) to ensure they are not getting tampered wit client-side by an attacker.
 - Use `__Host-` [Cookie Prefix](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#Attributes) to avoid Cookie Tossing attacks.
-- it's important to [use HTTPS for your website/app](https://letsencrypt.org/) to avoid a bunch of other potential security issues like [MITM](https://en.wikipedia.org/wiki/Man-in-the-middle_attack) etc.
+- It is important to [use HTTPS for your website/app](https://letsencrypt.org/) to avoid a bunch of other potential security issues like [MITM](https://en.wikipedia.org/wiki/Man-in-the-middle_attack) etc.
 
 ### Clearing
 
@@ -247,7 +247,7 @@ on the cookie path `/`.
 
 + `name`: a string name for the cookie to be cleared
 + `options`: an options object as described in the [cookie serialize][cs]
-documentation. Its optional to pass `options` object
+documentation. It is optional to pass an `options` object
 
 ### Manual cookie parsing
 
@@ -282,7 +282,7 @@ fastify.get('/', (req, reply) => {
   const result = reply.unsignCookie(req.cookies.myCookie)
 
   if (result.valid && result.renew) {
-    // Setting the same cookie again, this time plugin will sign it with a new key
+    // Setting the same cookie again, this time the plugin will sign it with a new key
     reply.setCookie('myCookie', result.value, {
       domain: 'example.com', // same options as before
       path: '/',
@@ -320,8 +320,8 @@ fastify.register(require('@fastify/cookie'), {
 ### Manual cookie unsigning
 
 The method `unsignCookie(value)` is added to the `fastify` instance, to the `request` and the `reply` object
-via the Fastify `decorate`, `decorateRequest` and `decorateReply` APIs, if a secret was provided as option.
-Using it on a signed cookie will call the the provided signer's (or the default signer if no custom implementation is provided) `unsign` method on the cookie.
+via the Fastify `decorate`, `decorateRequest`, and `decorateReply` APIs, if a secret was provided as an option.
+Using it on a signed cookie will call the provided signer's (or the default signer if no custom implementation is provided) `unsign` method on the cookie.
 
 **Example:**
 
@@ -361,9 +361,9 @@ test('Request requires signed cookie', async () => {
 });
 ```
 
-### Manual signing/unsigning with low level utilities
+### Manual signing/unsigning with low-level utilities
 
-with Signer
+With Signer:
 
 ```js
 const { Signer } = require('@fastify/cookie');
@@ -373,7 +373,7 @@ const signedValue = signer.sign('test');
 const {valid, renew, value } = signer.unsign(signedValue);
 ```
 
-with sign/unsign utilities
+With sign/unsign utilities:
 
 ```js
 const { fastifyCookie } = require('@fastify/cookie');
