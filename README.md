@@ -21,10 +21,10 @@ npm i @fastify/cookie
 ### Compatibility
 | Plugin version | Fastify version |
 | ---------------|-----------------|
-| `^10.x`        | `^5.x`          |
-| `^7.x`         | `^4.x`          |
-| `^4.x`         | `^3.x`          |
-| `^2.x`         | `^2.x`          |
+| `>=10.x`       | `^5.x`          |
+| `>=7.x <10.x`  | `^4.x`          |
+| `>=4.x <7.x`   | `^3.x`          |
+| `>=2.x <4.x`   | `^2.x`          |
 | `^1.x`         | `^1.x`          |
 
 Please note that if a Fastify version is out of support, then so are the corresponding versions of this plugin
