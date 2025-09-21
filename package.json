@@ -14,10 +14,6 @@
     "test:unit": "c8 --100 node --test",
     "test:unit:verbose": "npm run test:unit -- -Rspec"
   },
-  "precommit": [
-    "lint",
-    "test"
-  ],
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/fastify/fastify-cookie.git"
@@ -62,7 +58,6 @@
     }
   ],
   "devDependencies": {
-    "@fastify/pre-commit": "^2.1.0",
     "@types/node": "^24.0.8",
     "benchmark": "^2.1.4",
     "c8": "^10.1.2",
