@@ -1,8 +1,12 @@
-import { expectError, expectType } from 'tsd'
+import { expect } from 'tstyche'
 import * as fastifyCookieStar from '..'
 import fastifyCookieCjsImport = require('..')
 import cookie, { fastifyCookie as fastifyCookieNamed, Signer } from '..'
-import fastify, { FastifyInstance, FastifyReply, setCookieWrapper } from 'fastify'
+import fastify, {
+  type FastifyInstance,
+  type FastifyReply,
+  type setCookieWrapper
+} from 'fastify'
 
 const fastifyCookieCjs = require('..')
 
@@ -15,61 +19,72 @@ app.register(fastifyCookieCjsImport.fastifyCookie)
 app.register(fastifyCookieStar.default)
 app.register(fastifyCookieStar.fastifyCookie)
 
-expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieNamed)
-expectType<fastifyCookieStar.FastifyCookie>(cookie)
-expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieCjsImport.default)
-expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieCjsImport.fastifyCookie)
-expectType<fastifyCookieStar.FastifyCookie>(fastifyCookieStar.default)
-expectType<fastifyCookieStar.FastifyCookie>(
+expect(fastifyCookieNamed).type.toBe<fastifyCookieStar.FastifyCookie>()
+expect(cookie).type.toBe<fastifyCookieStar.FastifyCookie>()
+expect(
+  fastifyCookieCjsImport.default
+).type.toBe<fastifyCookieStar.FastifyCookie>()
+expect(
+  fastifyCookieCjsImport.fastifyCookie
+).type.toBe<fastifyCookieStar.FastifyCookie>()
+expect(fastifyCookieStar.default).type.toBe<fastifyCookieStar.FastifyCookie>()
+expect(
   fastifyCookieStar.fastifyCookie
-)
-expectType<any>(fastifyCookieCjs)
+).type.toBe<fastifyCookieStar.FastifyCookie>()
+expect(fastifyCookieCjs).type.toBe<any>()
 
-expectType<fastifyCookieStar.Sign>(cookie.sign)
-expectType<fastifyCookieStar.Unsign>(cookie.unsign)
-expectType<fastifyCookieStar.SignerFactory >(cookie.signerFactory)
+expect(cookie.sign).type.toBe<fastifyCookieStar.Sign>()
+expect(cookie.unsign).type.toBe<fastifyCookieStar.Unsign>()
+expect(cookie.signerFactory).type.toBe<fastifyCookieStar.SignerFactory>()
 
-expectType<fastifyCookieStar.Sign>(fastifyCookieNamed.sign)
-expectType<fastifyCookieStar.Unsign>(fastifyCookieNamed.unsign)
-expectType<fastifyCookieStar.SignerFactory >(fastifyCookieNamed.signerFactory)
+expect(fastifyCookieNamed.sign).type.toBe<fastifyCookieStar.Sign>()
+expect(fastifyCookieNamed.unsign).type.toBe<fastifyCookieStar.Unsign>()
+expect(
+  fastifyCookieNamed.signerFactory
+).type.toBe<fastifyCookieStar.SignerFactory>()
 
 const server = fastify()
 
 server.register(cookie)
 
 server.after((_err) => {
-  expectType< string >(
+  expect(
     server.serializeCookie('sessionId', 'aYb4uTIhdBXC')
-  )
+  ).type.toBe<string>()
 
-  expectType<{ [key: string]: string }>(
-    // See https://github.com/fastify/fastify-cookie#manual-cookie-parsing
-    server.parseCookie('sessionId=aYb4uTIhdBXC')
-  )
+  expect(server.parseCookie('sessionId=aYb4uTIhdBXC')).type.toBe<{
+    [key: string]: string;
+  }>()
 
   server.get('/', (request, reply) => {
     const test = request.cookies.test
-    expectType<string | undefined>(test)
+    expect(test).type.toBe<string | undefined>()
 
-    expectType<setCookieWrapper>(reply.cookie)
-    expectType<setCookieWrapper>(reply.setCookie)
+    expect(reply.cookie).type.toBe<setCookieWrapper>()
+    expect(reply.setCookie).type.toBe<setCookieWrapper>()
 
-    expectType<FastifyReply>(
+    expect(
       reply
         .setCookie('test', test!, { domain: 'example.com', path: '/' })
         .clearCookie('foo')
         .send({ hello: 'world' })
-    )
+    ).type.toBe<FastifyReply>()
   })
 
-  expectType<(value: string) => string>(server.signCookie)
-  expectType<(value: string) => fastifyCookieStar.UnsignResult>(server.unsignCookie)
+  expect(server.signCookie).type.toBe<(value: string) => string>()
+  expect(server.unsignCookie).type.toBe<
+    (value: string) => fastifyCookieStar.UnsignResult
+  >()
 
   server.get('/', (request, reply) => {
-    expectType<(value: string) => string>(request.signCookie)
-    expectType<(value: string) => string>(reply.signCookie)
-    expectType<(value: string) => fastifyCookieStar.UnsignResult>(request.unsignCookie)
-    expectType<(value: string) => fastifyCookieStar.UnsignResult>(reply.unsignCookie)
+    expect(request.signCookie).type.toBe<(value: string) => string>()
+    expect(reply.signCookie).type.toBe<(value: string) => string>()
+    expect(request.unsignCookie).type.toBe<
+      (value: string) => fastifyCookieStar.UnsignResult
+    >()
+    expect(reply.unsignCookie).type.toBe<
+      (value: string) => fastifyCookieStar.UnsignResult
+    >()
   })
 })
 
@@ -97,11 +112,15 @@ testSamesiteOptionsApp.after(() => {
   })
   server.get('/test-samesite-option-false', (request, reply) => {
     const test = request.cookies.test
-    reply.setCookie('test', test!, { sameSite: false }).send({ hello: 'world' })
+    reply
+      .setCookie('test', test!, { sameSite: false })
+      .send({ hello: 'world' })
   })
   server.get('/test-samesite-option-lax', (request, reply) => {
     const test = request.cookies.test
-    reply.setCookie('test', test!, { sameSite: 'lax' }).send({ hello: 'world' })
+    reply
+      .setCookie('test', test!, { sameSite: 'lax' })
+      .send({ hello: 'world' })
   })
   server.get('/test-samesite-option-strict', (request, reply) => {
     const test = request.cookies.test
@@ -120,7 +139,7 @@ testSamesiteOptionsApp.after(() => {
 const appWithImplicitHttpSigned = fastify()
 
 appWithImplicitHttpSigned.register(cookie, {
-  secret: 'testsecret',
+  secret: 'testsecret'
 })
 appWithImplicitHttpSigned.register(cookie, {
   secret: 'testsecret',
@@ -144,20 +163,20 @@ appWithImplicitHttpSigned.after(() => {
 const appWithRotationSecret = fastify()
 
 appWithRotationSecret.register(cookie, {
-  secret: ['testsecret'],
+  secret: ['testsecret']
 })
 appWithRotationSecret.after(() => {
   server.get('/', (request, reply) => {
     reply.unsignCookie(request.cookies.test!)
     const unsigned = reply.unsignCookie('test')
 
-    expectType<boolean>(unsigned.valid)
+    expect(unsigned.valid).type.toBe<boolean>()
     if (unsigned.valid) {
-      expectType<string>(unsigned.value)
+      expect(unsigned.value).type.toBe<string>()
     } else {
-      expectType<null>(unsigned.value)
+      expect(unsigned.value).type.toBe<null>()
     }
-    expectType<boolean>(unsigned.renew)
+    expect(unsigned.renew).type.toBe<boolean>()
 
     reply.send({ hello: 'world' })
   })
@@ -175,25 +194,25 @@ const parseOptions: fastifyCookieStar.CookieSerializeOptions = {
   sameSite: 'lax',
   secure: true,
   signed: true,
-  partitioned: false,
+  partitioned: false
 }
-expectType<fastifyCookieStar.CookieSerializeOptions>(parseOptions)
+expect(parseOptions).type.toBe<fastifyCookieStar.CookieSerializeOptions>()
 
 appWithParseOptions.register(cookie, {
   secret: 'testsecret',
-  parseOptions,
+  parseOptions
 })
 appWithParseOptions.after(() => {
   server.get('/', (request, reply) => {
     const unsigned = reply.unsignCookie(request.cookies.test!)
 
-    expectType<boolean>(unsigned.valid)
+    expect(unsigned.valid).type.toBe<boolean>()
     if (unsigned.valid) {
-      expectType<string>(unsigned.value)
+      expect(unsigned.value).type.toBe<string>()
     } else {
-      expectType<null>(unsigned.value)
+      expect(unsigned.value).type.toBe<null>()
     }
-    expectType<boolean>(unsigned.renew)
+    expect(unsigned.renew).type.toBe<boolean>()
   })
 })
 
@@ -203,7 +222,9 @@ appWithCustomSigner.register(cookie, {
   secret: {
     sign: (x) => x + '.signed',
     unsign: (x) => {
-      if (x.endsWith('.signed')) { return { renew: false, valid: true, value: x.slice(0, -7) } }
+      if (x.endsWith('.signed')) {
+        return { renew: false, valid: true, value: x.slice(0, -7) }
+      }
       return { renew: false, valid: false, value: null }
     }
   }
@@ -213,22 +234,28 @@ appWithCustomSigner.after(() => {
     reply.unsignCookie(request.cookies.test!)
     const unsigned = reply.unsignCookie('test')
 
-    expectType<boolean>(unsigned.valid)
+    expect(unsigned.valid).type.toBe<boolean>()
     if (unsigned.valid) {
-      expectType<string>(unsigned.value)
+      expect(unsigned.value).type.toBe<string>()
     } else {
-      expectType<null>(unsigned.value)
+      expect(unsigned.value).type.toBe<null>()
     }
-    expectType<boolean>(unsigned.renew)
+    expect(unsigned.renew).type.toBe<boolean>()
 
     reply.send({ hello: 'world' })
   })
 })
 
-expectType<Signer>(new fastifyCookieStar.Signer('secretString'))
-expectType<Signer>(new fastifyCookieStar.Signer(['secretStringInArray']))
-expectType<Signer>(new fastifyCookieStar.Signer(Buffer.from('secretString')))
-expectType<Signer>(new fastifyCookieStar.Signer([Buffer.from('secretStringInArray')]))
+expect(new fastifyCookieStar.Signer('secretString')).type.toBe<Signer>()
+expect(
+  new fastifyCookieStar.Signer(['secretStringInArray'])
+).type.toBe<Signer>()
+expect(
+  new fastifyCookieStar.Signer(Buffer.from('secretString'))
+).type.toBe<Signer>()
+expect(
+  new fastifyCookieStar.Signer([Buffer.from('secretStringInArray')])
+).type.toBe<Signer>()
 
 const signer = new fastifyCookieStar.Signer(['secretStringInArray'], 'sha256')
 signer.sign('Lorem Ipsum')
@@ -242,8 +269,22 @@ appWithHook.register(cookie, { hook: 'preHandler' })
 appWithHook.register(cookie, { hook: 'preParsing' })
 appWithHook.register(cookie, { hook: 'preSerialization' })
 appWithHook.register(cookie, { hook: 'preValidation' })
-expectError(appWithHook.register(cookie, { hook: true }))
-expectError(appWithHook.register(cookie, { hook: 'false' }))
 
-expectType<(cookieHeader: string, opts?: fastifyCookieStar.ParseOptions) => { [key: string]: string }>(cookie.parse)
-expectType<(name: string, value: string, opts?: fastifyCookieStar.SerializeOptions) => string>(cookie.serialize)
+expect(appWithHook.register)
+  .type.not.toBeCallableWith(cookie, { hook: true })
+expect(appWithHook.register)
+  .type.not.toBeCallableWith(cookie, { hook: 'false' })
+
+expect(cookie.parse).type.toBe<
+  (
+    cookieHeader: string,
+    opts?: fastifyCookieStar.ParseOptions
+  ) => { [key: string]: string }
+>()
+expect(cookie.serialize).type.toBe<
+  (
+    name: string,
+    value: string,
+    opts?: fastifyCookieStar.SerializeOptions
+  ) => string
+>()
