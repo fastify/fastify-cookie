@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/fastify/fastify-cookie.git"
+    "url": "git+https://github.com/fastify/fastify-cookie.git"
   },
   "keywords": [
     "fastify",
