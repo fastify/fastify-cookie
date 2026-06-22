@@ -4,7 +4,7 @@
 [![NPM version](https://img.shields.io/npm/v/@fastify/cookie.svg?style=flat)](https://www.npmjs.com/package/@fastify/cookie)
 [![neostandard javascript style](https://img.shields.io/badge/code_style-neostandard-brightgreen?style=flat)](https://github.com/neostandard/neostandard)
 
-A plugin for [Fastify](http://fastify.dev/) that adds support for reading and
+A plugin for [Fastify](https://fastify.dev/) that adds support for reading and
 setting cookies.
 
 This plugin's cookie parsing works via Fastify's `onRequest` hook. Therefore,
@@ -95,7 +95,7 @@ fastify.get('/', (req, reply) => {
 ## Options
 
 - `secret` (`String` | `Array` | `Buffer` | `Object`):
-  - A `String` or `Buffer` can be passed to use as secret to sign the cookie using [`cookie-signature`](http://npm.im/cookie-signature).
+  - A `String` or `Buffer` can be passed to use as secret to sign the cookie using [`cookie-signature`](https://www.npmjs.com/package/cookie-signature).
   - An `Array` can be passed if key rotation is desired. Read more about it in [Rotating signing secret](#rotating-secret).
   - More sophisticated cookie signing mechanisms can be implemented by supplying an `Object`. Read more about it in [Custom cookie signer](#custom-cookie-signer).
 
