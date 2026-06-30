@@ -165,14 +165,14 @@ More information about this can be found in [the proposal](https://github.com/pr
 
 ##### priority
 
-Specifies the `string` to be the value for the [`Priority` `Set-Cookie` attribute](https://tools.ietf.org/html/draft-west-cookie-priority-00#section-4.1).
+Specifies the `string` to be the value for the [`Priority` `Set-Cookie` attribute](https://datatracker.ietf.org/doc/html/draft-west-cookie-priority-00#section-4.1).
 
   - `'low'` will set the `Priority` attribute to `Low`.
   - `'medium'` will set the `Priority` attribute to `Medium`, the default priority when not set.
   - `'high'` will set the `Priority` attribute to `High`.
 
 More information about the different priority levels can be found in
-[the specification](https://tools.ietf.org/html/draft-west-cookie-priority-00#section-4.1).
+[the specification](https://datatracker.ietf.org/doc/html/draft-west-cookie-priority-00#section-4.1).
 
 ⚠️ **Warning:** This is an attribute that has not yet been fully standardized, and may change in the future without reflecting the semver versioning. This also means many clients may ignore the attribute until they understand it.
 
@@ -235,7 +235,7 @@ Following are _some_ of the precautions that should be taken to ensure the integ
 
 - It's important to use `options.httpOnly` cookies to prevent attacks like XSS.
 - Use signed cookies (`options.signed`) to ensure they are not getting tampered wit client-side by an attacker.
-- Use `__Host-` [Cookie Prefix](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#Attributes) to avoid Cookie Tossing attacks.
+- Use `__Host-` [Cookie Prefix](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie#attributes) to avoid Cookie Tossing attacks.
 - It is important to [use HTTPS for your website/app](https://letsencrypt.org/) to avoid a bunch of other potential security issues like [MITM](https://en.wikipedia.org/wiki/Man-in-the-middle_attack) etc.
 
 ### Clearing
