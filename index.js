@@ -146,8 +146,10 @@ function plugin (fastify, options, next) {
 
   if (hook) {
     fastify.addHook(hook, onReqHandlerWrapper(fastify, hook))
-    fastify.addHook('onSend', fastifyCookieOnSendHandler)
   }
+  // The onSend writer is independent of the parsing hook: `hook: false` only
+  // disables cookie autoparsing, not the ability to set cookies on the reply.
+  fastify.addHook('onSend', fastifyCookieOnSendHandler)
 
   next()
 

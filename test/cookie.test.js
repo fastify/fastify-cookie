@@ -929,6 +929,25 @@ test('dont add auto cookie parsing to onRequest-hook if hook-option is set to fa
   t.assert.strictEqual(res.statusCode, 200)
 })
 
+test('setCookie writes Set-Cookie even when hook-option is set to false', async (t) => {
+  t.plan(2)
+
+  const fastify = Fastify()
+  fastify.register(plugin, { hook: false })
+
+  fastify.get('/', (req, reply) => {
+    reply.setCookie('foo', 'bar', { path: '/' }).send({ hello: 'world' })
+  })
+
+  const res = await fastify.inject({
+    method: 'GET',
+    url: '/'
+  })
+
+  t.assert.strictEqual(res.statusCode, 200)
+  t.assert.ok(res.headers['set-cookie'], 'Set-Cookie should be written even with hook:false')
+})
+
 test('result in an error if hook-option is set to an invalid value', async (t) => {
   t.plan(1)
 
