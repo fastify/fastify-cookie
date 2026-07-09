@@ -14,11 +14,13 @@ upon this plugin's actions.
 It is also possible to [import the low-level cookie parsing and serialization functions](#importing-serialize-and-parse).
 
 ## Install
+
 ```sh
 npm i @fastify/cookie
 ```
 
 ### Compatibility
+
 | Plugin version | Fastify version |
 | ---------------|-----------------|
 | `>=10.x`       | `^5.x`          |
@@ -162,14 +164,13 @@ attribute. When truthy, the `Partitioned` attribute is set, otherwise it is not.
 
 More information about this can be found in [the proposal](https://github.com/privacycg/CHIPS).
 
-
 ##### priority
 
 Specifies the `string` to be the value for the [`Priority` `Set-Cookie` attribute](https://datatracker.ietf.org/doc/html/draft-west-cookie-priority-00#section-4.1).
 
-  - `'low'` will set the `Priority` attribute to `Low`.
-  - `'medium'` will set the `Priority` attribute to `Medium`, the default priority when not set.
-  - `'high'` will set the `Priority` attribute to `High`.
+- `'low'` will set the `Priority` attribute to `Low`.
+- `'medium'` will set the `Priority` attribute to `Medium`, the default priority when not set.
+- `'high'` will set the `Priority` attribute to `High`.
 
 More information about the different priority levels can be found in
 [the specification](https://datatracker.ietf.org/doc/html/draft-west-cookie-priority-00#section-4.1).
@@ -185,11 +186,11 @@ is considered the ["default path"](https://datatracker.ietf.org/doc/html/rfc6265
 
 Specifies the `boolean` or `string` to be the value for the [`SameSite` `Set-Cookie` attribute](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-09#section-5.4.7).
 
-  - `true` will set the `SameSite` attribute to `Strict` for strict same site enforcement.
-  - `false` will not set the `SameSite` attribute.
-  - `'lax'` will set the `SameSite` attribute to `Lax` for lax same site enforcement.
-  - `'none'` will set the `SameSite` attribute to `None` for an explicit cross-site cookie.
-  - `'strict'` will set the `SameSite` attribute to `Strict` for strict same site enforcement.
+- `true` will set the `SameSite` attribute to `Strict` for strict same site enforcement.
+- `false` will not set the `SameSite` attribute.
+- `'lax'` will set the `SameSite` attribute to `Lax` for lax same site enforcement.
+- `'none'` will set the `SameSite` attribute to `None` for an explicit cross-site cookie.
+- `'strict'` will set the `SameSite` attribute to `Strict` for strict same site enforcement.
 
 More information about the different enforcement levels can be found in
 [the specification](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-09#section-5.4.7).
@@ -214,7 +215,7 @@ as an object named `cookies`. Thus, if a request contains the header
 `Cookie: foo=foo` then, within your handler, `req.cookies.foo` would equal
 `'foo'`.
 
-You can pass options to the [cookie parse](https://github.com/jshttp/cookie#cookieparsestr-options) by setting an object named `parseOptions` in the plugin config object.
+You can pass options to the [cookie parse](https://github.com/jshttp/cookie#cookieparsecookiestr-options) by setting an object named `parseOptions` in the plugin config object.
 
 ### Sending
 
@@ -223,11 +224,11 @@ via the Fastify `decorateReply` API. Thus, in a request handler,
 `reply.setCookie('foo', 'foo', {path: '/'})` will set a cookie named `foo`
 with a value of `'foo'` on the cookie path `/`.
 
-+ `name`: a string name for the cookie to be set
-+ `value`: a string value for the cookie
-+ `options`: an options object as described in the [cookie serialize][cs] documentation
-+ `options.signed`: the cookie should be signed
-+ `options.secure`: if set to `true` it will set the Secure-flag. If it is set to `"auto"` Secure-flag is set when the connection is using tls.
+- `name`: a string name for the cookie to be set
+- `value`: a string value for the cookie
+- `options`: an options object as described in the [cookie serialize][cs] documentation
+- `options.signed`: the cookie should be signed
+- `options.secure`: if set to `true` it will set the Secure-flag. If it is set to `"auto"` Secure-flag is set when the connection is using tls.
 
 #### Securing the cookie
 
@@ -245,8 +246,8 @@ via the Fastify `decorateReply` API. Thus, in a request handler,
 `reply.clearCookie('foo', {path: '/'})` will clear a cookie named `foo`
 on the cookie path `/`.
 
-+ `name`: a string name for the cookie to be cleared
-+ `options`: an options object as described in the [cookie serialize][cs]
+- `name`: a string name for the cookie to be cleared
+- `options`: an options object as described in the [cookie serialize][cs]
 documentation. It is optional to pass an `options` object
 
 ### Manual cookie parsing
@@ -255,14 +256,16 @@ The method `parseCookie(cookieHeader)` is added to the `fastify` instance
 via the Fastify `decorate` API. Thus, `fastify.parseCookie('sessionId=aYb4uTIhdBXC')`
 will parse the raw cookie header and return an object `{ "sessionId": "aYb4uTIhdBXC" }`.
 
-[cs]: https://www.npmjs.com/package/cookie#options-1
+[cs]: https://github.com/jshttp/cookie#cookiestringifysetcookiesetcookieobj-options
 
 <a id="rotating-secret"></a>
+
 ### Rotating signing secret
 
 Key rotation is when an encryption key is retired and replaced by generating a new cryptographic key. To implement rotation, supply an `Array` of keys to `secret` option.
 
 **Example:**
+
 ```js
 fastify.register(require('@fastify/cookie'), {
   secret: [key1, key2]
@@ -272,11 +275,13 @@ fastify.register(require('@fastify/cookie'), {
 The plugin will **always** use the first key (`key1`) to sign cookies. When parsing incoming cookies, it will iterate over the supplied array to see if any of the available keys are able to decode the given signed cookie. This ensures that any old signed cookies are still valid.
 
 Note:
+
 - Key rotation is **only** achieved by redeploying the server again with the new `secret` array.
 - Iterating through all secrets is an expensive process, so the rotation list should contain as few keys as possible. Ideally, only the current key and the most recently retired key.
 - Although previously signed cookies are valid even after rotation, cookies should be updated with the new key as soon as possible. See the following example for how to accomplish this.
 
 **Example:**
+
 ```js
 fastify.get('/', (req, reply) => {
   const result = reply.unsignCookie(req.cookies.myCookie)
@@ -293,11 +298,13 @@ fastify.get('/', (req, reply) => {
 ```
 
 <a id="custom-cookie-signer"></a>
+
 ### Custom cookie signer
 
 The `secret` option optionally accepts an object with `sign` and `unsign` functions. This allows for implementing a custom cookie signing mechanism. See the following example:
 
 **Example:**
+
 ```js
 fastify.register(require('@fastify/cookie'), {
   secret: {
@@ -381,7 +388,6 @@ const { fastifyCookie } = require('@fastify/cookie');
 const signedValue = fastifyCookie.sign('test', 'secret');
 const unsignedvalue = fastifyCookie.unsign(signedValue, 'secret');
 ```
-
 
 ## License
 
