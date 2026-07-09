@@ -1,13 +1,9 @@
 'use strict'
 
 const fp = require('fastify-plugin')
-const { parseCookie: cookieParse, stringifySetCookie } = require('cookie')
+const { parseCookie: parse, stringifySetCookie } = require('cookie')
 
 const { Signer, sign, unsign } = require('./signer')
-
-function parse (str, options) {
-  return cookieParse(str, options)
-}
 
 function serialize (name, value, options) {
   return stringifySetCookie(Object.assign({ name, value }, options))
