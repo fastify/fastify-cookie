@@ -1,6 +1,6 @@
 {
   "name": "@fastify/cookie",
-  "version": "11.0.2",
+  "version": "11.1.0",
   "description": "Plugin for fastify to add support for cookies",
   "main": "index.js",
   "type": "commonjs",
@@ -68,7 +68,7 @@
     "tstyche": "^7.0.0"
   },
   "dependencies": {
-    "cookie": "^1.0.0",
+    "cookie": "^2.0.0",
     "fastify-plugin": "^6.0.0"
   },
   "publishConfig": {

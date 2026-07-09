@@ -1,9 +1,13 @@
 'use strict'
 
 const fp = require('fastify-plugin')
-const cookie = require('cookie')
+const { parseCookie: parse, stringifySetCookie } = require('cookie')
 
 const { Signer, sign, unsign } = require('./signer')
+
+function serialize (name, value, options) {
+  return stringifySetCookie(Object.assign({ name, value }, options))
+}
 
 const kReplySetCookies = Symbol('fastify.reply.setCookies')
 const kReplySetCookiesHookRan = Symbol('fastify.reply.setCookiesHookRan')
@@ -29,7 +33,11 @@ function fastifyCookieSetCookie (reply, name, value, options) {
     }
   }
 
-  reply[kReplySetCookies].set(`${name};${opts.domain};${opts.path || '/'}`, { name, value, opts })
+  reply[kReplySetCookies].set(`${name};${opts.domain};${opts.path || '/'}`, {
+    name,
+    value,
+    opts
+  })
 
   if (reply[kReplySetCookiesHookRan]) {
     setCookies(reply)
@@ -77,7 +85,7 @@ function setCookies (reply) {
     if (reply[kReplySetCookies].size === 1) {
       // Fast path for single cookie
       const c = reply[kReplySetCookies].values().next().value
-      reply.header('Set-Cookie', cookie.serialize(c.name, c.value, c.opts))
+      reply.header('Set-Cookie', serialize(c.name, c.value, c.opts))
       reply[kReplySetCookies].clear()
       return
     }
@@ -90,7 +98,7 @@ function setCookies (reply) {
   }
 
   for (const c of reply[kReplySetCookies].values()) {
-    cookieValue.push(cookie.serialize(c.name, c.value, c.opts))
+    cookieValue.push(serialize(c.name, c.value, c.opts))
   }
 
   reply.removeHeader('Set-Cookie')
@@ -117,12 +125,20 @@ function plugin (fastify, options, next) {
   const secret = options.secret
   const hook = getHook(options.hook)
   if (hook === undefined) {
-    return next(new Error('@fastify/cookie: Invalid value provided for the hook-option. You can set the hook-option only to false, \'onRequest\' , \'preParsing\' , \'preValidation\' or \'preHandler\''))
+    return next(
+      new Error(
+        "@fastify/cookie: Invalid value provided for the hook-option. You can set the hook-option only to false, 'onRequest' , 'preParsing' , 'preValidation' or 'preHandler'"
+      )
+    )
   }
-  const isSigner = !secret || (typeof secret.sign === 'function' && typeof secret.unsign === 'function')
-  const signer = isSigner ? secret : new Signer(secret, options.algorithm || 'sha256')
+  const isSigner =
+    !secret ||
+    (typeof secret.sign === 'function' && typeof secret.unsign === 'function')
+  const signer = isSigner
+    ? secret
+    : new Signer(secret, options.algorithm || 'sha256')
 
-  fastify.decorate('serializeCookie', cookie.serialize)
+  fastify.decorate('serializeCookie', serialize)
   fastify.decorate('parseCookie', parseCookie)
 
   if (secret !== undefined) {
@@ -155,7 +171,7 @@ function plugin (fastify, options, next) {
 
   // ***************************
   function parseCookie (cookieHeader) {
-    return cookie.parse(cookieHeader, options.parseOptions)
+    return parse(cookieHeader, options.parseOptions)
   }
 
   function signCookie (value) {
@@ -208,8 +224,8 @@ module.exports = fastifyCookie
 module.exports.default = fastifyCookie // supersedes fastifyCookie.default = fastifyCookie
 module.exports.fastifyCookie = fastifyCookie // supersedes fastifyCookie.fastifyCookie = fastifyCookie
 
-module.exports.serialize = cookie.serialize
-module.exports.parse = cookie.parse
+module.exports.serialize = serialize
+module.exports.parse = parse
 
 module.exports.signerFactory = Signer
 module.exports.Signer = Signer
