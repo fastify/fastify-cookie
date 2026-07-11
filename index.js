@@ -1,12 +1,23 @@
 'use strict'
 
 const fp = require('fastify-plugin')
-const { parseCookie: parse, stringifySetCookie } = require('cookie')
 
 const { Signer, sign, unsign } = require('./signer')
 
+// TODO: Use require(ESM) when Node.js 20 is nolonger supported or Fastify@6
+let cookieModule = null
+async function dynamicLoadCookie () {
+  if (cookieModule == null) {
+    cookieModule = await import('cookie')
+  }
+}
+
 function serialize (name, value, options) {
-  return stringifySetCookie(Object.assign({ name, value }, options))
+  return cookieModule.stringifySetCookie(Object.assign({ name, value }, options))
+}
+
+function parse (header, options) {
+  return cookieModule.parseCookie(header, options)
 }
 
 const kReplySetCookies = Symbol('fastify.reply.setCookies')
@@ -167,7 +178,7 @@ function plugin (fastify, options, next) {
   // disables cookie autoparsing, not the ability to set cookies on the reply.
   fastify.addHook('onSend', fastifyCookieOnSendHandler)
 
-  next()
+  dynamicLoadCookie().then(next, next)
 
   // ***************************
   function parseCookie (cookieHeader) {
