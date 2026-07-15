@@ -132,14 +132,12 @@ function fastifyCookieOnSendHandler (_fastifyReq, fastifyRes, _payload, done) {
   done()
 }
 
-function plugin (fastify, options, next) {
+async function plugin (fastify, options) {
   const secret = options.secret
   const hook = getHook(options.hook)
   if (hook === undefined) {
-    return next(
-      new Error(
-        "@fastify/cookie: Invalid value provided for the hook-option. You can set the hook-option only to false, 'onRequest' , 'preParsing' , 'preValidation' or 'preHandler'"
-      )
+    throw new Error(
+      "@fastify/cookie: Invalid value provided for the hook-option. You can set the hook-option only to false, 'onRequest' , 'preParsing' , 'preValidation' or 'preHandler'"
     )
   }
   const isSigner =
@@ -178,7 +176,7 @@ function plugin (fastify, options, next) {
   // disables cookie autoparsing, not the ability to set cookies on the reply.
   fastify.addHook('onSend', fastifyCookieOnSendHandler)
 
-  dynamicLoadCookie().then(next, next)
+  await dynamicLoadCookie()
 
   // ***************************
   function parseCookie (cookieHeader) {

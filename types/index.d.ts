@@ -1,6 +1,6 @@
 /// <reference types='node' />
 
-import { FastifyPluginCallback } from 'fastify'
+import { FastifyPluginAsync } from 'fastify'
 
 declare module 'fastify' {
   interface FastifyInstance extends SignerMethods {
@@ -94,7 +94,7 @@ declare module 'fastify' {
   }
 }
 
-type FastifyCookiePlugin = FastifyPluginCallback<
+type FastifyCookiePlugin = FastifyPluginAsync<
   NonNullable<fastifyCookie.FastifyCookieOptions>
 >
 
