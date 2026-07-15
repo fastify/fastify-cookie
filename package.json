@@ -1,6 +1,6 @@
 {
   "name": "@fastify/cookie",
-  "version": "11.1.1",
+  "version": "11.1.2",
   "description": "Plugin for fastify to add support for cookies",
   "main": "index.js",
   "type": "commonjs",
