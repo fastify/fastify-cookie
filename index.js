@@ -1,12 +1,23 @@
 'use strict'
 
 const fp = require('fastify-plugin')
-const { parseCookie: parse, stringifySetCookie } = require('cookie')
 
 const { Signer, sign, unsign } = require('./signer')
 
+// TODO: Use require(ESM) when Node.js 20 is nolonger supported or Fastify@6
+let cookieModule = null
+async function dynamicLoadCookie () {
+  if (cookieModule == null) {
+    cookieModule = await import('cookie')
+  }
+}
+
 function serialize (name, value, options) {
-  return stringifySetCookie(Object.assign({ name, value }, options))
+  return cookieModule.stringifySetCookie(Object.assign({ name, value }, options))
+}
+
+function parse (header, options) {
+  return cookieModule.parseCookie(header, options)
 }
 
 const kReplySetCookies = Symbol('fastify.reply.setCookies')
@@ -121,14 +132,12 @@ function fastifyCookieOnSendHandler (_fastifyReq, fastifyRes, _payload, done) {
   done()
 }
 
-function plugin (fastify, options, next) {
+async function plugin (fastify, options) {
   const secret = options.secret
   const hook = getHook(options.hook)
   if (hook === undefined) {
-    return next(
-      new Error(
-        "@fastify/cookie: Invalid value provided for the hook-option. You can set the hook-option only to false, 'onRequest' , 'preParsing' , 'preValidation' or 'preHandler'"
-      )
+    throw new Error(
+      "@fastify/cookie: Invalid value provided for the hook-option. You can set the hook-option only to false, 'onRequest' , 'preParsing' , 'preValidation' or 'preHandler'"
     )
   }
   const isSigner =
@@ -167,7 +176,7 @@ function plugin (fastify, options, next) {
   // disables cookie autoparsing, not the ability to set cookies on the reply.
   fastify.addHook('onSend', fastifyCookieOnSendHandler)
 
-  next()
+  await dynamicLoadCookie()
 
   // ***************************
   function parseCookie (cookieHeader) {
