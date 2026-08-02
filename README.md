@@ -336,7 +336,7 @@ Using it on a signed cookie will call the provided signer's (or the default sign
 fastify.register(require('@fastify/cookie'), { secret: 'my-secret' })
 
 fastify.get('/', (req, rep) => {
-  if (fastify.unsignCookie(req.cookie.foo).valid === false) {
+  if (fastify.unsignCookie(req.cookies.foo).valid === false) {
     rep.send('cookie is invalid')
     return
   }
@@ -352,20 +352,32 @@ Sometimes the service under test should only accept requests with signed cookies
 **Example:**
 
 ```js
+const { test } = require('node:test')
+const Fastify = require('fastify')
+const cookie = require('@fastify/cookie')
 
-test('Request requires signed cookie', async () => {
-    const response = await app.inject({
-        method: 'GET',
-        url: '/',
-        headers: {
-          cookies : {
-            'sid': app.signCookie(sidValue)
-          }
-        },
-    });
+test('request requires signed cookie', async (t) => {
+  const app = Fastify()
+  t.after(() => app.close())
 
-    expect(response.statusCode).toBe(200);
-});
+  await app.register(cookie, { secret: 'my-secret' })
+
+  app.get('/', (req, reply) => {
+    const { valid } = req.unsignCookie(req.cookies.sid)
+    reply.code(valid ? 200 : 401).send()
+  })
+
+  const sidValue = 'session-id'
+  const response = await app.inject({
+    method: 'GET',
+    url: '/',
+    headers: {
+      cookie: `sid=${app.signCookie(sidValue)}`
+    }
+  })
+
+  t.assert.strictEqual(response.statusCode, 200)
+})
 ```
 
 ### Manual signing/unsigning with low-level utilities
