@@ -62,7 +62,7 @@
     "benchmark": "^2.1.4",
     "c8": "^12.0.0",
     "eslint": "^9.17.0",
-    "fastify": "^5.0.0",
+    "fastify": "^5.12.0",
     "neostandard": "^0.13.0",
     "sinon": "^22.0.0",
     "tstyche": "^7.0.0"
