@@ -69,6 +69,13 @@ server.after((_err) => {
         .clearCookie('foo')
         .send({ hello: 'world' })
     ).type.toBe<FastifyReply>()
+
+    expect(reply.getCookie('test')).type.toBe<
+      ({ value: string } & fastifyCookieStar.CookieSerializeOptions) | undefined
+    >()
+    expect(reply.getCookies()).type.toBe<{
+      [key: string]: { value: string } & fastifyCookieStar.CookieSerializeOptions;
+    }>()
   })
 
   expect(server.signCookie).type.toBe<(value: string) => string>()
