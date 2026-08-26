@@ -67,6 +67,29 @@ function fastifyCookieClearCookie (reply, name, options) {
   return fastifyCookieSetCookie(reply, name, '', opts)
 }
 
+function fastifyCookieGetCookie (reply, name) {
+  parseCookies(reply.server, reply.request, reply)
+
+  for (const c of reply[kReplySetCookies].values()) {
+    if (c.name === name) {
+      return Object.assign({ value: c.value }, c.opts)
+    }
+  }
+
+  return undefined
+}
+
+function fastifyCookieGetCookies (reply) {
+  parseCookies(reply.server, reply.request, reply)
+
+  const result = {}
+  for (const c of reply[kReplySetCookies].values()) {
+    result[c.name] = Object.assign({ value: c.value }, c.opts)
+  }
+
+  return result
+}
+
 function parseCookies (fastify, request, reply) {
   if (reply[kReplySetCookies]) return
 
@@ -168,6 +191,8 @@ async function plugin (fastify, options) {
   fastify.decorateReply('cookie', setCookie)
   fastify.decorateReply('setCookie', setCookie)
   fastify.decorateReply('clearCookie', clearCookie)
+  fastify.decorateReply('getCookie', getCookie)
+  fastify.decorateReply('getCookies', getCookies)
 
   if (hook) {
     fastify.addHook(hook, onReqHandlerWrapper(fastify, hook))
@@ -199,6 +224,14 @@ async function plugin (fastify, options) {
   function clearCookie (name, cookieOptions) {
     const opts = Object.assign({}, options.parseOptions, cookieOptions)
     return fastifyCookieClearCookie(this, name, opts)
+  }
+
+  function getCookie (name) {
+    return fastifyCookieGetCookie(this, name)
+  }
+
+  function getCookies () {
+    return fastifyCookieGetCookies(this)
   }
 }
 

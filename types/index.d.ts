@@ -87,6 +87,17 @@ declare module 'fastify' {
     ): this;
 
     /**
+     * Get response cookie
+     * @param name Cookie name
+     */
+    getCookie(name: string): ({ value: string } & fastifyCookie.CookieSerializeOptions) | undefined;
+
+    /**
+     * Get all response cookies
+     */
+    getCookies(): { [key: string]: { value: string } & fastifyCookie.CookieSerializeOptions };
+
+    /**
      * Unsigns the specified cookie using the secret provided.
      * @param value Cookie value
      */
