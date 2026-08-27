@@ -301,19 +301,19 @@ fastify.get('/', (req, reply) => {
 
 ### Custom cookie signer
 
-The `secret` option optionally accepts an object with `sign` and `unsign` functions. This allows for implementing a custom cookie signing mechanism. See the following example:
+The `secret` option optionally accepts an object with `sign` and `unsign` functions. This allows for implementing a custom cookie signing mechanism. The functions also receive the current `FastifyRequest` as a second parameter when called in a request context, enabling tenant- or request-specific secrets. See the following example:
 
 **Example:**
 
 ```js
 fastify.register(require('@fastify/cookie'), {
   secret: {
-    sign: (value) => {
-      // sign using custom logic
+    sign: (value, req) => {
+      // sign using custom logic (e.g. per-tenant secret based on req.hostname)
       return signedValue
     },
-    unsign: (value) => {
-      // unsign using custom logic
+    unsign: (value, req) => {
+      // unsign using custom logic (e.g. per-tenant secret based on req.hostname)
       return {
         valid: true, // the cookie has been unsigned successfully
         renew: false, // the cookie has been unsigned with an old secret
