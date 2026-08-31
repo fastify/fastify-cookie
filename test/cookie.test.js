@@ -1333,3 +1333,19 @@ test('do not crash if the onRequest hook is not run', async (t) => {
   t.assert.strictEqual(res.statusCode, 200)
   t.assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 })
+
+test('passes encode option to cookie serializer', async (t) => {
+  t.plan(2)
+
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  fastify.get('/', (_req, reply) => {
+    reply.setCookie('foo', 'bar', { encode: () => 'encoded' }).send()
+  })
+
+  const res = await fastify.inject({ url: '/' })
+
+  t.assert.strictEqual(res.statusCode, 200)
+  t.assert.strictEqual(res.headers['set-cookie'], 'foo=encoded; SameSite=Lax')
+})
