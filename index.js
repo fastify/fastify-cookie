@@ -164,6 +164,17 @@ async function plugin (fastify, options) {
   fastify.decorateRequest('cookies', null)
   fastify.decorateReply(kReplySetCookies, null)
   fastify.decorateReply(kReplySetCookiesHookRan, false)
+  fastify.decorateReply('cookies', {
+    getter () {
+      const cookies = {}
+      if (this[kReplySetCookies]) {
+        for (const c of this[kReplySetCookies].values()) {
+          cookies[c.name] = c.value
+        }
+      }
+      return cookies
+    }
+  })
 
   fastify.decorateReply('cookie', setCookie)
   fastify.decorateReply('setCookie', setCookie)

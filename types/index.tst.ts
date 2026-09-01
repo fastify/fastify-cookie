@@ -59,6 +59,7 @@ server.after((_err) => {
   server.get('/', (request, reply) => {
     const test = request.cookies.test
     expect(test).type.toBe<string | undefined>()
+    expect(reply.cookies.test).type.toBe<string | undefined>()
 
     expect(reply.cookie).type.toBe<setCookieWrapper>()
     expect(reply.setCookie).type.toBe<setCookieWrapper>()

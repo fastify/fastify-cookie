@@ -1333,3 +1333,43 @@ test('do not crash if the onRequest hook is not run', async (t) => {
   t.assert.strictEqual(res.statusCode, 200)
   t.assert.deepStrictEqual(JSON.parse(res.body), { hello: 'world' })
 })
+
+test('reply.cookies reflects response cookies set on reply', async (t) => {
+  t.plan(4)
+
+  const fastify = Fastify()
+  await fastify.register(plugin)
+
+  fastify.get('/test-reply-cookies', (_req, reply) => {
+    t.assert.deepStrictEqual(reply.cookies, {})
+    reply.setCookie('foo', 'bar')
+    reply.setCookie('session', 'xyz')
+    t.assert.deepStrictEqual(reply.cookies, { foo: 'bar', session: 'xyz' })
+    t.assert.strictEqual(reply.cookies.foo, 'bar')
+    return { ok: true }
+  })
+
+  const res = await fastify.inject({
+    method: 'GET',
+    url: '/test-reply-cookies'
+  })
+  t.assert.strictEqual(res.statusCode, 200)
+})
+
+test('reply.cookies returns empty object when no cookies map initialized', async (t) => {
+  t.plan(2)
+
+  const fastify = Fastify()
+  await fastify.register(plugin, { hook: false })
+
+  fastify.get('/test-no-hook', (_req, reply) => {
+    t.assert.deepStrictEqual(reply.cookies, {})
+    return { ok: true }
+  })
+
+  const res = await fastify.inject({
+    method: 'GET',
+    url: '/test-no-hook'
+  })
+  t.assert.strictEqual(res.statusCode, 200)
+})
