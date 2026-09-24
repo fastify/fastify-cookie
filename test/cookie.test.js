@@ -763,6 +763,46 @@ test('serialize cookie manually using decorator', async (t) => {
   t.assert.deepStrictEqual(fastify.serializeCookie('foo', 'bar', {}), 'foo=bar')
 })
 
+test('setCookie forwards custom encode option to cookie serializer', async (t) => {
+  t.plan(2)
+
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  fastify.get('/test', (_req, reply) => {
+    reply.setCookie('test', 'a=%2F&b=c', { encode: String })
+    reply.send('done')
+  })
+
+  const res = await fastify.inject({ url: '/test' })
+
+  t.assert.strictEqual(res.statusCode, 200)
+  t.assert.strictEqual(res.headers['set-cookie'], 'test=a=%2F&b=c; SameSite=Lax')
+})
+
+test('serialize forwards custom encode option', async (t) => {
+  t.plan(2)
+
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  await new Promise(resolve => fastify.ready(resolve))
+
+  t.assert.strictEqual(plugin.serialize('test', 'a=%2F&b=c', { encode: String }), 'test=a=%2F&b=c')
+  t.assert.strictEqual(fastify.serializeCookie('test', 'a=%2F&b=c', { encode: String }), 'test=a=%2F&b=c')
+})
+
+test('serializeCookie does not require an options object', async (t) => {
+  t.plan(1)
+
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  await new Promise(resolve => fastify.ready(resolve))
+
+  t.assert.strictEqual(fastify.serializeCookie('foo', 'bar'), 'foo=bar')
+})
+
 test('parse cookie manually using decorator', async (t) => {
   t.plan(2)
 

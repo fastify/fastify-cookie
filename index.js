@@ -13,7 +13,8 @@ async function dynamicLoadCookie () {
 }
 
 function serialize (name, value, options) {
-  return cookieModule.stringifySetCookie(Object.assign({ name, value }, options))
+  const { encode, ...cookieAttributes } = options || {}
+  return cookieModule.stringifySetCookie(Object.assign({ name, value }, cookieAttributes), { encode })
 }
 
 function parse (header, options) {
