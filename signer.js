@@ -57,8 +57,16 @@ function _unsign (signedValue, secrets, algorithm) {
   if (typeof signedValue !== 'string') {
     throw new TypeError('Signed cookie string must be provided.')
   }
-  const value = signedValue.slice(0, signedValue.lastIndexOf('.'))
-  const actual = Buffer.from(signedValue.slice(signedValue.lastIndexOf('.') + 1))
+  const dotIndex = signedValue.lastIndexOf('.')
+  if (dotIndex === -1 || dotIndex === signedValue.length - 1) {
+    return {
+      valid: false,
+      renew: false,
+      value: null
+    }
+  }
+  const value = signedValue.slice(0, dotIndex)
+  const actual = Buffer.from(signedValue.slice(dotIndex + 1))
 
   for (let i = 0; i < secrets.length; ++i) {
     const secret = secrets[i]
