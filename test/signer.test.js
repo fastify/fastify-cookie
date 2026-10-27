@@ -30,7 +30,7 @@ describe('default', () => {
   })
 
   test('signer.unsign', (t) => {
-    t.plan(4)
+    t.plan(7)
 
     const input = signer.sign('some-value', secret)
     const result = signer.unsign(input)
@@ -38,7 +38,10 @@ describe('default', () => {
     t.assert.strictEqual(result.valid, true)
     t.assert.strictEqual(result.renew, false)
     t.assert.strictEqual(result.value, 'some-value')
+    t.assert.deepStrictEqual(signer.unsign('unsigned-string-without-dot'), { valid: false, renew: false, value: null })
+    t.assert.deepStrictEqual(signer.unsign('string-ending-with-dot.'), { valid: false, renew: false, value: null })
     t.assert.throws(() => signer.unsign(undefined), err => err.message === 'Signed cookie string must be provided.')
+    t.assert.throws(() => signer.unsign(null), err => err.message === 'Signed cookie string must be provided.')
   })
 
   test('unsign', (t) => {
