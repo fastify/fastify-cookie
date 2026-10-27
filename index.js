@@ -13,7 +13,7 @@ async function dynamicLoadCookie () {
 }
 
 function serialize (name, value, options) {
-  return cookieModule.stringifySetCookie(Object.assign({ name, value }, options))
+  return cookieModule.stringifySetCookie(Object.assign({ name, value }, options), options)
 }
 
 function parse (header, options) {
