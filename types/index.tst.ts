@@ -5,6 +5,7 @@ import cookie, { fastifyCookie as fastifyCookieNamed, Signer } from '..'
 import fastify, {
   type FastifyInstance,
   type FastifyReply,
+  type FastifyRequest,
   type setCookieWrapper
 } from 'fastify'
 
@@ -220,8 +221,12 @@ const appWithCustomSigner = fastify()
 
 appWithCustomSigner.register(cookie, {
   secret: {
-    sign: (x) => x + '.signed',
-    unsign: (x) => {
+    sign: (x, req) => {
+      expect(req).type.toBe<FastifyRequest | undefined>()
+      return x + '.signed'
+    },
+    unsign: (x, req) => {
+      expect(req).type.toBe<FastifyRequest | undefined>()
       if (x.endsWith('.signed')) {
         return { renew: false, valid: true, value: x.slice(0, -7) }
       }

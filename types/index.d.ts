@@ -1,6 +1,6 @@
 /// <reference types='node' />
 
-import { FastifyPluginAsync } from 'fastify'
+import { FastifyPluginAsync, FastifyRequest } from 'fastify'
 
 declare module 'fastify' {
   interface FastifyInstance extends SignerMethods {
@@ -100,8 +100,8 @@ type FastifyCookiePlugin = FastifyPluginAsync<
 
 declare namespace fastifyCookie {
   interface SignerBase {
-    sign: (value: string) => string;
-    unsign: (input: string) => UnsignResult;
+    sign: (value: string, request?: FastifyRequest) => string;
+    unsign: (input: string, request?: FastifyRequest) => UnsignResult;
   }
 
   export class Signer implements SignerBase {

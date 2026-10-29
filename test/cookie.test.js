@@ -635,7 +635,7 @@ describe('cookies signature', () => {
 })
 
 test('custom signer', async (t) => {
-  t.plan(6)
+  t.plan(7)
 
   const fastify = Fastify()
   const signStub = sinon.stub().returns('SIGNED-VALUE')
@@ -660,11 +660,12 @@ test('custom signer', async (t) => {
   t.assert.strictEqual(cookies.length, 1)
   t.assert.strictEqual(cookies[0].name, 'foo')
   t.assert.strictEqual(cookies[0].value, 'SIGNED-VALUE')
-  t.assert.ok(signStub.calledOnceWithExactly('bar'))
+  t.assert.ok(signStub.calledOnce)
+  t.assert.strictEqual(signStub.firstCall.args[0], 'bar')
 })
 
 test('unsignCookie decorator with custom signer', async (t) => {
-  t.plan(3)
+  t.plan(4)
 
   const fastify = Fastify()
   const signStub = sinon.stub().returns('SIGNED-VALUE')
@@ -687,7 +688,45 @@ test('unsignCookie decorator with custom signer', async (t) => {
   })
   t.assert.strictEqual(res.statusCode, 200)
   t.assert.deepStrictEqual(JSON.parse(res.body), { unsigned: 'ORIGINAL VALUE' })
-  t.assert.ok(unsignStub.calledOnceWithExactly('SOME-SIGNED-VALUE'))
+  t.assert.ok(unsignStub.calledOnce)
+  t.assert.strictEqual(unsignStub.firstCall.args[0], 'SOME-SIGNED-VALUE')
+})
+
+test('custom signer receives request parameter', async (t) => {
+  t.plan(4)
+
+  const fastify = Fastify()
+  let signReq
+  let unsignReq
+  const secret = {
+    sign: (value, req) => {
+      signReq = req
+      return `signed-${value}`
+    },
+    unsign: (value, req) => {
+      unsignReq = req
+      return { valid: true, renew: false, value: value.replace('signed-', '') }
+    }
+  }
+  fastify.register(plugin, { secret })
+
+  fastify.get('/test', (req, reply) => {
+    reply
+      .setCookie('foo', 'bar', { signed: true })
+      .send({ unsigned: reply.unsignCookie(req.cookies.foo) })
+  })
+
+  const res = await fastify.inject({
+    method: 'GET',
+    url: '/test',
+    headers: {
+      cookie: 'foo=signed-incoming'
+    }
+  })
+  t.assert.strictEqual(res.statusCode, 200)
+  t.assert.deepStrictEqual(JSON.parse(res.body), { unsigned: { valid: true, renew: false, value: 'incoming' } })
+  t.assert.strictEqual(signReq?.raw?.url, '/test')
+  t.assert.strictEqual(unsignReq?.raw?.url, '/test')
 })
 
 test('pass options to `cookies.parse`', async (t) => {
