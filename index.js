@@ -184,12 +184,12 @@ async function plugin (fastify, options) {
     return parse(cookieHeader, options.parseOptions)
   }
 
-  function signCookie (value) {
-    return signer.sign(value)
+  function signCookie (value, context) {
+    return signer.sign(value, context || this?.request || this)
   }
 
-  function unsignCookie (value) {
-    return signer.unsign(value)
+  function unsignCookie (value, context) {
+    return signer.unsign(value, context || this?.request || this)
   }
 
   function setCookie (name, value, cookieOptions) {
