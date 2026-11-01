@@ -71,19 +71,19 @@ server.after((_err) => {
     ).type.toBe<FastifyReply>()
   })
 
-  expect(server.signCookie).type.toBe<(value: string) => string>()
+  expect(server.signCookie).type.toBe<(value: string, context?: any) => string>()
   expect(server.unsignCookie).type.toBe<
-    (value: string) => fastifyCookieStar.UnsignResult
+    (value: string, context?: any) => fastifyCookieStar.UnsignResult
   >()
 
   server.get('/', (request, reply) => {
-    expect(request.signCookie).type.toBe<(value: string) => string>()
-    expect(reply.signCookie).type.toBe<(value: string) => string>()
+    expect(request.signCookie).type.toBe<(value: string, context?: any) => string>()
+    expect(reply.signCookie).type.toBe<(value: string, context?: any) => string>()
     expect(request.unsignCookie).type.toBe<
-      (value: string) => fastifyCookieStar.UnsignResult
+      (value: string, context?: any) => fastifyCookieStar.UnsignResult
     >()
     expect(reply.unsignCookie).type.toBe<
-      (value: string) => fastifyCookieStar.UnsignResult
+      (value: string, context?: any) => fastifyCookieStar.UnsignResult
     >()
   })
 })

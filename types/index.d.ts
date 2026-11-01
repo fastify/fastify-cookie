@@ -41,14 +41,16 @@ declare module 'fastify' {
     /**
      * Signs the specified cookie using the secret/signer provided.
      * @param value cookie value
+     * @param context optional request or custom context passed to custom signer
      */
-    signCookie(value: string): string;
+    signCookie(value: string, context?: any): string;
 
     /**
      * Unsigns the specified cookie using the secret/signer provided.
      * @param value Cookie value
+     * @param context optional request or custom context passed to custom signer
      */
-    unsignCookie(value: string): fastifyCookie.UnsignResult;
+    unsignCookie(value: string, context?: any): fastifyCookie.UnsignResult;
   }
 
   export type setCookieWrapper = (
@@ -89,8 +91,9 @@ declare module 'fastify' {
     /**
      * Unsigns the specified cookie using the secret provided.
      * @param value Cookie value
+     * @param context optional request or custom context passed to custom signer
      */
-    unsignCookie(value: string): fastifyCookie.UnsignResult;
+    unsignCookie(value: string, context?: any): fastifyCookie.UnsignResult;
   }
 }
 

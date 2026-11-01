@@ -635,7 +635,7 @@ describe('cookies signature', () => {
 })
 
 test('custom signer', async (t) => {
-  t.plan(6)
+  t.plan(7)
 
   const fastify = Fastify()
   const signStub = sinon.stub().returns('SIGNED-VALUE')
@@ -643,7 +643,9 @@ test('custom signer', async (t) => {
   const secret = { sign: signStub, unsign: unsignStub }
   fastify.register(plugin, { secret })
 
-  fastify.get('/test1', (_req, reply) => {
+  let capturedReq
+  fastify.get('/test1', (req, reply) => {
+    capturedReq = req
     reply
       .setCookie('foo', 'bar', { signed: true })
       .send({ hello: 'world' })
@@ -660,11 +662,12 @@ test('custom signer', async (t) => {
   t.assert.strictEqual(cookies.length, 1)
   t.assert.strictEqual(cookies[0].name, 'foo')
   t.assert.strictEqual(cookies[0].value, 'SIGNED-VALUE')
-  t.assert.ok(signStub.calledOnceWithExactly('bar'))
+  t.assert.ok(signStub.calledOnceWith('bar'))
+  t.assert.strictEqual(signStub.firstCall.args[1], capturedReq)
 })
 
 test('unsignCookie decorator with custom signer', async (t) => {
-  t.plan(3)
+  t.plan(4)
 
   const fastify = Fastify()
   const signStub = sinon.stub().returns('SIGNED-VALUE')
@@ -672,7 +675,9 @@ test('unsignCookie decorator with custom signer', async (t) => {
   const secret = { sign: signStub, unsign: unsignStub }
   fastify.register(plugin, { secret })
 
+  let capturedReq
   fastify.get('/test1', (req, reply) => {
+    capturedReq = req
     reply.send({
       unsigned: reply.unsignCookie(req.cookies.foo)
     })
@@ -687,7 +692,80 @@ test('unsignCookie decorator with custom signer', async (t) => {
   })
   t.assert.strictEqual(res.statusCode, 200)
   t.assert.deepStrictEqual(JSON.parse(res.body), { unsigned: 'ORIGINAL VALUE' })
-  t.assert.ok(unsignStub.calledOnceWithExactly('SOME-SIGNED-VALUE'))
+  t.assert.ok(unsignStub.calledOnceWith('SOME-SIGNED-VALUE'))
+  t.assert.strictEqual(unsignStub.firstCall.args[1], capturedReq)
+})
+
+test('multi-tenant custom signer using request context (issue #289)', async (t) => {
+  t.plan(7)
+
+  const tenantSecrets = {
+    tenantA: 'secret-alpha',
+    tenantB: 'secret-beta'
+  }
+
+  const fastify = Fastify()
+  fastify.register(plugin, {
+    secret: {
+      sign: (value, req) => {
+        const tenant = req && req.headers ? req.headers['x-tenant'] : 'default'
+        const secret = tenantSecrets[tenant] || 'fallback'
+        return `${value}.${tenant}.${secret}`
+      },
+      unsign: (signedValue, req) => {
+        const parts = signedValue.split('.')
+        const value = parts[0]
+        const tenant = parts[1]
+        const secret = parts[2]
+        const expectedTenant = req && req.headers ? req.headers['x-tenant'] : 'default'
+        if (tenant === expectedTenant && secret === tenantSecrets[expectedTenant]) {
+          return { valid: true, renew: false, value }
+        }
+        return { valid: false, renew: false, value: null }
+      }
+    }
+  })
+
+  fastify.get('/set', (req, reply) => {
+    reply.setCookie('session', 'user-123', { signed: true }).send({ ok: true })
+  })
+
+  fastify.get('/read', (req, reply) => {
+    const unsigned = req.unsignCookie(req.cookies.session)
+    reply.send(unsigned)
+  })
+
+  // 1. Tenant A sets cookie
+  const resA = await fastify.inject({
+    method: 'GET',
+    url: '/set',
+    headers: { 'x-tenant': 'tenantA' }
+  })
+  t.assert.strictEqual(resA.statusCode, 200)
+  const cookieA = resA.cookies[0].value
+  t.assert.strictEqual(cookieA, 'user-123.tenantA.secret-alpha')
+
+  // 2. Tenant A reads cookie with tenantA header -> valid
+  const readA = await fastify.inject({
+    method: 'GET',
+    url: '/read',
+    headers: { 'x-tenant': 'tenantA', cookie: `session=${cookieA}` }
+  })
+  t.assert.strictEqual(readA.statusCode, 200)
+  t.assert.deepStrictEqual(JSON.parse(readA.body), { valid: true, renew: false, value: 'user-123' })
+
+  // 3. Tenant B reads cookie with tenantB header -> invalid (tenant mismatch)
+  const readB = await fastify.inject({
+    method: 'GET',
+    url: '/read',
+    headers: { 'x-tenant': 'tenantB', cookie: `session=${cookieA}` }
+  })
+  t.assert.strictEqual(readB.statusCode, 200)
+  t.assert.deepStrictEqual(JSON.parse(readB.body), { valid: false, renew: false, value: null })
+
+  // 4. Test explicit context passed to fastify.signCookie and fastify.unsignCookie
+  const manualSigned = fastify.signCookie('foo', { headers: { 'x-tenant': 'tenantB' } })
+  t.assert.strictEqual(manualSigned, 'foo.tenantB.secret-beta')
 })
 
 test('pass options to `cookies.parse`', async (t) => {
