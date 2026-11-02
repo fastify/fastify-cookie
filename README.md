@@ -204,7 +204,7 @@ Specifies the `boolean` value for the [`Secure` `Set-Cookie` attribute](https://
 the `Secure` attribute is set, otherwise, it is not. By default, the `Secure` attribute is not set.
 
 **Note:** be careful when setting this to `true`, as compliant clients will not send the cookie back to
-the server in the future if the browser does not have an HTTPS connection.
+the server in the future if the browser does not have an HTTPS connection (except on `localhost`; see [Using `Secure` and `SameSite=None` cookies on `localhost`](#using-secure-and-samesitenone-cookies-on-localhost)).
 
 ## API
 
@@ -238,6 +238,29 @@ Following are _some_ of the precautions that should be taken to ensure the integ
 - Use signed cookies (`options.signed`) to ensure they are not getting tampered wit client-side by an attacker.
 - Use `__Host-` [Cookie Prefix](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie#attributes) to avoid Cookie Tossing attacks.
 - It is important to [use HTTPS for your website/app](https://letsencrypt.org/) to avoid a bunch of other potential security issues like [MITM](https://en.wikipedia.org/wiki/Man-in-the-middle_attack) etc.
+
+#### Using `Secure` and `SameSite=None` cookies on `localhost`
+
+When accessing a local HTTP server (for example, `http://localhost:3000`) from a remote HTTPS frontend (for example, `https://sandbox.example.com`) during development, cross-site cookies require `sameSite: 'none'` and `secure: true`. Although browsers exempt `localhost` from requiring TLS for `Secure` cookies, two additional considerations apply when using `secure: 'auto'` (or session plugins such as `@fastify/session` that check `request.protocol === 'https'`) and Chromium's [Private Network Access](https://developer.chrome.com/blog/private-network-access-preflight) specification:
+
+1. Fastify only sets `request.protocol` to `'https'` over plain HTTP when `trustProxy: true` is enabled and the `x-forwarded-proto: https` header is present.
+2. Chromium-based browsers require the `Access-Control-Allow-Private-Network: true` response header for requests from a public origin to `localhost`.
+
+For local development only, you can configure Fastify as follows:
+
+```js
+const app = Fastify({
+  trustProxy: true
+})
+
+app.addHook('preHandler', async function (request) {
+  request.headers['x-forwarded-proto'] = 'https'
+})
+
+app.addHook('onSend', async function (_request, reply) {
+  reply.header('Access-Control-Allow-Private-Network', 'true')
+})
+```
 
 ### Clearing
 
