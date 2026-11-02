@@ -1389,3 +1389,10 @@ test('passes encode option to cookie serializer', async (t) => {
   t.assert.strictEqual(res.statusCode, 200)
   t.assert.strictEqual(res.headers['set-cookie'], 'foo=encoded; SameSite=Lax')
 })
+
+test('standalone parse and serialize work before plugin registration (#383)', async (t) => {
+  t.plan(2)
+
+  t.assert.deepStrictEqual({ ...plugin.parse('sid=abc') }, { sid: 'abc' })
+  t.assert.strictEqual(plugin.serialize('sid', 'abc'), 'sid=abc')
+})

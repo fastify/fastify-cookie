@@ -6,11 +6,19 @@ const { Signer, sign, unsign } = require('./signer')
 
 // TODO: Use require(ESM) when Node.js 20 is nolonger supported or Fastify@6
 let cookieModule = null
+try {
+  cookieModule = require('cookie')
+/* c8 ignore start */
+} catch {
+  // Fallback for runtimes where synchronous require of ESM is not enabled
+}
+
 async function dynamicLoadCookie () {
   if (cookieModule == null) {
     cookieModule = await import('cookie')
   }
 }
+/* c8 ignore stop */
 
 function serialize (name, value, options) {
   const { encode, ...cookieAttributes } = options || {}
