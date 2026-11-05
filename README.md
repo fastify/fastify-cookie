@@ -230,6 +230,10 @@ with a value of `'foo'` on the cookie path `/`.
 - `options.signed`: the cookie should be signed
 - `options.secure`: if set to `true` it will set the Secure-flag. If it is set to `"auto"` Secure-flag is set when the connection is using tls.
 
+### Reading Response Cookies
+
+Cookies set on the response via `reply.setCookie` or `reply.clearCookie` are accessible on the `reply` object as `reply.cookies`. Thus, if `reply.setCookie('foo', 'bar')` was called, `reply.cookies.foo` will equal `'bar'` within your handler and subsequent hooks (such as `preSerialization`, `onSend`, and `onResponse`).
+
 #### Securing the cookie
 
 Following are _some_ of the precautions that should be taken to ensure the integrity of an application:

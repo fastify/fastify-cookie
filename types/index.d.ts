@@ -32,7 +32,7 @@ declare module 'fastify' {
 
   interface FastifyReply extends SignerMethods {
     /**
-     * Request cookies
+     * Response cookies
      */
     cookies: { [cookieName: string]: string | undefined };
   }

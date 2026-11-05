@@ -22,7 +22,15 @@ function parse (header, options) {
 }
 
 const kReplySetCookies = Symbol('fastify.reply.setCookies')
+const kReplyCookies = Symbol('fastify.reply.cookies')
 const kReplySetCookiesHookRan = Symbol('fastify.reply.setCookiesHookRan')
+
+function getReplyCookies () {
+  if (!this[kReplyCookies]) {
+    this[kReplyCookies] = {}
+  }
+  return this[kReplyCookies]
+}
 
 function fastifyCookieSetCookie (reply, name, value, options) {
   parseCookies(reply.server, reply.request, reply)
@@ -51,6 +59,8 @@ function fastifyCookieSetCookie (reply, name, value, options) {
     opts
   })
 
+  reply[kReplyCookies][name] = value
+
   if (reply[kReplySetCookiesHookRan]) {
     setCookies(reply)
   }
@@ -75,6 +85,9 @@ function parseCookies (fastify, request, reply) {
 
   request.cookies = cookieHeader ? fastify.parseCookie(cookieHeader) : {} // New container per request. Issue #53
   reply[kReplySetCookies] = new Map()
+  if (!reply[kReplyCookies]) {
+    reply[kReplyCookies] = {}
+  }
 }
 
 function onReqHandlerWrapper (fastify, hook) {
@@ -164,7 +177,11 @@ async function plugin (fastify, options) {
 
   fastify.decorateRequest('cookies', null)
   fastify.decorateReply(kReplySetCookies, null)
+  fastify.decorateReply(kReplyCookies, null)
   fastify.decorateReply(kReplySetCookiesHookRan, false)
+  fastify.decorateReply('cookies', {
+    getter: getReplyCookies
+  })
 
   fastify.decorateReply('cookie', setCookie)
   fastify.decorateReply('setCookie', setCookie)
