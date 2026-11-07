@@ -106,8 +106,8 @@ declare namespace fastifyCookie {
 
   export class Signer implements SignerBase {
     constructor (secrets: string | Array<string> | Buffer | Array<Buffer>, algorithm?: string)
-    sign: (value: string) => string
-    unsign: (input: string) => UnsignResult
+    sign: (value: string, request?: FastifyRequest) => string
+    unsign: (input: string, request?: FastifyRequest) => UnsignResult
   }
 
   export interface SerializeOptions {

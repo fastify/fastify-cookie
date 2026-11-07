@@ -1428,3 +1428,19 @@ test('passes encode option to cookie serializer', async (t) => {
   t.assert.strictEqual(res.statusCode, 200)
   t.assert.strictEqual(res.headers['set-cookie'], 'foo=encoded; SameSite=Lax')
 })
+
+test('fastify.signCookie signs without a request context', async (t) => {
+  t.plan(3)
+
+  const fastify = Fastify()
+  fastify.register(plugin, { secret: 'my-secret' })
+  await fastify.ready()
+
+  // Called on the instance, `this` is not a request, so no context is passed on.
+  const signed = fastify.signCookie('value')
+  t.assert.strictEqual(signed, sign('value', 'my-secret'))
+
+  const result = fastify.unsignCookie(signed)
+  t.assert.strictEqual(result.valid, true)
+  t.assert.strictEqual(result.value, 'value')
+})

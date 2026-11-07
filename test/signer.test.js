@@ -126,3 +126,44 @@ describe('Signer', () => {
     t.assert.doesNotThrow(() => Signer('secret', 'sha256'))
   })
 })
+
+describe('default Signer with a request', () => {
+  const secret = 'my-secret'
+
+  test('the base methods accept the request a subclass forwards', (t) => {
+    t.plan(3)
+
+    // A subclass can only shadow the request if the base method takes a second
+    // parameter; the signature it computes does not depend on it.
+    const signer = Signer(secret)
+    const request = { raw: { url: '/signer-request' } }
+
+    let signArgs = -1
+    let unsignArgs = -1
+    const baseSign = Signer.prototype.sign
+    const baseUnsign = Signer.prototype.unsign
+    signer.sign = function (...args) {
+      signArgs = args.length
+      return baseSign.apply(this, args)
+    }
+    signer.unsign = function (...args) {
+      unsignArgs = args.length
+      return baseUnsign.apply(this, args)
+    }
+
+    const signed = signer.sign('value', request)
+    const result = signer.unsign(signed, request)
+
+    t.assert.strictEqual(signArgs, 2)
+    t.assert.strictEqual(unsignArgs, 2)
+    t.assert.strictEqual(result.value, 'value')
+  })
+
+  test('the base methods declare the request parameter', (t) => {
+    t.plan(2)
+    // `Function.length` counts the parameters before the first default or rest,
+    // so it says whether the source actually names one.
+    t.assert.strictEqual(Signer.prototype.sign.length, 2)
+    t.assert.strictEqual(Signer.prototype.unsign.length, 2)
+  })
+})
