@@ -1389,3 +1389,60 @@ test('passes encode option to cookie serializer', async (t) => {
   t.assert.strictEqual(res.statusCode, 200)
   t.assert.strictEqual(res.headers['set-cookie'], 'foo=encoded; SameSite=Lax')
 })
+
+test('reply.getCookie and reply.getCookies return cookies set on reply', async (t) => {
+  t.plan(7)
+
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  fastify.get('/test', (req, reply) => {
+    t.assert.strictEqual(reply.getCookie('foo'), undefined)
+    t.assert.deepStrictEqual(reply.getCookies(), {})
+
+    reply.setCookie('foo', 'bar', { path: '/test', httpOnly: true })
+    reply.setCookie('baz', 'qux', { secure: true })
+
+    const foo = reply.getCookie('foo')
+    t.assert.deepStrictEqual(foo, { value: 'bar', sameSite: 'lax', path: '/test', httpOnly: true })
+
+    const cookies = reply.getCookies()
+    t.assert.deepStrictEqual(cookies.foo, { value: 'bar', sameSite: 'lax', path: '/test', httpOnly: true })
+    t.assert.deepStrictEqual(cookies.baz, { value: 'qux', sameSite: 'lax', secure: true })
+
+    reply.send('done')
+  })
+
+  const res = await fastify.inject({
+    method: 'GET',
+    url: '/test'
+  })
+  t.assert.strictEqual(res.statusCode, 200)
+  t.assert.strictEqual(res.body, 'done')
+})
+
+test('reply.getCookies defines special cookie names as own properties', async (t) => {
+  t.plan(4)
+
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  let cookies
+  fastify.get('/test', (req, reply) => {
+    reply.setCookie('__proto__', 'safe', { path: '/' })
+    cookies = reply.getCookies()
+    reply.send('done')
+  })
+
+  const res = await fastify.inject({
+    method: 'GET',
+    url: '/test'
+  })
+  t.assert.strictEqual(res.statusCode, 200)
+  t.assert.ok(Object.hasOwn(cookies, '__proto__'))
+  t.assert.strictEqual(Object.getPrototypeOf(cookies), Object.prototype)
+  t.assert.deepStrictEqual(
+    Object.getOwnPropertyDescriptor(cookies, '__proto__').value,
+    { value: 'safe', sameSite: 'lax', path: '/' }
+  )
+})
