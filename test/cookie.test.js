@@ -1389,3 +1389,17 @@ test('passes encode option to cookie serializer', async (t) => {
   t.assert.strictEqual(res.statusCode, 200)
   t.assert.strictEqual(res.headers['set-cookie'], 'foo=encoded; SameSite=Lax')
 })
+
+test('standalone parse and serialize work without plugin registration', async (t) => {
+  t.plan(4)
+
+  const { parse, serialize } = plugin
+  const parsed = parse('sid=abc; foo=bar')
+  t.assert.strictEqual(parsed.sid, 'abc')
+  t.assert.strictEqual(parsed.foo, 'bar')
+
+  const serialized = serialize('sid', 'abc', { path: '/' })
+  t.assert.ok(serialized.includes('sid=abc'))
+  t.assert.ok(serialized.includes('Path=/'))
+})
+

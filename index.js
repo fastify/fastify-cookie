@@ -6,19 +6,38 @@ const { Signer, sign, unsign } = require('./signer')
 
 // TODO: Use require(ESM) when Node.js 20 is nolonger supported or Fastify@6
 let cookieModule = null
+try {
+  cookieModule = require('cookie')
+} catch {
+  // Ignored if require(ESM) is unsupported synchronously
+}
+
 async function dynamicLoadCookie () {
   if (cookieModule == null) {
     cookieModule = await import('cookie')
   }
 }
 
+function getCookieModule () {
+  if (cookieModule == null) {
+    try {
+      cookieModule = require('cookie')
+    } catch {
+      throw new Error(
+        '@fastify/cookie: The `cookie` module has not been initialized. Please register the plugin with Fastify or use a Node.js runtime that supports synchronous module loading.'
+      )
+    }
+  }
+  return cookieModule
+}
+
 function serialize (name, value, options) {
   const { encode, ...cookieAttributes } = options || {}
-  return cookieModule.stringifySetCookie(Object.assign({ name, value }, cookieAttributes), { encode })
+  return getCookieModule().stringifySetCookie(Object.assign({ name, value }, cookieAttributes), { encode })
 }
 
 function parse (header, options) {
-  return cookieModule.parseCookie(header, options)
+  return getCookieModule().parseCookie(header, options)
 }
 
 const kReplySetCookies = Symbol('fastify.reply.setCookies')
