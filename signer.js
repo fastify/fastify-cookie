@@ -95,11 +95,13 @@ function _unsign (signedValue, secrets, algorithm) {
   }
 }
 
-Signer.prototype.sign = function (value) {
+// `request` is accepted so a subclass overriding either method can hand it to
+// `super`; the HMAC over the value does not depend on it.
+Signer.prototype.sign = function (value, request) {
   return _sign(value, this.signingKey, this.algorithm)
 }
 
-Signer.prototype.unsign = function (signedValue) {
+Signer.prototype.unsign = function (signedValue, request) {
   return _unsign(signedValue, this.secrets, this.algorithm)
 }
 
