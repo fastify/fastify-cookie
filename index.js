@@ -85,7 +85,12 @@ function fastifyCookieGetCookies (reply) {
 
   const result = {}
   for (const c of reply[kReplySetCookies].values()) {
-    result[c.name] = Object.assign({ value: c.value }, c.opts)
+    Object.defineProperty(result, c.name, {
+      value: Object.assign({ value: c.value }, c.opts),
+      enumerable: true,
+      configurable: true,
+      writable: true
+    })
   }
 
   return result

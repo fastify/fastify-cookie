@@ -1420,3 +1420,29 @@ test('reply.getCookie and reply.getCookies return cookies set on reply', async (
   t.assert.strictEqual(res.statusCode, 200)
   t.assert.strictEqual(res.body, 'done')
 })
+
+test('reply.getCookies defines special cookie names as own properties', async (t) => {
+  t.plan(4)
+
+  const fastify = Fastify()
+  fastify.register(plugin)
+
+  let cookies
+  fastify.get('/test', (req, reply) => {
+    reply.setCookie('__proto__', 'safe', { path: '/' })
+    cookies = reply.getCookies()
+    reply.send('done')
+  })
+
+  const res = await fastify.inject({
+    method: 'GET',
+    url: '/test'
+  })
+  t.assert.strictEqual(res.statusCode, 200)
+  t.assert.ok(Object.hasOwn(cookies, '__proto__'))
+  t.assert.strictEqual(Object.getPrototypeOf(cookies), Object.prototype)
+  t.assert.deepStrictEqual(
+    Object.getOwnPropertyDescriptor(cookies, '__proto__').value,
+    { value: 'safe', sameSite: 'lax', path: '/' }
+  )
+})
