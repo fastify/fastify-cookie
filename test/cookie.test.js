@@ -1444,3 +1444,19 @@ test('fastify.signCookie signs without a request context', async (t) => {
   t.assert.strictEqual(result.valid, true)
   t.assert.strictEqual(result.value, 'value')
 })
+
+test('unbound signing decorators work without a request context', async (t) => {
+  t.plan(4)
+
+  const fastify = Fastify()
+  const signStub = sinon.stub().returns('SIGNED-VALUE')
+  const unsignStub = sinon.stub().returns({ valid: true, renew: false, value: 'value' })
+  fastify.register(plugin, { secret: { sign: signStub, unsign: unsignStub } })
+  await fastify.ready()
+
+  const { signCookie, unsignCookie } = fastify
+  t.assert.doesNotThrow(() => signCookie('value'))
+  t.assert.doesNotThrow(() => unsignCookie('SIGNED-VALUE'))
+  t.assert.ok(signStub.calledOnceWithExactly('value', undefined))
+  t.assert.ok(unsignStub.calledOnceWithExactly('SIGNED-VALUE', undefined))
+})

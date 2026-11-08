@@ -185,6 +185,7 @@ async function plugin (fastify, options) {
   }
 
   function getRequestContext (context) {
+    if (!context) return undefined
     if (Object.hasOwn(context, 'request') && context.request) return context.request
     // Decorated on the instance and on the reply as well as on the request;
     // only the request carries a `raw` socket.
