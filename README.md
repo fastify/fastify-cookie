@@ -239,6 +239,23 @@ Following are _some_ of the precautions that should be taken to ensure the integ
 - Use `__Host-` [Cookie Prefix](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie#attributes) to avoid Cookie Tossing attacks.
 - It is important to [use HTTPS for your website/app](https://letsencrypt.org/) to avoid a bunch of other potential security issues like [MITM](https://en.wikipedia.org/wiki/Man-in-the-middle_attack) etc.
 
+#### Cross-site cookies in local development (localhost)
+
+Modern browsers require cookies configured with `sameSite: 'none'` to also have `secure: true`. Browsers treat `localhost` as a trustworthy, secure origin, so compliant browsers will store and send `Secure` cookies over plain `http://localhost`.
+
+When developing locally with an HTTP Fastify server (`http://localhost`) that receives cross-site requests from an HTTPS frontend (such as a remote sandbox, web container, or staging deployment):
+
+1. Explicitly set `{ sameSite: 'none', secure: true }` on the cookie. Avoid `secure: 'auto'` in this setup because `'auto'` checks whether the incoming request protocol is `https`, which evaluates to `false` on a plain HTTP dev server.
+2. If your browser enforces [Private Network Access (PNA)](https://developer.chrome.com/blog/private-network-access-update/), ensure preflight requests return the `Access-Control-Allow-Private-Network: true` response header:
+
+```js
+fastify.addHook('onSend', async (request, reply) => {
+  if (request.headers['access-control-request-private-network']) {
+    reply.header('Access-Control-Allow-Private-Network', 'true')
+  }
+})
+```
+
 ### Clearing
 
 The method `clearCookie(name, options)` is added to the `reply` object
