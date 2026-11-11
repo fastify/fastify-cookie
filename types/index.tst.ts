@@ -60,6 +60,11 @@ server.after((_err) => {
     const test = request.cookies.test
     expect(test).type.toBe<string | undefined>()
 
+    const replyTest = reply.cookies.test
+    expect(replyTest).type.toBe<string | undefined>()
+    expect(reply.cookies).type.toBe<{ [cookieName: string]: string | undefined }>()
+    expect(reply.cookies = {}).type.toRaiseError(2540)
+
     expect(reply.cookie).type.toBe<setCookieWrapper>()
     expect(reply.setCookie).type.toBe<setCookieWrapper>()
 

@@ -33,6 +33,73 @@ test('cookies get set correctly', async (t) => {
   t.assert.strictEqual(cookies[0].path, '/')
 })
 
+test('reply.cookies returns cookies set on the response', async (t) => {
+  t.plan(10)
+
+  const fastify = Fastify()
+  fastify.register(plugin, { secret: 'test-secret' })
+
+  let onResponseCookies
+  fastify.addHook('onResponse', async (_req, reply) => {
+    onResponseCookies = reply.cookies
+  })
+
+  let preSerializationCookies
+  fastify.addHook('preSerialization', async (_req, reply, payload) => {
+    preSerializationCookies = reply.cookies
+    return payload
+  })
+
+  fastify.get('/test-reply-cookies', (_req, reply) => {
+    t.assert.deepStrictEqual(reply.cookies, {})
+
+    reply.setCookie('foo', 'bar', { path: '/' })
+    t.assert.strictEqual(reply.cookies.foo, 'bar')
+
+    reply.setCookie('signed', 'secretVal', { signed: true })
+    t.assert.ok(reply.cookies.signed)
+    t.assert.notStrictEqual(reply.cookies.signed, 'secretVal')
+    t.assert.strictEqual(reply.unsignCookie(reply.cookies.signed).value, 'secretVal')
+
+    reply.setCookie('toClear', 'initialVal')
+    t.assert.strictEqual(reply.cookies.toClear, 'initialVal')
+    reply.clearCookie('toClear')
+    t.assert.strictEqual(reply.cookies.toClear, '')
+
+    reply.send({ status: 'ok' })
+  })
+
+  const res = await fastify.inject({
+    method: 'GET',
+    url: '/test-reply-cookies'
+  })
+
+  t.assert.strictEqual(res.statusCode, 200)
+  t.assert.strictEqual(preSerializationCookies.foo, 'bar')
+  t.assert.strictEqual(onResponseCookies.foo, 'bar')
+})
+
+test('reply.cookies works when hook option is set to false', async (t) => {
+  t.plan(3)
+
+  const fastify = Fastify()
+  fastify.register(plugin, { hook: false })
+
+  fastify.get('/test-no-hook', (_req, reply) => {
+    t.assert.deepStrictEqual(reply.cookies, {})
+    reply.setCookie('foo', 'bar')
+    t.assert.strictEqual(reply.cookies.foo, 'bar')
+    reply.send({ ok: true })
+  })
+
+  const res = await fastify.inject({
+    method: 'GET',
+    url: '/test-no-hook'
+  })
+
+  t.assert.strictEqual(res.statusCode, 200)
+})
+
 test('express cookie compatibility', async (t) => {
   t.plan(6)
 
