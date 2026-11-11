@@ -34,7 +34,7 @@ declare module 'fastify' {
     /**
      * Response cookies
      */
-    cookies: { [cookieName: string]: string | undefined };
+    readonly cookies: { [cookieName: string]: string | undefined };
   }
 
   interface SignerMethods {
